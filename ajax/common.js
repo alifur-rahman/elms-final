@@ -3,7 +3,8 @@
 // Prepares the project for future AJAX/API development.
 // ============================================================
 
-var API_BASE = 'ajax/';
+// Set to empty; callers pass the full relative path from the page.
+var API_BASE = '';
 
 function apiRequest(endpoint, method, data, onSuccess, onError) {
     var xhr = new XMLHttpRequest();

@@ -11,7 +11,7 @@ $sidebarItems = [
         ['id' => 'candidates',     'text' => 'Candidates',       'href' => 'candidates/list.php',           'badge' => 2],
         ['id' => 'screening',      'text' => 'Screening',        'href' => 'screening/list.php',            'badge' => 1],
         ['id' => 'interview',      'text' => 'Interview',        'href' => 'interview/list.php',            'badge' => 2],
-        ['id' => 'assessment',     'text' => 'Assessment',       'href' => 'assessment/list.html',          'badge' => 0],
+        ['id' => 'assessment',     'text' => 'Assessment',       'href' => 'assessment/list.php',           'badge' => 0],
         ['id' => 'offer_approval', 'text' => 'Offer Approval',   'href' => 'offer_approval/list.html',      'badge' => 1],
         ['id' => 'offer_letter',   'text' => 'Offer Letter',     'href' => 'recruitment/offer_letter/list.html', 'badge' => 1],
     ],

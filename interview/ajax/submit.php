@@ -58,9 +58,11 @@ try {
 
     $insertId = $pdo->lastInsertId();
 
-    // Update candidate status to Interview
-    $upd = $pdo->prepare("UPDATE candidates SET status = 'Interview' WHERE id = :id");
+    // Update candidate status to Interview (status_id = 3)
+    $upd = $pdo->prepare("UPDATE candidates SET status_id = 3 WHERE id = :id");
     $upd->execute([':id' => $candidate_id]);
+
+    addCandidateLog($pdo, $candidate_id, 'interview_scheduled', 'Shortlisted', 'Interview', 'Scheduled: ' . $type . ' with ' . $interviewer);
 
     $pdo->commit();
 

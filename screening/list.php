@@ -4,6 +4,12 @@ $pageTitle   = 'Screening';
 $activePage  = 'screening';
 $breadcrumb  = 'Home / Recruitment / Screening';
 $pageStyles  = '
+.tab-bar { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; }
+.tab-btn { padding: 10px 24px; font-size: 14px; font-weight: 600; background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; color: #64748b; transition: all .2s; }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-btn:hover { color: var(--primary); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
 .stat-card { background: #fff; border-radius: 8px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.08); display: flex; align-items: center; gap: 14px; }
 .stat-card .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
@@ -16,47 +22,54 @@ $pageStyles  = '
 .filter-bar .form-control { width: auto; min-width: 130px; }
 ';
 $pageScripts = '
-var screeningData = [];
+var upcomingData = [];
+var completeData = [];
 var editingScreeningId = null;
 
-function renderScreening() {
-    var tbody = document.getElementById("screeningTableBody");
+function switchTab(name) {
+    document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); });
+    document.querySelectorAll(".tab-content").forEach(function(c) { c.classList.remove("active"); });
+    document.getElementById("tabBtn" + name).classList.add("active");
+    document.getElementById("tab" + name).classList.add("active");
+    if (name === "Upcoming") renderUpcoming();
+    else renderComplete();
+}
+
+function renderUpcoming() {
+    var tbody = document.getElementById("upcomingTableBody");
     tbody.innerHTML = "";
-    var stats = { pending: 0, shortlisted: 0, rejected: 0 };
+    upcomingData.forEach(function(c) {
+        var name = c.first_name + " " + c.last_name;
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+            "<td><strong>" + name + "</strong></td>" +
+            "<td>" + (c.job_title || "N/A") + "</td>" +
+            "<td>" + formatDate(c.applied_at) + "</td>" +
+            "<td><span class=\"badge badge-pending\">Applied</span></td>" +
+            "<td><button class=\"btn btn-sm btn-primary\" onclick=\"window.openScreening(" + c.candidate_id + ",0)\">Screen Now</button></td>";
+        tbody.appendChild(tr);
+    });
+    document.getElementById("statPending").textContent = upcomingData.length;
+}
 
-    screeningData.forEach(function(row) {
-        var hasScreening = row.screening_id !== null && row.screening_id !== undefined;
+function renderComplete() {
+    var tbody = document.getElementById("completeTableBody");
+    tbody.innerHTML = "";
+    var stats = { shortlisted: 0, rejected: 0 };
+    completeData.forEach(function(row) {
         var name = row.first_name + " " + row.last_name;
-
-        if (row.candidate_status === "Applied") stats.pending++;
-        if (hasScreening && row.screening_result === "Shortlist") stats.shortlisted++;
-        if (hasScreening && row.screening_result === "Reject") stats.rejected++;
-
-        var statusHtml = "";
-        if (hasScreening) {
-            statusHtml = "Rating: " + row.rating + " | <span class=\"badge " + getBadgeClass(row.screening_result) + "\">" + row.screening_result + "</span>";
-        } else {
-            statusHtml = "<span class=\"badge badge-pending\">Pending</span>";
-        }
-
-        var actionHtml = "";
-        if (hasScreening) {
-            actionHtml = "<button class=\"btn btn-sm btn-warning\" onclick=\"window.openScreening(" + row.candidate_id + "," + row.screening_id + ")\">Edit Screening</button>";
-        } else {
-            actionHtml = "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScreening(" + row.candidate_id + ",0)\">Screen Now</button>";
-        }
-
+        if (row.screening_result === "Shortlist") stats.shortlisted++;
+        if (row.screening_result === "Reject") stats.rejected++;
         var tr = document.createElement("tr");
         tr.innerHTML =
             "<td><strong>" + name + "</strong></td>" +
             "<td>" + (row.job_title || "N/A") + "</td>" +
             "<td>" + formatDate(row.applied_at) + "</td>" +
-            "<td>" + statusHtml + "</td>" +
-            "<td>" + actionHtml + "</td>";
+            "<td>Rating: " + (row.rating || "-") + " | <span class=\"badge " + getBadgeClass(row.screening_result) + "\">" + (row.screening_result || "-") + "</span></td>" +
+            "<td>" + (row.screening_date ? formatDate(row.screening_date) : "-") + "</td>" +
+            "<td><button class=\"btn btn-sm btn-warning\" onclick=\"window.openScreening(" + row.candidate_id + "," + row.screening_id + ")\">Edit</button></td>";
         tbody.appendChild(tr);
     });
-
-    document.getElementById("statPending").textContent = stats.pending;
     document.getElementById("statShortlisted").textContent = stats.shortlisted;
     document.getElementById("statRejected").textContent = stats.rejected;
 }
@@ -67,8 +80,8 @@ window.openScreening = function(candidateId, screeningId) {
     editingScreeningId = screeningId || null;
 
     if (screeningId) {
-        for (var i = 0; i < screeningData.length; i++) {
-            var row = screeningData[i];
+        for (var i = 0; i < completeData.length; i++) {
+            var row = completeData[i];
             if (row.screening_id === screeningId) {
                 document.getElementById("scRating").value = row.rating;
                 document.getElementById("scCommunication").value = row.communication_score;
@@ -144,19 +157,6 @@ window.ajaxSaveScreening = function() {
     });
 };
 
-function filterByDept() {
-    var deptVal = document.getElementById("deptFilter").value.toLowerCase();
-    var rows = document.querySelectorAll("#screeningTable tbody tr");
-    for (var i = 0; i < rows.length; i++) {
-        var jobCell = rows[i].querySelectorAll("td")[1];
-        if (!deptVal || (jobCell && jobCell.textContent.toLowerCase().indexOf(deptVal) !== -1)) {
-            rows[i].style.display = "";
-        } else {
-            rows[i].style.display = "none";
-        }
-    }
-}
-
 function loadDeptFilter() {
     var sel = document.getElementById("deptFilter");
     if (!sel || sel.options.length > 1) return;
@@ -171,14 +171,16 @@ function loadDeptFilter() {
 }
 
 function renderPage() {
-    apiGet("ajax/list.php", null, function(res) {
-        if (res.success && res.data) {
-            screeningData = res.data;
-        }
-        renderScreening();
-    }, function() {
-        renderScreening();
-    });
+    apiGet("ajax/list_upcoming.php", null, function(res) {
+        if (res.success && res.data) upcomingData = res.data;
+        else upcomingData = [];
+        renderUpcoming();
+    }, function() { upcomingData = []; renderUpcoming(); });
+    apiGet("ajax/list_complete.php", null, function(res) {
+        if (res.success && res.data) completeData = res.data;
+        else completeData = [];
+        renderComplete();
+    }, function() { completeData = []; renderComplete(); });
 }
 
 loadDeptFilter();
@@ -202,33 +204,68 @@ ob_start();
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h2>Screening List</h2>
-        <div class="filter-bar">
-            <div class="search-box">
-                <span class="search-icon">&#x1F50D;</span>
-                <input type="text" id="searchInput" placeholder="Search candidate or job..." onkeyup="filterTable('searchInput','screeningTable')">
+<div class="tab-bar">
+    <button class="tab-btn active" id="tabBtnUpcoming" onclick="switchTab('Upcoming')">&#x1F4C5; Upcoming</button>
+    <button class="tab-btn" id="tabBtnComplete" onclick="switchTab('Complete')">&#x2705; Complete</button>
+</div>
+
+<div class="tab-content active" id="tabUpcoming">
+    <div class="card">
+        <div class="card-header">
+            <h2>Upcoming Screenings</h2>
+            <div class="filter-bar">
+                <div class="search-box">
+                    <span class="search-icon">&#x1F50D;</span>
+                    <input type="text" id="searchUpcoming" placeholder="Search candidate..." onkeyup="filterTable('searchUpcoming','upcomingTable')">
+                </div>
             </div>
-            <select class="form-control" id="deptFilter" onchange="filterByDept()">
-                <option value="">All Departments</option>
-            </select>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table id="upcomingTable">
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Job</th>
+                            <th>Applied Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="upcomingTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
-    <div class="card-body">
-        <div class="table-container">
-            <table id="screeningTable">
-                <thead>
-                    <tr>
-                        <th>Candidate</th>
-                        <th>Job</th>
-                        <th>Applied Date</th>
-                        <th>Screening Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="screeningTableBody"></tbody>
-            </table>
+</div>
+
+<div class="tab-content" id="tabComplete">
+    <div class="card">
+        <div class="card-header">
+            <h2>Completed Screenings</h2>
+            <div class="filter-bar">
+                <div class="search-box">
+                    <span class="search-icon">&#x1F50D;</span>
+                    <input type="text" id="searchComplete" placeholder="Search candidate..." onkeyup="filterTable('searchComplete','completeTable')">
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table id="completeTable">
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Job</th>
+                            <th>Applied Date</th>
+                            <th>Screening Result</th>
+                            <th>Screening Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completeTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

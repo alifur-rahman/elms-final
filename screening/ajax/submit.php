@@ -67,14 +67,29 @@ try {
 
     $insertId = $pdo->lastInsertId();
 
-    // Update candidate status based on screening result
-    $candidateStatus = match ($result) {
+    // Map result to status_id
+    $targetStatusId = match ($result) {
+        'Shortlist' => 2,
+        'Reject'    => 7,
+        'Hold'      => 8,
+        default     => 1,
+    };
+    $targetStatusName = match ($result) {
         'Shortlist' => 'Shortlisted',
         'Reject'    => 'Rejected',
+        'Hold'      => 'Hold',
         default     => 'Applied',
     };
-    $upd = $pdo->prepare("UPDATE candidates SET status = :status WHERE id = :id");
-    $upd->execute([':status' => $candidateStatus, ':id' => $candidate_id]);
+
+    // Get current candidate status code
+    $cs = $pdo->prepare("SELECT cs.code FROM candidates cc LEFT JOIN candidate_statuses cs ON cs.id = cc.status_id WHERE cc.id = :id");
+    $cs->execute([':id' => $candidate_id]);
+    $currentStatus = $cs->fetchColumn() ?: 'Applied';
+
+    $upd = $pdo->prepare("UPDATE candidates SET status_id = :status_id WHERE id = :id");
+    $upd->execute([':status_id' => $targetStatusId, ':id' => $candidate_id]);
+
+    addCandidateLog($pdo, $candidate_id, 'screening_' . strtolower($result), $currentStatus, $targetStatusName, $remarks ?: null);
 
     $pdo->commit();
 

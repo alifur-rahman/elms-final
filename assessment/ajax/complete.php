@@ -22,7 +22,12 @@ try {
         exit;
     }
 
-    $check = $pdo->prepare("SELECT id, first_name, last_name FROM candidates WHERE id = :id");
+    $check = $pdo->prepare("
+        SELECT c.id, c.first_name, c.last_name, cs.code AS status_code
+        FROM candidates c
+        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
+        WHERE c.id = :id
+    ");
     $check->execute([':id' => $id]);
     $candidate = $check->fetch();
 
@@ -32,8 +37,14 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("UPDATE candidates SET status = 'Offered' WHERE id = :id");
+    $pdo->beginTransaction();
+
+    $stmt = $pdo->prepare("UPDATE candidates SET status_id = 5 WHERE id = :id");
     $stmt->execute([':id' => $id]);
+
+    addCandidateLog($pdo, $id, 'assessment_completed', $candidate['status_code'], 'Offered', 'Assessment completed');
+
+    $pdo->commit();
 
     $name = $candidate['first_name'] . ' ' . $candidate['last_name'];
 
@@ -43,6 +54,7 @@ try {
     ]);
 
 } catch (Exception $e) {
+    if ($pdo->inTransaction()) $pdo->rollBack();
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
 }

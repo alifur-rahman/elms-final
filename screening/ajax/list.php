@@ -20,6 +20,7 @@ try {
         LEFT JOIN screenings s ON s.candidate_id = c.id
         LEFT JOIN requisitions r ON r.id = c.job_id
         LEFT JOIN departments d ON d.id = r.dept_id
+        WHERE c.status = 'Applied'
         ORDER BY c.created_at DESC
     ");
 

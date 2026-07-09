@@ -11,6 +11,8 @@ $pageStyles  = '
 .stat-card .stat-icon.green { background: #e6f4ea; color: var(--success); }
 .stat-card .stat-icon.yellow { background: #fef7e0; color: var(--warning); }
 .stat-card .stat-icon.red { background: #fce8e6; color: var(--danger); }
+.stat-card .stat-icon.purple { background: #f3e8ff; color: #7c3aed; }
+.stat-card .stat-icon.orange { background: #fff3e0; color: #f57c00; }
 .stat-card .stat-info h3 { font-size: 22px; font-weight: 700; line-height: 1.2; }
 .stat-card .stat-info p { font-size: 12px; color: var(--gray-500); }
 .filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -34,9 +36,10 @@ function resetCandidateForm() {
 function renderCandidates() {
     var tbody = document.getElementById("candidateTableBody");
     tbody.innerHTML = "";
-    var stats = { Applied: 0, Shortlisted: 0, Interview: 0, Offered: 0, Rejected: 0, Joined: 0 };
+    var counts = {};
     candidatesData.forEach(function(c) {
-        if (stats[c.status] !== undefined) stats[c.status]++;
+        var key = c.status_name || "Unknown";
+        counts[key] = (counts[key] || 0) + 1;
         var row = document.createElement("tr");
         row.innerHTML =
             "<td>" + (c.code || "-") + "</td>" +
@@ -45,32 +48,25 @@ function renderCandidates() {
             "<td>" + (c.phone || "-") + "</td>" +
             "<td><a href=\"../recruitment/list.php?job_id=" + c.job_id + "\" style=\"color:var(--primary);text-decoration:none;font-weight:500\">" + (c.job_title || "N/A") + "</a></td>" +
             "<td>" + formatDate(c.applied_at) + "</td>" +
-            "<td><span class=\"badge " + getBadgeClass(c.status) + "\">" + c.status + "</span></td>" +
+            "<td><span class=\"badge " + getBadgeClass(c.status_name) + "\">" + (c.status_name || "Unknown") + "</span></td>" +
             "<td>" +
                 "<div class=\"btn-group\">" +
                     "<button class=\"btn btn-sm btn-outline\" onclick=\"window.editCandidate(" + c.id + ")\" style=\"margin-right:4px\">Edit</button>" +
                     "<button class=\"btn btn-sm btn-primary\" onclick=\"window.viewCandidate(" + c.id + ")\" style=\"margin-right:4px\">View</button>" +
                      "<button class=\"btn btn-sm btn-danger\" onclick=\"window.deleteCandidate(" + c.id + ")\" style=\"margin-left:4px\">&#x1F5D1;</button>" +
-                    "<select class=\"form-control\" style=\"width:auto;min-width:90px;padding:4px 8px;font-size:12px;\" onchange=\"window.changeStatus(" + c.id + ",this.value)\">" +
-                        "<option value=\"\">Status</option>" +
-                        "<option value=\"Applied\">Applied</option>" +
-                        "<option value=\"Shortlisted\">Shortlisted</option>" +
-                        "<option value=\"Interview\">Interview</option>" +
-                        "<option value=\"Offered\">Offered</option>" +
-                        "<option value=\"Rejected\">Rejected</option>" +
-                        "<option value=\"Joined\">Joined</option>" +
-                    "</select>" +
-                   
                 "</div>" +
             "</td>";
         tbody.appendChild(row);
     });
-    document.getElementById("statApplied").textContent = stats.Applied;
-    document.getElementById("statShortlisted").textContent = stats.Shortlisted;
-    document.getElementById("statInterviewed").textContent = stats.Interview;
-    document.getElementById("statOffered").textContent = stats.Offered;
-    document.getElementById("statRejected").textContent = stats.Rejected;
-    document.getElementById("statJoined").textContent = stats.Joined;
+
+    var statsHtml = "";
+    var iconMap = { Applied: "blue", Shortlisted: "green", Interview: "yellow", Selected: "purple", Offered: "orange", Joined: "green", Rejected: "red", Hold: "yellow" };
+    for (var key in counts) {
+        var icon = iconMap[key] || "blue";
+        statsHtml += "<div class=\"stat-card\"><div class=\"stat-icon " + icon + "\">&#x1F4CB;</div><div class=\"stat-info\"><h3>" + counts[key] + "</h3><p>" + key + "</p></div></div>";
+    }
+    if (!statsHtml) statsHtml = "<div class=\"stat-card\"><div class=\"stat-icon blue\">&#x1F4CB;</div><div class=\"stat-info\"><h3>0</h3><p>No Candidates</p></div></div>";
+    document.getElementById("statsGrid").innerHTML = statsHtml;
 }
 
 window.viewCandidate = function(id) {
@@ -90,7 +86,7 @@ window.viewCandidate = function(id) {
         { label: "Department", val: c.dept_name || "N/A" },
         { label: "Current Salary", val: c.current_salary ? formatCurrency(c.current_salary, "BDT ") : "-" },
         { label: "Expected Salary", val: c.expected_salary ? formatCurrency(c.expected_salary, "BDT ") : "-" },
-        { label: "Status", val: "<span class=\"badge " + getBadgeClass(c.status) + "\">" + c.status + "</span>" },
+        { label: "Status", val: "<span class=\"badge " + getBadgeClass(c.status_name) + "\">" + (c.status_name || "Unknown") + "</span>" },
         { label: "Applied At", val: c.applied_at ? formatDateTime(c.applied_at) : "-" },
     ];
     var html = "";
@@ -121,7 +117,6 @@ window.editCandidate = function(id) {
     document.getElementById("acPermanentAddress").value = c.permanent_address;
     document.getElementById("acCurrentSalary").value = c.current_salary;
     document.getElementById("acExpectedSalary").value = c.expected_salary;
-    document.getElementById("acStatus").value = c.status;
     document.getElementById("candModalTitle").innerHTML = "&#x270F; Edit Candidate";
     document.getElementById("candSubmitBtn").innerHTML = "&#x2728; Update Candidate";
     openModal("addCandidateModal");
@@ -135,25 +130,6 @@ window.deleteCandidate = function(id) {
     }, function(err, status) {
         var msg = (typeof err === "object" && err.message) ? err.message : "Delete failed";
         showAlert(msg, "error");
-    });
-};
-
-window.changeStatus = function(id, newStatus) {
-    if (!newStatus) return;
-    var c = null;
-    for (var i = 0; i < candidatesData.length; i++) { if (candidatesData[i].id === id) { c = candidatesData[i]; break; } }
-    if (!c) return;
-    apiPost("ajax/update.php", {
-        id: id, job_id: c.job_id, first_name: c.first_name, last_name: c.last_name,
-        email: c.email, phone: c.phone, nid: c.nid, blood_group: c.blood_group,
-        dob: c.dob, gender: c.gender, present_address: c.present_address,
-        permanent_address: c.permanent_address, current_salary: c.current_salary,
-        expected_salary: c.expected_salary, status: newStatus
-    }, function(res) {
-        showAlert("Status updated to " + newStatus, "success");
-        renderPage();
-    }, function(err) {
-        showAlert("Status update failed", "error");
     });
 };
 
@@ -171,14 +147,11 @@ window.ajaxSaveCandidate = function() {
     var permanentAddress = document.getElementById("acPermanentAddress").value.trim();
     var currentSalary = parseFloat(document.getElementById("acCurrentSalary").value) || 0;
     var expectedSalary = parseFloat(document.getElementById("acExpectedSalary").value) || 0;
-    var status = document.getElementById("acStatus").value;
-
     if (!jobId) { showAlert("Please select a job", "error"); return; }
     if (!firstName) { showAlert("First name is required", "error"); return; }
     if (!lastName) { showAlert("Last name is required", "error"); return; }
     if (!email) { showAlert("Email is required", "error"); return; }
     if (email.indexOf("@") === -1 || email.indexOf(".") === -1) { showAlert("Enter a valid email", "error"); return; }
-    if (!status) { showAlert("Status is required", "error"); return; }
 
     var btn = document.getElementById("candSubmitBtn");
     var origText = btn.innerHTML;
@@ -190,7 +163,7 @@ window.ajaxSaveCandidate = function() {
         email: email, phone: phone, nid: nid, blood_group: bloodGroup,
         dob: dob, gender: gender, present_address: presentAddress,
         permanent_address: permanentAddress, current_salary: currentSalary,
-        expected_salary: expectedSalary, status: status
+        expected_salary: expectedSalary
     };
 
     var isEdit = editingCandidateId !== null;
@@ -273,27 +246,7 @@ ob_start();
 <div class="stats-grid" id="statsGrid">
     <div class="stat-card">
         <div class="stat-icon blue">&#x1F4CB;</div>
-        <div class="stat-info"><h3 id="statApplied">0</h3><p>Total Applied</p></div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon green">&#x2B50;</div>
-        <div class="stat-info"><h3 id="statShortlisted">0</h3><p>Shortlisted</p></div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon blue">&#x1F91D;</div>
-        <div class="stat-info"><h3 id="statInterviewed">0</h3><p>Interviewed</p></div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon yellow">&#x1F4C4;</div>
-        <div class="stat-info"><h3 id="statOffered">0</h3><p>Offered</p></div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon red">&#x2715;</div>
-        <div class="stat-info"><h3 id="statRejected">0</h3><p>Rejected</p></div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon green">&#x2705;</div>
-        <div class="stat-info"><h3 id="statJoined">0</h3><p>Joined</p></div>
+        <div class="stat-info"><h3>0</h3><p>Loading...</p></div>
     </div>
 </div>
 
@@ -301,15 +254,7 @@ ob_start();
     <div class="card-header">
         <h2>All Candidates</h2>
         <div class="filter-bar">
-            <select class="form-control" id="statusFilter" onchange="filterTable('statusFilter','candidateTable',6)">
-                <option value="">All Status</option>
-                <option value="Applied">Applied</option>
-                <option value="Shortlisted">Shortlisted</option>
-                <option value="Interview">Interview</option>
-                <option value="Offered">Offered</option>
-                <option value="Rejected">Rejected</option>
-                <option value="Joined">Joined</option>
-            </select>
+
             <select class="form-control" id="deptFilter" onchange="filterByDept()">
                 <option value="">All Departments</option>
             </select>
@@ -439,17 +384,6 @@ ob_start();
                         <label>Expected Salary</label>
                         <input type="number" class="form-control" id="acExpectedSalary" min="0" step="0.01">
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Status <span class="required">*</span></label>
-                    <select class="form-control" id="acStatus" required>
-                        <option value="Applied">Applied</option>
-                        <option value="Shortlisted">Shortlisted</option>
-                        <option value="Interview">Interview</option>
-                        <option value="Offered">Offered</option>
-                        <option value="Rejected">Rejected</option>
-                        <option value="Joined">Joined</option>
-                    </select>
                 </div>
             </form>
         </div>

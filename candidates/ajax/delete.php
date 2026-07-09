@@ -33,10 +33,12 @@ try {
         exit;
     }
 
+    $name = $candidate['first_name'] . ' ' . $candidate['last_name'];
+
+    addCandidateLog($pdo, $id, 'candidate_deleted', null, null, 'Candidate deleted');
+
     $stmt = $pdo->prepare("DELETE FROM candidates WHERE id = :id");
     $stmt->execute([':id' => $id]);
-
-    $name = $candidate['first_name'] . ' ' . $candidate['last_name'];
 
     echo json_encode([
         'success' => true,

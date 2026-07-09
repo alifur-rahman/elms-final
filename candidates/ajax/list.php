@@ -1,14 +1,14 @@
 <?php
 header('Content-Type: application/json');
-
 require_once __DIR__ . '/../../includes/config.php';
 
 try {
     $pdo = getDB();
 
     $stmt = $pdo->query("
-        SELECT c.*, r.title AS job_title, d.name AS dept_name
+        SELECT c.*, cs.name AS status_name, r.title AS job_title, d.name AS dept_name
         FROM candidates c
+        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
         LEFT JOIN requisitions r ON r.id = c.job_id
         LEFT JOIN departments d ON d.id = r.dept_id
         ORDER BY c.created_at DESC
@@ -34,7 +34,8 @@ try {
             'permanent_address' => $r['permanent_address'] ?? '',
             'current_salary'    => (float) $r['current_salary'],
             'expected_salary'   => (float) $r['expected_salary'],
-            'status'            => $r['status'],
+            'status_id'         => (int) $r['status_id'],
+            'status_name'       => $r['status_name'],
             'applied_at'        => $r['applied_at'],
             'created_at'        => $r['created_at'],
             'job_title'         => $r['job_title'] ?? 'N/A',

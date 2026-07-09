@@ -32,13 +32,13 @@ try {
         exit;
     }
 
-    // Fields for feedback update
+    $candidate_id = (int) $existing['candidate_id'];
+
     $rating      = $body['rating'] ?? null;
     $decision    = trim($body['decision'] ?? '');
     $feedback    = trim($body['feedback'] ?? '');
     $status      = trim($body['status'] ?? 'Completed');
 
-    // Fields for reschedule (optional)
     $date        = array_key_exists('date', $body) ? trim($body['date']) : null;
     $type        = array_key_exists('type', $body) ? trim($body['type']) : null;
     $interviewer = array_key_exists('interviewer', $body) ? trim($body['interviewer']) : null;
@@ -72,13 +72,26 @@ try {
 
     // Update candidate status based on decision
     if ($status === 'Completed' && $decision !== '') {
-        $candidateStatus = match ($decision) {
-            'Pass' => 'Shortlisted',
-            'Fail' => 'Rejected',
-            default => 'Applied',
+        $targetStatusId = match ($decision) {
+            'Pass' => 4,
+            'Fail' => 7,
+            default => 3,
         };
-        $upd = $pdo->prepare("UPDATE candidates SET status = :status WHERE id = :id");
-        $upd->execute([':status' => $candidateStatus, ':id' => $existing['candidate_id']]);
+        $targetStatusName = match ($decision) {
+            'Pass' => 'Selected',
+            'Fail' => 'Rejected',
+            default => 'Interview',
+        };
+
+        // Get current status code for log
+        $cs = $pdo->prepare("SELECT cs.code FROM candidates cc LEFT JOIN candidate_statuses cs ON cs.id = cc.status_id WHERE cc.id = :id");
+        $cs->execute([':id' => $candidate_id]);
+        $currentStatus = $cs->fetchColumn() ?: 'Interview';
+
+        $upd = $pdo->prepare("UPDATE candidates SET status_id = :status_id WHERE id = :id");
+        $upd->execute([':status_id' => $targetStatusId, ':id' => $candidate_id]);
+
+        addCandidateLog($pdo, $candidate_id, 'interview_' . strtolower($decision), $currentStatus, $targetStatusName, $feedback ?: null);
     }
 
     $pdo->commit();

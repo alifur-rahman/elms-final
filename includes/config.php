@@ -33,3 +33,6 @@ function getDB(): PDO {
     }
     return $pdo;
 }
+
+// Load global helper functions
+require_once __DIR__ . '/functions.php';

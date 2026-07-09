@@ -25,3 +25,8 @@ function formatCurrency($amount, $symbol = '$') {
     if (!$amount) return '-';
     return $symbol . number_format((float)$amount, 2);
 }
+
+function addCandidateLog(PDO $pdo, int $candidateId, string $action, ?string $fromStatus = null, ?string $toStatus = null, ?string $notes = null): void {
+    $stmt = $pdo->prepare("INSERT INTO candidate_logs (candidate_id, action, from_status, to_status, notes, created_by) VALUES (?, ?, ?, ?, ?, 'Admin User')");
+    $stmt->execute([$candidateId, $action, $fromStatus, $toStatus, $notes]);
+}

@@ -28,14 +28,13 @@ try {
     $permanent_address = trim($body['permanent_address'] ?? '');
     $current_salary = (float) ($body['current_salary'] ?? 0);
     $expected_salary = (float) ($body['expected_salary'] ?? 0);
-    $status         = trim($body['status'] ?? 'Applied');
+    $status_id      = 1; // Always Applied
 
     $errors = [];
     if ($job_id <= 0) $errors[] = 'Job is required';
     if ($first_name === '') $errors[] = 'First name is required';
     if ($last_name === '') $errors[] = 'Last name is required';
     if ($email === '') $errors[] = 'Email is required';
-    if ($status === '') $errors[] = 'Status is required';
 
     if (!empty($errors)) {
         http_response_code(422);
@@ -43,21 +42,22 @@ try {
         exit;
     }
 
-    // Auto-generate candidate code
     $stmt = $pdo->query("SELECT MAX(id) AS max_id FROM candidates");
     $maxRow = $stmt->fetch();
     $nextId = ($maxRow['max_id'] ?? 0) + 1;
     $code = 'CAND-' . date('Y') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
 
+    $pdo->beginTransaction();
+
     $stmt = $pdo->prepare("
         INSERT INTO candidates
             (job_id, code, first_name, last_name, email, phone, nid, blood_group,
              dob, gender, present_address, permanent_address,
-             current_salary, expected_salary, status)
+             current_salary, expected_salary, status_id)
         VALUES
             (:job_id, :code, :first_name, :last_name, :email, :phone, :nid, :blood_group,
              :dob, :gender, :present_address, :permanent_address,
-             :current_salary, :expected_salary, :status)
+             :current_salary, :expected_salary, :status_id)
     ");
 
     $stmt->execute([
@@ -75,10 +75,14 @@ try {
         ':permanent_address' => $permanent_address ?: null,
         ':current_salary'   => $current_salary ?: 0,
         ':expected_salary'  => $expected_salary ?: 0,
-        ':status'           => $status,
+        ':status_id'        => $status_id,
     ]);
 
     $insertId = $pdo->lastInsertId();
+
+    addCandidateLog($pdo, $insertId, 'candidate_created', null, 'Applied', 'Candidate registered');
+
+    $pdo->commit();
 
     echo json_encode([
         'success' => true,
@@ -87,6 +91,7 @@ try {
     ]);
 
 } catch (Exception $e) {
+    if ($pdo->inTransaction()) $pdo->rollBack();
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
 }

@@ -23,9 +23,10 @@ try {
         exit;
     }
 
-    $check = $pdo->prepare("SELECT id FROM candidates WHERE id = :id");
+    $check = $pdo->prepare("SELECT id, first_name, last_name FROM candidates WHERE id = :id");
     $check->execute([':id' => $id]);
-    if (!$check->fetch()) {
+    $candidate = $check->fetch();
+    if (!$candidate) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Candidate not found']);
         exit;
@@ -44,14 +45,12 @@ try {
     $permanent_address = trim($body['permanent_address'] ?? '');
     $current_salary = (float) ($body['current_salary'] ?? 0);
     $expected_salary = (float) ($body['expected_salary'] ?? 0);
-    $status         = trim($body['status'] ?? 'Applied');
 
     $errors = [];
     if ($job_id <= 0) $errors[] = 'Job is required';
     if ($first_name === '') $errors[] = 'First name is required';
     if ($last_name === '') $errors[] = 'Last name is required';
     if ($email === '') $errors[] = 'Email is required';
-    if ($status === '') $errors[] = 'Status is required';
 
     if (!empty($errors)) {
         http_response_code(422);
@@ -65,7 +64,7 @@ try {
             email = :email, phone = :phone, nid = :nid, blood_group = :blood_group,
             dob = :dob, gender = :gender, present_address = :present_address,
             permanent_address = :permanent_address, current_salary = :current_salary,
-            expected_salary = :expected_salary, status = :status
+            expected_salary = :expected_salary
         WHERE id = :id
     ");
 
@@ -84,8 +83,9 @@ try {
         ':permanent_address' => $permanent_address ?: null,
         ':current_salary'   => $current_salary ?: 0,
         ':expected_salary'  => $expected_salary ?: 0,
-        ':status'           => $status,
     ]);
+
+    addCandidateLog($pdo, $id, 'candidate_updated', null, null, 'Profile updated');
 
     echo json_encode([
         'success' => true,

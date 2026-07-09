@@ -1,18 +1,17 @@
 <?php
 header('Content-Type: application/json');
-
 require_once __DIR__ . '/../../includes/config.php';
 
 try {
     $pdo = getDB();
 
-    // Return candidates eligible for interview scheduling
     $stmt = $pdo->query("
-        SELECT c.id, c.first_name, c.last_name, c.job_id, c.status,
-               r.title AS job_title
+        SELECT c.id, c.first_name, c.last_name, c.job_id, c.status_id,
+               cs.name AS status_name, r.title AS job_title
         FROM candidates c
+        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
         LEFT JOIN requisitions r ON r.id = c.job_id
-        WHERE c.status IN ('Shortlisted', 'Interview')
+        WHERE c.status_id = 2
         ORDER BY c.first_name ASC
     ");
 
@@ -26,7 +25,8 @@ try {
             'last_name'   => $r['last_name'],
             'job_id'      => (int) $r['job_id'],
             'job_title'   => $r['job_title'] ?? 'N/A',
-            'status'      => $r['status'],
+            'status_id'   => (int) $r['status_id'],
+            'status_name' => $r['status_name'],
         ];
     }
 

@@ -28,7 +28,7 @@ function renderAssessments() {
         stats.count++;
         if (c.avg_rating) stats.totalScore += c.avg_rating;
 
-        var isPending = (c.candidate_status !== "Offered" && c.candidate_status !== "Joined");
+        var isPending = (c.candidate_status === "Selected");
         if (isPending) stats.pending++;
         else stats.completed++;
 

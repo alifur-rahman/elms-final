@@ -1,6 +1,5 @@
 <?php
 header('Content-Type: application/json');
-
 require_once __DIR__ . '/../../includes/config.php';
 
 try {
@@ -9,16 +8,17 @@ try {
     $stmt = $pdo->query("
         SELECT
             c.id AS candidate_id, c.first_name, c.last_name, c.email, c.phone,
-            c.job_id, c.status AS candidate_status, c.applied_at,
+            c.job_id, c.status_id, cs.name AS candidate_status, c.applied_at,
             r.title AS job_title,
             COUNT(i.id) AS interview_count,
             ROUND(AVG(CASE WHEN i.status = 'Completed' AND i.rating IS NOT NULL THEN i.rating END), 1) AS avg_rating,
             MAX(CASE WHEN i.decision = 'Pass' THEN 1 ELSE 0 END) AS has_pass_interview
         FROM candidates c
+        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
         LEFT JOIN requisitions r ON r.id = c.job_id
         LEFT JOIN interviews i ON i.candidate_id = c.id
         GROUP BY c.id
-        HAVING has_pass_interview = 1 OR c.status IN ('Interview', 'Offered', 'Joined')
+        HAVING has_pass_interview = 1 OR c.status_id IN (4, 5, 6)
         ORDER BY c.created_at DESC
     ");
 

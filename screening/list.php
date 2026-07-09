@@ -20,25 +20,109 @@ $pageStyles  = '
 .stat-card .stat-info p { font-size: 12px; color: var(--gray-500); }
 .filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .filter-bar .form-control { width: auto; min-width: 130px; }
+.pagination-bar { display:flex; align-items:center; justify-content:space-between; margin-top:16px; flex-wrap:wrap; gap:10px; }
+.pagination-bar .page-info { font-size:13px; color:var(--gray-500); }
+.pagination-bar .page-btns { display:flex; gap:4px; align-items:center; }
+.pagination-bar .page-btn { min-width:32px; height:32px; padding:0 10px; border:1px solid var(--gray-200); border-radius:6px; background:#fff; font-size:13px; cursor:pointer; color:var(--gray-700); transition:var(--transition); font-family:inherit; }
+.pagination-bar .page-btn:hover { border-color:var(--primary); color:var(--primary); }
+.pagination-bar .page-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+.pagination-bar .page-btn:disabled { opacity:.4; cursor:default; }
+.pagination-bar .per-page { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-500); }
+.pagination-bar .per-page select { padding:4px 8px; border:1px solid var(--gray-200); border-radius:4px; font-size:13px; font-family:inherit; }
 ';
 $pageScripts = '
 var upcomingData = [];
 var completeData = [];
 var editingScreeningId = null;
+var currentPage = 1;
+var perPage = 10;
 
 function switchTab(name) {
     document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); });
     document.querySelectorAll(".tab-content").forEach(function(c) { c.classList.remove("active"); });
     document.getElementById("tabBtn" + name).classList.add("active");
     document.getElementById("tab" + name).classList.add("active");
+    currentPage = 1;
     if (name === "Upcoming") renderUpcoming();
     else renderComplete();
 }
 
+function getFilteredUpcoming() {
+    var q = document.getElementById("searchUpcoming").value.trim().toLowerCase();
+    return upcomingData.filter(function(c) {
+        var name = (c.first_name + " " + c.last_name + " " + (c.job_title || "")).toLowerCase();
+        return !q || name.indexOf(q) !== -1;
+    });
+}
+
+function getFilteredComplete() {
+    var q = document.getElementById("searchComplete").value.trim().toLowerCase();
+    return completeData.filter(function(row) {
+        var name = (row.first_name + " " + row.last_name + " " + (row.job_title || "")).toLowerCase();
+        return !q || name.indexOf(q) !== -1;
+    });
+}
+
+function renderPaginationBar(containerId, total, totalPages) {
+    var html = "";
+    html += "<div class=\"page-info\">Showing page " + currentPage + " of " + totalPages + " (" + total + " total)</div>";
+    html += "<div class=\"page-btns\">";
+    html += "<button class=\"page-btn\" onclick=\"goToPage(1)\" " + (currentPage <= 1 ? "disabled" : "") + ">&#xAB;</button>";
+    html += "<button class=\"page-btn\" onclick=\"goToPage(" + (currentPage - 1) + ")\" " + (currentPage <= 1 ? "disabled" : "") + ">&#x2039;</button>";
+    var start = Math.max(1, currentPage - 2);
+    var end = Math.min(totalPages, currentPage + 2);
+    for (var p = start; p <= end; p++) {
+        html += "<button class=\"page-btn" + (p === currentPage ? " active" : "") + "\" onclick=\"goToPage(" + p + ")\">" + p + "</button>";
+    }
+    html += "<button class=\"page-btn\" onclick=\"goToPage(" + (currentPage + 1) + ")\" " + (currentPage >= totalPages ? "disabled" : "") + ">&#x203A;</button>";
+    html += "<button class=\"page-btn\" onclick=\"goToPage(" + totalPages + ")\" " + (currentPage >= totalPages ? "disabled" : "") + ">&#xBB;</button>";
+    html += "</div>";
+    html += "<div class=\"per-page\">Rows: <select onchange=\"changePerPage(this.value)\">";
+    [10, 20, 50, 100].forEach(function(n) {
+        html += "<option value=\"" + n + "\"" + (n === perPage ? " selected" : "") + ">" + n + "</option>";
+    });
+    html += "</select></div>";
+    document.getElementById(containerId).innerHTML = html;
+}
+
+function goToPage(p) {
+    var filtered = document.getElementById("tabUpcoming").classList.contains("active") ? getFilteredUpcoming() : getFilteredComplete();
+    var totalPages = Math.ceil(filtered.length / perPage) || 1;
+    if (p < 1) p = 1;
+    if (p > totalPages) p = totalPages;
+    if (p === currentPage) return;
+    currentPage = p;
+    if (document.getElementById("tabUpcoming").classList.contains("active")) renderUpcoming();
+    else renderComplete();
+}
+
+function changePerPage(n) {
+    perPage = parseInt(n);
+    currentPage = 1;
+    if (document.getElementById("tabUpcoming").classList.contains("active")) renderUpcoming();
+    else renderComplete();
+}
+
+function applyUpcomingFilter() {
+    currentPage = 1;
+    renderUpcoming();
+}
+
+function applyCompleteFilter() {
+    currentPage = 1;
+    renderComplete();
+}
+
 function renderUpcoming() {
+    var filtered = getFilteredUpcoming();
+    var totalPages = Math.ceil(filtered.length / perPage) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    var start = (currentPage - 1) * perPage;
+    var pageData = filtered.slice(start, start + perPage);
+
     var tbody = document.getElementById("upcomingTableBody");
     tbody.innerHTML = "";
-    upcomingData.forEach(function(c) {
+    pageData.forEach(function(c) {
         var name = c.first_name + " " + c.last_name;
         var tr = document.createElement("tr");
         tr.innerHTML =
@@ -49,17 +133,29 @@ function renderUpcoming() {
             "<td><button class=\"btn btn-sm btn-primary\" onclick=\"window.openScreening(" + c.candidate_id + ",0)\">Screen Now</button></td>";
         tbody.appendChild(tr);
     });
+    if (pageData.length === 0) {
+        tbody.innerHTML = "<tr><td colspan=\"5\" style=\"text-align:center;padding:32px;color:var(--gray-400)\">No pending screenings</td></tr>";
+    }
     document.getElementById("statPending").textContent = upcomingData.length;
+    renderPaginationBar("paginationUpcoming", filtered.length, totalPages);
 }
 
 function renderComplete() {
+    var filtered = getFilteredComplete();
+    var totalPages = Math.ceil(filtered.length / perPage) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    var start = (currentPage - 1) * perPage;
+    var pageData = filtered.slice(start, start + perPage);
+
     var tbody = document.getElementById("completeTableBody");
     tbody.innerHTML = "";
     var stats = { shortlisted: 0, rejected: 0 };
     completeData.forEach(function(row) {
-        var name = row.first_name + " " + row.last_name;
         if (row.screening_result === "Shortlist") stats.shortlisted++;
         if (row.screening_result === "Reject") stats.rejected++;
+    });
+    pageData.forEach(function(row) {
+        var name = row.first_name + " " + row.last_name;
         var tr = document.createElement("tr");
         tr.innerHTML =
             "<td><strong>" + name + "</strong></td>" +
@@ -70,8 +166,12 @@ function renderComplete() {
             "<td><button class=\"btn btn-sm btn-warning\" onclick=\"window.openScreening(" + row.candidate_id + "," + row.screening_id + ")\">Edit</button></td>";
         tbody.appendChild(tr);
     });
+    if (pageData.length === 0) {
+        tbody.innerHTML = "<tr><td colspan=\"6\" style=\"text-align:center;padding:32px;color:var(--gray-400)\">No completed screenings</td></tr>";
+    }
     document.getElementById("statShortlisted").textContent = stats.shortlisted;
     document.getElementById("statRejected").textContent = stats.rejected;
+    renderPaginationBar("paginationComplete", filtered.length, totalPages);
 }
 
 window.openScreening = function(candidateId, screeningId) {
@@ -216,7 +316,7 @@ ob_start();
             <div class="filter-bar">
                 <div class="search-box">
                     <span class="search-icon">&#x1F50D;</span>
-                    <input type="text" id="searchUpcoming" placeholder="Search candidate..." onkeyup="filterTable('searchUpcoming','upcomingTable')">
+                    <input type="text" id="searchUpcoming" placeholder="Search candidate..." onkeyup="applyUpcomingFilter()">
                 </div>
             </div>
         </div>
@@ -234,6 +334,7 @@ ob_start();
                     </thead>
                     <tbody id="upcomingTableBody"></tbody>
                 </table>
+                <div id="paginationUpcoming" class="pagination-bar"></div>
             </div>
         </div>
     </div>
@@ -246,7 +347,7 @@ ob_start();
             <div class="filter-bar">
                 <div class="search-box">
                     <span class="search-icon">&#x1F50D;</span>
-                    <input type="text" id="searchComplete" placeholder="Search candidate..." onkeyup="filterTable('searchComplete','completeTable')">
+                    <input type="text" id="searchComplete" placeholder="Search candidate..." onkeyup="applyCompleteFilter()">
                 </div>
             </div>
         </div>
@@ -265,6 +366,7 @@ ob_start();
                     </thead>
                     <tbody id="completeTableBody"></tbody>
                 </table>
+                <div id="paginationComplete" class="pagination-bar"></div>
             </div>
         </div>
     </div>

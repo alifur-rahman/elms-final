@@ -25,11 +25,73 @@ $pageStyles  = '
 .view-job-desc { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200); }
 .view-job-desc h4 { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
 .view-job-desc p { font-size: 13px; color: var(--gray-600); line-height: 1.6; white-space: pre-line; }
+.pagination-bar { display:flex; align-items:center; justify-content:space-between; margin-top:16px; flex-wrap:wrap; gap:10px; }
+.pagination-bar .page-info { font-size:13px; color:var(--gray-500); }
+.pagination-bar .page-btns { display:flex; gap:4px; align-items:center; }
+.pagination-bar .page-btn { min-width:32px; height:32px; padding:0 10px; border:1px solid var(--gray-200); border-radius:6px; background:#fff; font-size:13px; cursor:pointer; color:var(--gray-700); transition:var(--transition); font-family:inherit; }
+.pagination-bar .page-btn:hover { border-color:var(--primary); color:var(--primary); }
+.pagination-bar .page-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+.pagination-bar .page-btn:disabled { opacity:.4; cursor:default; }
+.pagination-bar .per-page { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-500); }
+.pagination-bar .per-page select { padding:4px 8px; border:1px solid var(--gray-200); border-radius:4px; font-size:13px; font-family:inherit; }
 ';
 $pageScripts = '
 var reqSkills = [];
 var jobsData = [];
 var editingJobId = null;
+var currentPage = 1;
+var perPage = 10;
+
+function getFilteredData() {
+    var q = document.getElementById("searchJobs").value.trim().toLowerCase();
+    return jobsData.filter(function(j) {
+        var text = (j.title + " " + (j.dept_name || getDeptName(j.dept_id)) + " " + j.location + " " + (j.status || "")).toLowerCase();
+        return !q || text.indexOf(q) !== -1;
+    });
+}
+
+function renderPaginationBar(total, totalPages) {
+    var html = "";
+    html += "<div class=\"page-info\">Showing page " + currentPage + " of " + totalPages + " (" + total + " total)</div>";
+    html += "<div class=\"page-btns\">";
+    html += "<button class=\"page-btn\" onclick=\"goToPage(1)\" " + (currentPage <= 1 ? "disabled" : "") + ">&#xAB;</button>";
+    html += "<button class=\"page-btn\" onclick=\"goToPage(" + (currentPage - 1) + ")\" " + (currentPage <= 1 ? "disabled" : "") + ">&#x2039;</button>";
+    var start = Math.max(1, currentPage - 2);
+    var end = Math.min(totalPages, currentPage + 2);
+    for (var p = start; p <= end; p++) {
+        html += "<button class=\"page-btn" + (p === currentPage ? " active" : "") + "\" onclick=\"goToPage(" + p + ")\">" + p + "</button>";
+    }
+    html += "<button class=\"page-btn\" onclick=\"goToPage(" + (currentPage + 1) + ")\" " + (currentPage >= totalPages ? "disabled" : "") + ">&#x203A;</button>";
+    html += "<button class=\"page-btn\" onclick=\"goToPage(" + totalPages + ")\" " + (currentPage >= totalPages ? "disabled" : "") + ">&#xBB;</button>";
+    html += "</div>";
+    html += "<div class=\"per-page\">Rows: <select onchange=\"changePerPage(this.value)\">";
+    [10, 20, 50, 100].forEach(function(n) {
+        html += "<option value=\"" + n + "\"" + (n === perPage ? " selected" : "") + ">" + n + "</option>";
+    });
+    html += "</select></div>";
+    document.getElementById("paginationBar").innerHTML = html;
+}
+
+function goToPage(p) {
+    var filtered = getFilteredData();
+    var totalPages = Math.ceil(filtered.length / perPage) || 1;
+    if (p < 1) p = 1;
+    if (p > totalPages) p = totalPages;
+    if (p === currentPage) return;
+    currentPage = p;
+    renderTable();
+}
+
+function changePerPage(n) {
+    perPage = parseInt(n);
+    currentPage = 1;
+    renderTable();
+}
+
+function applyFilters() {
+    currentPage = 1;
+    renderTable();
+}
 
 function resetRequisitionForm() {
     document.getElementById("requisitionForm").reset();
@@ -188,9 +250,15 @@ window.editJob = function(jobId) {
 };
 
 function renderTable() {
+    var filtered = getFilteredData();
+    var totalPages = Math.ceil(filtered.length / perPage) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    var start = (currentPage - 1) * perPage;
+    var pageData = filtered.slice(start, start + perPage);
+
     var tbody = document.getElementById("jobsBody");
     tbody.innerHTML = "";
-    jobsData.forEach(function(job) {
+    pageData.forEach(function(job) {
         var deptName = job.dept_name || getDeptName(job.dept_id);
         var statusBadge = "<span class=\"badge " + getBadgeClass(job.status) + "\">" + job.status + "</span>";
         var priorityBadge = "<span class=\"badge " + getBadgeClass(job.priority) + "\">" + job.priority + "</span>";
@@ -207,6 +275,11 @@ function renderTable() {
             "<td><button class=\"btn btn-sm btn-outline\" onclick=\"window.editJob(" + job.id + ")\" style=\"margin-right:4px\">Edit</button><button class=\"btn btn-sm btn-primary\" onclick=\"window.viewJob(" + job.id + ")\">View</button></td>";
         tbody.appendChild(row);
     });
+    if (pageData.length === 0) {
+        var cols = document.querySelectorAll("#jobsTable thead th").length;
+        tbody.innerHTML = "<tr><td colspan=\"" + cols + "\" style=\"text-align:center;padding:32px;color:var(--gray-400)\">No positions found</td></tr>";
+    }
+    renderPaginationBar(filtered.length, totalPages);
 }
 
 function renderPipeline() {
@@ -273,12 +346,14 @@ function renderPage(callback) {
         if (res.success && res.data) {
             jobsData = res.data;
         }
+        currentPage = 1;
         renderTable();
         renderPipeline();
         renderStats();
         initDeptSelect();
         if (callback) callback();
     }, function() {
+        currentPage = 1;
         renderTable();
         renderPipeline();
         renderStats();
@@ -305,7 +380,7 @@ ob_start();
     <div class="btn-group">
         <div class="search-box">
             <span class="search-icon">&#x1F50D;</span>
-            <input type="text" id="searchJobs" placeholder="Search positions..." onkeyup="filterTable('searchJobs','jobsTable')" style="border:none;padding:7px 8px;font-size:13px;outline:none;width:200px;font-family:inherit">
+            <input type="text" id="searchJobs" placeholder="Search positions..." onkeyup="applyFilters()" style="border:none;padding:7px 8px;font-size:13px;outline:none;width:200px;font-family:inherit">
         </div>
         <button class="btn btn-primary btn-sm" onclick="resetRequisitionForm();openModal('createRequisitionModal')">+ Create Requisition</button>
     </div>
@@ -329,6 +404,7 @@ ob_start();
                 </thead>
                 <tbody id="jobsBody"></tbody>
             </table>
+            <div id="paginationBar" class="pagination-bar"></div>
         </div>
     </div>
 </div>

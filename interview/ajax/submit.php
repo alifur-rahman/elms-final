@@ -15,13 +15,14 @@ try {
     $body = json_decode(file_get_contents('php://input'), true);
     if (!$body) $body = $_POST;
 
-    $candidate_id = (int) ($body['candidate_id'] ?? 0);
-    $date         = trim($body['date'] ?? '');
-    $type         = trim($body['type'] ?? '');
-    $interviewer  = trim($body['interviewer'] ?? '');
-    $round        = (int) ($body['round'] ?? 1);
-    $round_name   = trim($body['round_name'] ?? '');
-    $status       = trim($body['status'] ?? 'Scheduled');
+    $candidate_id  = (int) ($body['candidate_id'] ?? 0);
+    $date          = trim($body['date'] ?? '');
+    $type          = trim($body['type'] ?? '');
+    $interviewer   = trim($body['interviewer'] ?? '');
+    $round         = (int) ($body['round'] ?? 1);
+    $round_name    = trim($body['round_name'] ?? '');
+    $status        = trim($body['status'] ?? 'Waiting for Feedback');
+    $is_final_round = !empty($body['is_final_round']) ? 1 : 0;
 
     $errors = [];
     if ($candidate_id <= 0) $errors[] = 'Candidate is required';
@@ -35,13 +36,20 @@ try {
         exit;
     }
 
+    // Auto-calculate round if not set or zero
+    if ($round <= 0) {
+        $maxStmt = $pdo->prepare("SELECT COALESCE(MAX(`round`), 0) FROM interviews WHERE candidate_id = :cid");
+        $maxStmt->execute([':cid' => $candidate_id]);
+        $round = (int) $maxStmt->fetchColumn() + 1;
+    }
+
     $pdo->beginTransaction();
 
     $stmt = $pdo->prepare("
         INSERT INTO interviews
-            (candidate_id, date, type, interviewer, round, round_name, status)
+            (candidate_id, date, type, interviewer, round, round_name, is_final_round, status)
         VALUES
-            (:candidate_id, :date, :type, :interviewer, :round, :round_name, :status)
+            (:candidate_id, :date, :type, :interviewer, :round, :round_name, :is_final_round, :status)
     ");
 
     $dt = str_replace('T', ' ', $date);
@@ -53,6 +61,7 @@ try {
         ':interviewer'   => $interviewer,
         ':round'         => $round,
         ':round_name'    => $round_name ?: ('Round ' . $round),
+        ':is_final_round' => $is_final_round,
         ':status'        => $status,
     ]);
 
@@ -62,7 +71,8 @@ try {
     $upd = $pdo->prepare("UPDATE candidates SET status_id = 3 WHERE id = :id");
     $upd->execute([':id' => $candidate_id]);
 
-    addCandidateLog($pdo, $candidate_id, 'interview_scheduled', 'Shortlisted', 'Interview', 'Scheduled: ' . $type . ' with ' . $interviewer);
+    $logFromStatus = ($round > 1) ? 'Interview' : 'Shortlisted';
+    addCandidateLog($pdo, $candidate_id, 'interview_scheduled', $logFromStatus, 'Interview', 'Scheduled: Round ' . $round . ' (' . $round_name . ') - ' . $type . ' with ' . $interviewer);
 
     $pdo->commit();
 

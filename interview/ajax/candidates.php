@@ -11,7 +11,7 @@ try {
         FROM candidates c
         LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
         LEFT JOIN requisitions r ON r.id = c.job_id
-        WHERE c.status_id = 2
+        WHERE c.status_id IN (2, 3)
         ORDER BY c.first_name ASC
     ");
 
@@ -19,14 +19,33 @@ try {
 
     $candidates = [];
     foreach ($rows as $r) {
+        $cid = (int) $r['id'];
+
+        // Count existing interviews & get max round
+        $cntStmt = $pdo->prepare("SELECT COUNT(*) AS cnt, COALESCE(MAX(`round`),0) AS mx FROM interviews WHERE candidate_id = :id");
+        $cntStmt->execute([':id' => $cid]);
+        $cntRow = $cntStmt->fetch();
+        $interviewCount = (int) ($cntRow['cnt'] ?? 0);
+        $maxRound = (int) ($cntRow['mx'] ?? 0);
+
+        // Check if there's a pending scheduled interview for this candidate
+        $pendStmt = $pdo->prepare("SELECT id FROM interviews WHERE candidate_id = :id AND status = 'Scheduled' LIMIT 1");
+        $pendStmt->execute([':id' => $cid]);
+        $scheduledId = $pendStmt->fetchColumn();
+        $scheduledId = $scheduledId ? (int) $scheduledId : null;
+
         $candidates[] = [
-            'id'          => (int) $r['id'],
-            'first_name'  => $r['first_name'],
-            'last_name'   => $r['last_name'],
-            'job_id'      => (int) $r['job_id'],
-            'job_title'   => $r['job_title'] ?? 'N/A',
-            'status_id'   => (int) $r['status_id'],
-            'status_name' => $r['status_name'],
+            'id'                => $cid,
+            'first_name'        => $r['first_name'],
+            'last_name'         => $r['last_name'],
+            'job_id'            => (int) $r['job_id'],
+            'job_title'         => $r['job_title'] ?? 'N/A',
+            'status_id'         => (int) $r['status_id'],
+            'status_name'       => $r['status_name'],
+            'interview_count'   => $interviewCount,
+            'max_round'         => $maxRound,
+            'next_round'        => $maxRound + 1,
+            'scheduled_id'      => $scheduledId,
         ];
     }
 

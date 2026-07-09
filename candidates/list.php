@@ -21,10 +21,21 @@ $pageStyles  = '
 .view-candidate-grid .vc-item label { display: block; font-size: 11px; color: var(--gray-500); text-transform: uppercase; font-weight: 600; letter-spacing: .4px; }
 .view-candidate-grid .vc-item span { font-size: 14px; font-weight: 500; color: var(--gray-900); }
 .view-candidate-grid .vc-item-full { grid-column: 1 / -1; }
+.pagination-bar { display:flex; align-items:center; justify-content:space-between; margin-top:16px; flex-wrap:wrap; gap:10px; }
+.pagination-bar .page-info { font-size:13px; color:var(--gray-500); }
+.pagination-bar .page-btns { display:flex; gap:4px; align-items:center; }
+.pagination-bar .page-btn { min-width:32px; height:32px; padding:0 10px; border:1px solid var(--gray-200); border-radius:6px; background:#fff; font-size:13px; cursor:pointer; color:var(--gray-700); transition:var(--transition); font-family:inherit; }
+.pagination-bar .page-btn:hover { border-color:var(--primary); color:var(--primary); }
+.pagination-bar .page-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+.pagination-bar .page-btn:disabled { opacity:.4; cursor:default; }
+.pagination-bar .per-page { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-500); }
+.pagination-bar .per-page select { padding:4px 8px; border:1px solid var(--gray-200); border-radius:4px; font-size:13px; font-family:inherit; }
 ';
 $pageScripts = '
 var candidatesData = [];
 var editingCandidateId = null;
+var currentPage = 1;
+var perPage = 10;
 
 function resetCandidateForm() {
     document.getElementById("candidateForm").reset();
@@ -33,13 +44,90 @@ function resetCandidateForm() {
     editingCandidateId = null;
 }
 
-function renderCandidates() {
-    var tbody = document.getElementById("candidateTableBody");
-    tbody.innerHTML = "";
+function getFilteredData() {
+    var q = document.getElementById("searchInput").value.trim().toLowerCase();
+    var dept = document.getElementById("deptFilter").value.toLowerCase();
+    return candidatesData.filter(function(c) {
+        var name = (c.first_name + " " + c.last_name + " " + c.email + " " + (c.code || "") + " " + (c.phone || "")).toLowerCase();
+        if (q && name.indexOf(q) === -1) return false;
+        if (dept && c.dept_name && c.dept_name.toLowerCase() !== dept) return false;
+        return true;
+    });
+}
+
+function renderStats() {
     var counts = {};
     candidatesData.forEach(function(c) {
         var key = c.status_name || "Unknown";
         counts[key] = (counts[key] || 0) + 1;
+    });
+    var iconMap = { Applied: "blue", Shortlisted: "green", Interview: "yellow", Selected: "purple", Offered: "orange", Joined: "green", Rejected: "red", Hold: "yellow" };
+    var html = "";
+    for (var key in counts) {
+        var icon = iconMap[key] || "blue";
+        html += "<div class=\"stat-card\"><div class=\"stat-icon " + icon + "\">&#x1F4CB;</div><div class=\"stat-info\"><h3>" + counts[key] + "</h3><p>" + key + "</p></div></div>";
+    }
+    if (!html) html = "<div class=\"stat-card\"><div class=\"stat-icon blue\">&#x1F4CB;</div><div class=\"stat-info\"><h3>0</h3><p>No Candidates</p></div></div>";
+    document.getElementById("statsGrid").innerHTML = html;
+}
+
+function renderPagination(total, totalPages) {
+    var html = "";
+    html += "<div class=\"page-info\">Showing page " + currentPage + " of " + totalPages + " (" + total + " total candidates)</div>";
+    html += "<div class=\"page-btns\">";
+    html += "<button class=\"page-btn\" onclick=\"goToPage(1)\" " + (currentPage <= 1 ? "disabled" : "") + ">&#xAB;</button>";
+    html += "<button class=\"page-btn\" onclick=\"goToPage(" + (currentPage - 1) + ")\" " + (currentPage <= 1 ? "disabled" : "") + ">&#x2039;</button>";
+
+    var start = Math.max(1, currentPage - 2);
+    var end = Math.min(totalPages, currentPage + 2);
+    for (var p = start; p <= end; p++) {
+        html += "<button class=\"page-btn" + (p === currentPage ? " active" : "") + "\" onclick=\"goToPage(" + p + ")\">" + p + "</button>";
+    }
+
+    html += "<button class=\"page-btn\" onclick=\"goToPage(" + (currentPage + 1) + ")\" " + (currentPage >= totalPages ? "disabled" : "") + ">&#x203A;</button>";
+    html += "<button class=\"page-btn\" onclick=\"goToPage(" + totalPages + ")\" " + (currentPage >= totalPages ? "disabled" : "") + ">&#xBB;</button>";
+    html += "</div>";
+
+    html += "<div class=\"per-page\">Rows: <select onchange=\"changePerPage(this.value)\">";
+    [10, 20, 50, 100].forEach(function(n) {
+        html += "<option value=\"" + n + "\"" + (n === perPage ? " selected" : "") + ">" + n + "</option>";
+    });
+    html += "</select></div>";
+
+    document.getElementById("paginationBar").innerHTML = html;
+}
+
+function goToPage(p) {
+    var filtered = getFilteredData();
+    var totalPages = Math.ceil(filtered.length / perPage) || 1;
+    if (p < 1) p = 1;
+    if (p > totalPages) p = totalPages;
+    if (p === currentPage) return;
+    currentPage = p;
+    renderCandidates();
+}
+
+function changePerPage(n) {
+    perPage = parseInt(n);
+    currentPage = 1;
+    renderCandidates();
+}
+
+function applyFilters() {
+    currentPage = 1;
+    renderCandidates();
+}
+
+function renderCandidates() {
+    var filtered = getFilteredData();
+    var totalPages = Math.ceil(filtered.length / perPage) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    var start = (currentPage - 1) * perPage;
+    var pageData = filtered.slice(start, start + perPage);
+
+    var tbody = document.getElementById("candidateTableBody");
+    tbody.innerHTML = "";
+    pageData.forEach(function(c) {
         var row = document.createElement("tr");
         row.innerHTML =
             "<td>" + (c.code || "-") + "</td>" +
@@ -59,14 +147,13 @@ function renderCandidates() {
         tbody.appendChild(row);
     });
 
-    var statsHtml = "";
-    var iconMap = { Applied: "blue", Shortlisted: "green", Interview: "yellow", Selected: "purple", Offered: "orange", Joined: "green", Rejected: "red", Hold: "yellow" };
-    for (var key in counts) {
-        var icon = iconMap[key] || "blue";
-        statsHtml += "<div class=\"stat-card\"><div class=\"stat-icon " + icon + "\">&#x1F4CB;</div><div class=\"stat-info\"><h3>" + counts[key] + "</h3><p>" + key + "</p></div></div>";
+    if (pageData.length === 0) {
+        var cols = document.querySelectorAll("#candidateTable thead th").length;
+        tbody.innerHTML = "<tr><td colspan=\"" + cols + "\" style=\"text-align:center;padding:32px;color:var(--gray-400)\">No candidates found</td></tr>";
     }
-    if (!statsHtml) statsHtml = "<div class=\"stat-card\"><div class=\"stat-icon blue\">&#x1F4CB;</div><div class=\"stat-info\"><h3>0</h3><p>No Candidates</p></div></div>";
-    document.getElementById("statsGrid").innerHTML = statsHtml;
+
+    renderStats();
+    renderPagination(filtered.length, totalPages);
 }
 
 window.viewCandidate = function(id) {
@@ -184,19 +271,6 @@ window.ajaxSaveCandidate = function() {
     });
 };
 
-function filterByDept() {
-    var deptVal = document.getElementById("deptFilter").value.toLowerCase();
-    var rows = document.querySelectorAll("#candidateTable tbody tr");
-    for (var i = 0; i < rows.length; i++) {
-        var jobCell = rows[i].querySelectorAll("td")[4];
-        if (!deptVal || (jobCell && jobCell.textContent.toLowerCase().indexOf(deptVal) !== -1)) {
-            rows[i].style.display = "";
-        } else {
-            rows[i].style.display = "none";
-        }
-    }
-}
-
 function loadDeptFilter() {
     var sel = document.getElementById("deptFilter");
     if (!sel || sel.options.length > 1) return;
@@ -230,6 +304,7 @@ function renderPage() {
         if (res.success && res.data) {
             candidatesData = res.data;
         }
+        currentPage = 1;
         renderCandidates();
     }, function() {
         renderCandidates();
@@ -255,12 +330,12 @@ ob_start();
         <h2>All Candidates</h2>
         <div class="filter-bar">
 
-            <select class="form-control" id="deptFilter" onchange="filterByDept()">
+            <select class="form-control" id="deptFilter" onchange="applyFilters()">
                 <option value="">All Departments</option>
             </select>
             <div class="search-box">
                 <span class="search-icon">&#x1F50D;</span>
-                <input type="text" id="searchInput" placeholder="Search candidates..." onkeyup="filterTable('searchInput','candidateTable')">
+                <input type="text" id="searchInput" placeholder="Search candidates..." onkeyup="applyFilters()">
             </div>
             <button class="btn btn-primary" onclick="resetCandidateForm();openModal('addCandidateModal')">+ Add Candidate</button>
         </div>
@@ -282,6 +357,7 @@ ob_start();
                 </thead>
                 <tbody id="candidateTableBody"></tbody>
             </table>
+            <div id="paginationBar" class="pagination-bar"></div>
         </div>
     </div>
 </div>

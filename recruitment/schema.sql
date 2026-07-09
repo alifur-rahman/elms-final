@@ -54,5 +54,7 @@ CREATE TABLE IF NOT EXISTS requisitions (
 
     INDEX idx_dept_id (dept_id),
     INDEX idx_status (status),
-    INDEX idx_priority (priority)
+    INDEX idx_priority (priority),
+
+    CONSTRAINT fk_requisition_dept FOREIGN KEY (dept_id) REFERENCES departments(id) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

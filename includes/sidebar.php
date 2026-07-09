@@ -8,7 +8,7 @@ $sidebarItems = [
     ],
     'Recruitment' => [
         ['id' => 'recruitment',    'text' => 'Pipeline',         'href' => 'recruitment/list.php',          'badge' => 3],
-        ['id' => 'candidates',     'text' => 'Candidates',       'href' => 'candidates/list.html',          'badge' => 2],
+        ['id' => 'candidates',     'text' => 'Candidates',       'href' => 'candidates/list.php',           'badge' => 2],
         ['id' => 'screening',      'text' => 'Screening',        'href' => 'screening/list.html',           'badge' => 1],
         ['id' => 'interview',      'text' => 'Interview',        'href' => 'interview/list.html',           'badge' => 2],
         ['id' => 'assessment',     'text' => 'Assessment',       'href' => 'assessment/list.html',          'badge' => 0],

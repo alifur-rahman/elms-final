@@ -268,7 +268,7 @@ function initDeptSelect() {
     }
 }
 
-function renderPage() {
+function renderPage(callback) {
     apiGet("ajax/list.php", null, function(res) {
         if (res.success && res.data) {
             jobsData = res.data;
@@ -277,16 +277,25 @@ function renderPage() {
         renderPipeline();
         renderStats();
         initDeptSelect();
+        if (callback) callback();
     }, function() {
         renderTable();
         renderPipeline();
         renderStats();
         initDeptSelect();
+        if (callback) callback();
     });
 }
 
 var BASE_URL = "..";
-renderPage();
+renderPage(function() {
+    var params = new URLSearchParams(window.location.search);
+    var jobId = params.get("job_id");
+    if (jobId) {
+        var id = parseInt(jobId);
+        setTimeout(function() { window.viewJob(id); }, 200);
+    }
+});
 ';
 
 ob_start();

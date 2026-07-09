@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP HRIS - Probation Appraisal</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Probation Appraisal List</h2>
+                    <div class="filter-bar">
+                        <select class="form-control" id="deptFilter" onchange="applyFilters()">
+                            <option value="">All Departments</option>
+                        </select>
+                        <select class="form-control" id="statusFilter" onchange="applyFilters()">
+                            <option value="">All Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        <div class="search-box">
+                            <span class="search-icon">&#128269;</span>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search employee..." onkeyup="applyFilters()">
+                        </div>
+                        <a href="new.html" class="btn btn-primary">+ New Appraisal</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="probationTable">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Joining Date</th>
+                                    <th>Probation End</th>
+                                    <th>Days Left</th>
+                                    <th>Score</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="probationBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- View Detail Modal -->
+    <div class="modal-overlay" id="viewModal" onclick="if(event.target===this)closeModal('viewModal')">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3>Probation Detail</h3>
+                <button class="modal-close" onclick="closeModal('viewModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="viewModalBody"></div>
+        </div>
+    </div>
+
+    <!-- Review Form Modal -->
+    <div class="modal-overlay" id="reviewModal" onclick="if(event.target===this)closeModal('reviewModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Probation Review Form</h3>
+                <button class="modal-close" onclick="closeModal('reviewModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="reviewProbationId">
+                <div class="form-group">
+                    <label>Overall Score <span class="required">*</span></label>
+                    <input type="number" class="form-control" id="reviewScore" min="0" max="5" step="0.01" placeholder="0.00 - 5.00">
+                </div>
+                <div class="form-group">
+                    <label>Recommendation <span class="required">*</span></label>
+                    <select class="form-control" id="reviewRecommendation">
+                        <option value="">Select Recommendation</option>
+                        <option value="Confirm">Confirm</option>
+                        <option value="Extend">Extend</option>
+                        <option value="Terminate">Terminate</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Remarks</label>
+                    <textarea class="form-control" id="reviewRemarks" rows="4" placeholder="Enter review remarks..."></textarea>
+                </div>
+                <div class="mt-24">
+                    <button class="btn btn-primary" onclick="submitReview()">Submit Review</button>
+                    <button class="btn btn-outline" onclick="closeModal('reviewModal')">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        var BASE_URL = '..';
+        renderSidebar('probation');
+        renderHeader('Probation Appraisal', 'Home / Probation / Probation Appraisal');
+
+        function renderStats() {
+            var all = DATA.probations;
+            var active = all.filter(function(p) { return p.status === 'Pending' || p.status === 'In Progress'; }).length;
+            var completed = all.filter(function(p) { return p.status === 'Completed'; }).length;
+            var extended = all.filter(function(p) { return p.recommendation === 'Extend'; }).length;
+            var pendingConf = all.filter(function(p) { return p.status === 'Completed' && p.recommendation === 'Confirm'; }).length;
+            document.getElementById('statsGrid').innerHTML =
+                '<div class="stat-card"><div class="stat-icon blue">&#128200;</div><div class="stat-info"><h3>' + active + '</h3><p>Active</p></div></div>' +
+                '<div class="stat-card"><div class="stat-icon green">&#9989;</div><div class="stat-info"><h3>' + completed + '</h3><p>Completed</p></div></div>' +
+                '<div class="stat-card"><div class="stat-icon yellow">&#128260;</div><div class="stat-info"><h3>' + extended + '</h3><p>Extended</p></div></div>' +
+                '<div class="stat-card"><div class="stat-icon red">&#128203;</div><div class="stat-info"><h3>' + pendingConf + '</h3><p>Pending Confirmation</p></div></div>';
+        }
+
+        function populateDeptFilter() {
+            var sel = document.getElementById('deptFilter');
+            for (var i = 0; i < DATA.departments.length; i++) {
+                var d = DATA.departments[i];
+                sel.innerHTML += '<option value="' + d.name.toLowerCase() + '">' + d.name + '</option>';
+            }
+        }
+
+        function applyFilters() {
+            var deptVal = document.getElementById('deptFilter').value;
+            var statusVal = document.getElementById('statusFilter').value.toLowerCase();
+            var searchVal = document.getElementById('searchInput').value.toLowerCase();
+            var rows = document.querySelectorAll('#probationTable tbody tr');
+            for (var i = 0; i < rows.length; i++) {
+                var dept = rows[i].getAttribute('data-dept');
+                var st = rows[i].getAttribute('data-status');
+                var name = rows[i].getAttribute('data-name');
+                var show = true;
+                if (deptVal && dept !== deptVal) show = false;
+                if (statusVal && st !== statusVal) show = false;
+                if (searchVal && name.indexOf(searchVal) === -1) show = false;
+                rows[i].style.display = show ? '' : 'none';
+            }
+        }
+
+        function renderProbations() {
+            var html = '';
+            for (var i = 0; i < DATA.probations.length; i++) {
+                var p = DATA.probations[i];
+                var e = DATA.employees.find(function(emp) { return emp.id === p.employee_id; });
+                if (!e) continue;
+                var name = getEmployeeName(p.employee_id);
+                var dept = getDeptName(e.dept_id);
+                var days = getDaysRemaining(p.end_date);
+                var daysColor = days <= 0 ? '#d93025' : days <= 15 ? '#d93025' : days <= 30 ? '#f9ab00' : '#1e8e3e';
+                var actionBtn = '<div class="btn-group">' +
+                    '<a href="edit.html" class="btn btn-sm btn-outline">Edit</a>' +
+                    (p.status === 'Completed'
+                        ? '<button class="btn btn-sm btn-outline" onclick="viewDetail(' + p.id + ')">View</button>'
+                        : '<button class="btn btn-sm btn-primary" onclick="openReview(' + p.id + ')">Review</button>') +
+                    '</div>';
+                html += '<tr data-dept="' + dept.toLowerCase() + '" data-status="' + p.status.toLowerCase() + '" data-name="' + name.toLowerCase() + '">' +
+                    '<td>' + name + '</td>' +
+                    '<td>' + dept + '</td>' +
+                    '<td>' + formatDate(p.joining_date) + '</td>' +
+                    '<td>' + formatDate(p.end_date) + '</td>' +
+                    '<td><span class="badge" style="background:' + daysColor + ';color:#fff">' + (days > 0 ? days + ' days' : 'Overdue') + '</span></td>' +
+                    '<td>' + (p.score ? p.score.toFixed(2) : '-') + '</td>' +
+                    '<td><span class="badge ' + getBadgeClass(p.status) + '">' + p.status + '</span></td>' +
+                    '<td>' + actionBtn + '</td>' +
+                    '</tr>';
+            }
+            document.getElementById('probationBody').innerHTML = html || '<tr><td colspan="8" class="text-muted text-center">No probation records found</td></tr>';
+        }
+
+        function viewDetail(id) {
+            var p = DATA.probations.find(function(pr) { return pr.id === id; });
+            if (!p) return;
+            var e = DATA.employees.find(function(emp) { return emp.id === p.employee_id; });
+            var name = getEmployeeName(p.employee_id);
+            var dept = e ? getDeptName(e.dept_id) : 'N/A';
+            var recBadge = p.recommendation === 'Confirm' ? 'badge-confirm' : p.recommendation === 'Extend' ? 'badge-extend' : 'badge-terminate';
+
+            var catHtml = '';
+            var totalWeight = 0;
+            var totalScore = 0;
+            for (var i = 0; i < DATA.appraisalCategories.length; i++) {
+                var cat = DATA.appraisalCategories[i];
+                var catScore = (Math.random() * 3 + 2).toFixed(1);
+                totalWeight += cat.weight;
+                totalScore += parseFloat(catScore) * cat.weight;
+                catHtml += '<tr><td>' + cat.name + '</td><td>' + cat.weight + '%</td><td>' + catScore + '/5</td><td>' + (catScore * cat.weight / 100).toFixed(2) + '</td></tr>';
+            }
+            var weightedAvg = totalWeight > 0 ? (totalScore / totalWeight).toFixed(2) : 'N/A';
+
+            var html = '<div class="profile-card">' +
+                '<div class="profile-avatar">' + name.charAt(0) + '</div>' +
+                '<div class="profile-details">' +
+                    '<div class="detail-item"><label>Employee</label><span>' + name + '</span></div>' +
+                    '<div class="detail-item"><label>Department</label><span>' + dept + '</span></div>' +
+                    '<div class="detail-item"><label>Joining Date</label><span>' + formatDate(p.joining_date) + '</span></div>' +
+                    '<div class="detail-item"><label>Probation (months)</label><span>' + p.months + '</span></div>' +
+                    '<div class="detail-item"><label>End Date</label><span>' + formatDate(p.end_date) + '</span></div>' +
+                    '<div class="detail-item"><label>Review Date</label><span>' + formatDate(p.review_date) + '</span></div>' +
+                '</div></div>';
+
+            html += '<div class="mb-24"><h4 style="font-size:14px;font-weight:600;margin-bottom:12px">Category Breakdown</h4>' +
+                '<div class="table-container"><table class="appraisal-table"><thead><tr><th>Category</th><th>Weight</th><th>Score</th><th>Weighted</th></tr></thead><tbody>' + catHtml + '</tbody></table></div></div>';
+
+            html += '<div class="form-row-3 mb-24">' +
+                '<div class="form-group"><label>Overall Score</label><div style="font-size:18px;font-weight:700">' + (p.score ? p.score.toFixed(2) : weightedAvg) + ' / 5.00</div></div>' +
+                '<div class="form-group"><label>Recommendation</label><div><span class="badge ' + recBadge + '">' + p.recommendation + '</span></div></div>' +
+                '<div class="form-group"><label>Status</label><div><span class="badge ' + getBadgeClass(p.status) + '">' + p.status + '</span></div></div>' +
+                '</div>';
+
+            if (p.remarks) {
+                html += '<div class="form-group"><label>Remarks</label><p class="text-muted">' + p.remarks + '</p></div>';
+            }
+
+            document.getElementById('viewModalBody').innerHTML = html;
+            openModal('viewModal');
+        }
+
+        function openReview(id) {
+            document.getElementById('reviewProbationId').value = id;
+            document.getElementById('reviewScore').value = '';
+            document.getElementById('reviewRecommendation').value = '';
+            document.getElementById('reviewRemarks').value = '';
+            openModal('reviewModal');
+        }
+
+        function submitReview() {
+            var id = document.getElementById('reviewProbationId').value;
+            var score = document.getElementById('reviewScore').value;
+            var rec = document.getElementById('reviewRecommendation').value;
+            var remarks = document.getElementById('reviewRemarks').value;
+            if (!score || !rec) { showAlert('Please fill score and recommendation', 'error'); return; }
+            var p = DATA.probations.find(function(pr) { return pr.id === parseInt(id); });
+            if (p) {
+                p.score = parseFloat(score);
+                p.recommendation = rec;
+                p.remarks = remarks;
+                p.status = 'Completed';
+            }
+            showAlert('Probation review submitted successfully', 'success');
+            closeModal('reviewModal');
+            renderProbations();
+            renderStats();
+        }
+
+        populateDeptFilter();
+        renderStats();
+        renderProbations();
+    </script>
+</body>
+</html>

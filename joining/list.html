@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP HRIS - Joining</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Upcoming Joinings</h2>
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <span class="search-icon">&#128269;</span>
+                            <input type="text" class="form-control" id="upcomingSearch" placeholder="Search upcoming..." onkeyup="filterTable('upcomingSearch','upcomingTable')">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="upcomingTable">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Position</th>
+                                    <th>Joining Date</th>
+                                    <th>Days Until</th>
+                                </tr>
+                            </thead>
+                            <tbody id="upcomingBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Joined Employees</h2>
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <span class="search-icon">&#128269;</span>
+                            <input type="text" class="form-control" id="joinedSearch" placeholder="Search joined..." onkeyup="filterTable('joinedSearch','joinedTable')">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="joinedTable">
+                            <thead>
+                                <tr>
+                                    <th>Employee Name</th>
+                                    <th>Position</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Joining Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="joinedBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        var BASE_URL = '..';
+        renderSidebar('joining');
+        renderHeader('Joining', 'Home / Onboarding / Joining');
+
+        function renderStats() {
+            var accepted = DATA.offers.filter(function(o) { return o.status === 'Accepted'; });
+            var upcoming = accepted.length;
+            var joined = DATA.employees.length;
+            document.getElementById('statsGrid').innerHTML =
+                '<div class="stat-card"><div class="stat-icon green">&#128200;</div><div class="stat-info"><h3>' + joined + '</h3><p>Total Joined</p></div></div>' +
+                '<div class="stat-card"><div class="stat-icon blue">&#128197;</div><div class="stat-info"><h3>' + upcoming + '</h3><p>Upcoming Joining</p></div></div>';
+        }
+
+        function renderUpcoming() {
+            var accepted = DATA.offers.filter(function(o) { return o.status === 'Accepted'; });
+            var html = '';
+            for (var i = 0; i < accepted.length; i++) {
+                var o = accepted[i];
+                var name = getCandidateName(o.candidate_id);
+                var jobTitle = '';
+                var cand = DATA.candidates.find(function(c) { return c.id === o.candidate_id; });
+                if (cand) jobTitle = getJobTitle(cand.job_id);
+                var days = getDaysRemaining(o.joining_date);
+                var color = days <= 7 ? '#d93025' : days <= 30 ? '#f9ab00' : '#1e8e3e';
+                html += '<tr>' +
+                    '<td>' + name + '</td>' +
+                    '<td>' + jobTitle + '</td>' +
+                    '<td>' + formatDate(o.joining_date) + '</td>' +
+                    '<td><span class="badge" style="background:' + color + ';color:#fff">' + (days > 0 ? days + ' days' : 'Overdue') + '</span></td>' +
+                    '</tr>';
+            }
+            document.getElementById('upcomingBody').innerHTML = html || '<tr><td colspan="4" class="text-muted text-center">No upcoming joinings</td></tr>';
+        }
+
+        function renderJoined() {
+            var html = '';
+            for (var i = 0; i < DATA.employees.length; i++) {
+                var e = DATA.employees[i];
+                html += '<tr>' +
+                    '<td>' + getEmployeeName(e.id) + '</td>' +
+                    '<td>' + getDesignationName(e.designation_id) + '</td>' +
+                    '<td>' + e.email + '</td>' +
+                    '<td>' + (e.phone || '-') + '</td>' +
+                    '<td>' + formatDate(e.joining_date) + '</td>' +
+                    '</tr>';
+            }
+            document.getElementById('joinedBody').innerHTML = html || '<tr><td colspan="5" class="text-muted text-center">No joined employees</td></tr>';
+        }
+
+        renderStats();
+        renderUpcoming();
+        renderJoined();
+    </script>
+</body>
+</html>

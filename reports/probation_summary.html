@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - ERP HRIS</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .report-card { background:#fff;border-radius:8px;padding:20px;box-shadow:var(--shadow);border-left:4px solid var(--primary) }
+        .report-card.green { border-left-color: var(--success) }
+        .report-card.orange { border-left-color: var(--warning) }
+        .report-card.red { border-left-color: var(--danger) }
+        .chart-placeholder { height:200px;background:var(--gray-50);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gray-500);font-size:14px;border:1px dashed var(--gray-300) }
+    </style>
+</head>
+<body>
+<div id="sidebar"></div>
+<main class="main-content">
+    <div id="header"></div>
+    <div class="page-content">
+
+        <div class="stats-grid" style="margin-bottom:24px">
+            <div class="stat-card">
+                <div class="stat-icon blue">📊</div>
+                <div class="stat-info"><h3>4</h3><p>Total Reports</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">📈</div>
+                <div class="stat-info"><h3>85%</h3><p>Confirmation Rate</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon yellow">⏳</div>
+                <div class="stat-info"><h3>2</h3><p>Due This Quarter</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red">⚠️</div>
+                <div class="stat-info"><h3>0</h3><p>Overdue Reviews</p></div>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+            <div class="card">
+                <div class="card-header"><h2>Probation Summary</h2><span class="badge badge-completed">Current Quarter</span></div>
+                <div class="card-body">
+                    <div style="display:flex;flex-direction:column;gap:16px">
+                        <div class="report-card">
+                            <div style="display:flex;justify-content:space-between;align-items:center">
+                                <div><strong>Probation Completion Rate</strong><br><span style="font-size:12px;color:var(--gray-500)">Employees who completed probation</span></div>
+                                <div style="font-size:24px;font-weight:700;color:var(--success)">100%</div>
+                            </div>
+                        </div>
+                        <div class="report-card green">
+                            <div style="display:flex;justify-content:space-between;align-items:center">
+                                <div><strong>Confirmed Employees</strong><br><span style="font-size:12px;color:var(--gray-500)">Recommended for confirmation</span></div>
+                                <div style="font-size:24px;font-weight:700;color:var(--success)">1</div>
+                            </div>
+                        </div>
+                        <div class="report-card orange">
+                            <div style="display:flex;justify-content:space-between;align-items:center">
+                                <div><strong>Pending Reviews</strong><br><span style="font-size:12px;color:var(--gray-500)">Awaiting appraisal submission</span></div>
+                                <div style="font-size:24px;font-weight:700;color:var(--warning)">0</div>
+                            </div>
+                        </div>
+                        <div class="report-card red">
+                            <div style="display:flex;justify-content:space-between;align-items:center">
+                                <div><strong>At Risk</strong><br><span style="font-size:12px;color:var(--gray-500)">Probation ending within 30 days, no review</span></div>
+                                <div style="font-size:24px;font-weight:700;color:var(--danger)">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h2>Score Distribution</h2></div>
+                <div class="card-body">
+                    <div class="chart-placeholder">📊 Score Distribution Chart<br><span style="font-size:12px">(Chart.js integration pending)</span></div>
+                    <div style="margin-top:16px">
+                        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Below 2.0</span><span>0</span></div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>2.0 - 3.0</span><span>0</span></div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>3.0 - 4.0</span><span>0</span></div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>4.0 - 4.5</span><span>0</span></div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--success)"><span>4.5 - 5.0</span><span>1</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Monthly Activity Log</h2>
+                <div class="filter-bar">
+                    <select class="form-control"><option>This Year (2026)</option><option>2025</option></select>
+                </div>
+            </div>
+            <div class="card-body" style="padding:0">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Month</th><th>New Hires</th><th>Probations Completed</th><th>Confirmed</th><th>Terminated</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>January</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                            <tr><td>February</td><td><strong>1</strong></td><td>0</td><td>0</td><td>0</td></tr>
+                            <tr><td>March</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                            <tr><td>April</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                            <tr><td>May</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                            <tr><td>June</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                            <tr><td>July</td><td>0</td><td><strong>1</strong></td><td>0</td><td>0</td></tr>
+                            <tr><td>August</td><td>0</td><td>0</td><td><strong>1</strong></td><td>0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px">
+            <div class="card">
+                <div class="card-header"><h2>Department Wise</h2></div>
+                <div class="card-body">
+                    <div class="chart-placeholder">🏢 Department Distribution Chart</div>
+                    <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+                        <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--gray-100)">
+                            <span>Engineering</span><span style="font-weight:500">1</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--gray-100);color:var(--gray-500)">
+                            <span>Marketing</span><span>0</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--gray-100);color:var(--gray-500)">
+                            <span>Finance</span><span>0</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--gray-100);color:var(--gray-500)">
+                            <span>Human Resources</span><span>0</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;color:var(--gray-500)">
+                            <span>Others</span><span>0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h2>Export Reports</h2></div>
+                <div class="card-body">
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                        <button class="btn btn-primary" style="display:flex;align-items:center;gap:8px;justify-content:center;padding:12px">📄 Export Probation Summary (PDF)</button>
+                        <button class="btn btn-success" style="display:flex;align-items:center;gap:8px;justify-content:center;padding:12px">📊 Export Score Analysis (Excel)</button>
+                        <button class="btn btn-warning" style="display:flex;align-items:center;gap:8px;justify-content:center;padding:12px">📋 Export Full Report (CSV)</button>
+                        <button class="btn" style="display:flex;align-items:center;gap:8px;justify-content:center;padding:12px">🖨️ Print Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+        var BASE_URL = '..';
+        renderSidebar('reports');
+renderHeader('Reports', 'Home / Reports');
+</script>
+</body>
+</html>

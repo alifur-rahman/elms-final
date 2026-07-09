@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP HRIS - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+        .dashboard-main { min-width: 0; }
+        .dashboard-sidebar-section { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 20px; margin-bottom: 20px; }
+        .dashboard-sidebar-section h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--gray-200); }
+        .upcoming-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
+        .upcoming-item:last-child { border-bottom: none; }
+        .upcoming-item .ui-avatar { width: 36px; height: 36px; border-radius: 50%; background: #e8f0fe; color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+        .upcoming-item .ui-info { flex: 1; }
+        .upcoming-item .ui-info .ui-name { font-size: 13px; font-weight: 500; }
+        .upcoming-item .ui-info .ui-detail { font-size: 11px; color: var(--gray-500); }
+        .upcoming-item .ui-date { font-size: 11px; color: var(--primary); font-weight: 600; white-space: nowrap; }
+        .timeline { padding-left: 24px; }
+        .lifecycle-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        .lifecycle-card { text-decoration: none; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 16px 12px; text-align: center; transition: all .2s ease; }
+        .lifecycle-card:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(26,115,232,.12); transform: translateY(-2px); }
+        .lifecycle-card .lc-icon { font-size: 24px; margin-bottom: 6px; }
+        .lifecycle-card .lc-label { font-size: 12px; font-weight: 500; color: var(--gray-700); }
+        .lifecycle-card .lc-count { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+        .reminder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+        .reminder-card { background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 16px; text-align: center; }
+        .reminder-card .rc-days { font-size: 24px; font-weight: 700; color: var(--primary); }
+        .reminder-card .rc-label { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+        .reminder-card .rc-action { font-size: 11px; color: var(--gray-600); margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--gray-100); }
+    </style>
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon yellow">📝</div>
+                    <div class="stat-info"><h3 id="statPending">0</h3><p>Pending Appraisals</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div class="stat-info"><h3 id="statCompleted">0</h3><p>Completed</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">📅</div>
+                    <div class="stat-info"><h3 id="statDueMonth">0</h3><p>Due This Month</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">🎉</div>
+                    <div class="stat-info"><h3 id="statConfirm">0</h3><p>Pending Confirmation</p></div>
+                </div>
+            </div>
+
+            <div class="dashboard-layout">
+                <div class="dashboard-main">
+
+                    <div class="card mb-24">
+                        <div class="card-header">
+                            <h2>Pending Probation Appraisals</h2>
+                            <div class="filter-bar">
+                                <div class="search-box">
+                                    <span class="search-icon">🔍</span>
+                                    <input type="text" id="searchProbation" placeholder="Search..." onkeyup="filterTable('searchProbation','probationTable')">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body" style="padding:0">
+                            <div class="table-container">
+                                <table id="probationTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Employee</th>
+                                            <th>Department</th>
+                                            <th>Designation</th>
+                                            <th>Joining Date</th>
+                                            <th>Probation End</th>
+                                            <th>Days Remaining</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="probationBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-24">
+                        <div class="card-header"><h2>Recent Activity</h2></div>
+                        <div class="card-body">
+                            <div class="timeline" id="recentTimeline"></div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-24">
+                        <div class="card-header"><h2>Lifecycle Flow</h2></div>
+                        <div class="card-body">
+                            <div class="lifecycle-cards">
+                                <a href="recruitment/list.html" class="lifecycle-card"><div class="lc-count" id="lcRecruitment">0</div><div class="lc-icon">🎯</div><div class="lc-label">Recruitment</div></a>
+                                <a href="candidates/list.html" class="lifecycle-card"><div class="lc-count" id="lcCandidates">0</div><div class="lc-icon">👥</div><div class="lc-label">Candidates</div></a>
+                                <a href="screening/list.html" class="lifecycle-card"><div class="lc-count" id="lcScreening">0</div><div class="lc-icon">🔍</div><div class="lc-label">Screening</div></a>
+                                <a href="interview/list.html" class="lifecycle-card"><div class="lc-count" id="lcInterview">0</div><div class="lc-icon">🤝</div><div class="lc-label">Interview</div></a>
+                                <a href="offer_approval/list.html" class="lifecycle-card"><div class="lc-count" id="lcOffer">0</div><div class="lc-icon">✅</div><div class="lc-label">Offer</div></a>
+                                <a href="pre_onboarding/list.html" class="lifecycle-card"><div class="lc-count" id="lcPreOnboard">0</div><div class="lc-icon">📋</div><div class="lc-label">Pre-Onboard</div></a>
+                                <a href="probation/list.html" class="lifecycle-card"><div class="lc-count" id="lcProbation">0</div><div class="lc-icon">📝</div><div class="lc-label">Probation</div></a>
+                                <a href="confirmation/list.html" class="lifecycle-card"><div class="lc-count" id="lcConfirm">0</div><div class="lc-icon">🎉</div><div class="lc-label">Confirmation</div></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><h2>Automatic Reminder Schedule</h2></div>
+                        <div class="card-body">
+                            <div class="reminder-grid">
+                                <div class="reminder-card"><div class="rc-days">90</div><div class="rc-label">Days Before</div><div class="rc-action">Probation start reminder</div></div>
+                                <div class="reminder-card"><div class="rc-days">60</div><div class="rc-label">Days Before</div><div class="rc-action">Mid-probation check-in</div></div>
+                                <div class="reminder-card"><div class="rc-days">30</div><div class="rc-label">Days Before</div><div class="rc-action">Appraisal preparation</div></div>
+                                <div class="reminder-card"><div class="rc-days">15</div><div class="rc-label">Days Before</div><div class="rc-action">Manager notification</div></div>
+                                <div class="reminder-card"><div class="rc-days">7</div><div class="rc-label">Days Before</div><div class="rc-action">Urgent reminder</div></div>
+                                <div class="reminder-card"><div class="rc-days">1</div><div class="rc-label">Day Before</div><div class="rc-action">Deadline alert</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-sidebar">
+                    <div class="dashboard-sidebar-section">
+                        <h3>Upcoming Confirmations</h3>
+                        <div id="upcomingConfirmations"></div>
+                    </div>
+                    <div class="dashboard-sidebar-section">
+                        <h3>Quick Actions</h3>
+                        <div style="display:flex;flex-direction:column;gap:8px">
+                            <button class="btn btn-primary btn-sm" onclick="window.location='recruitment/list.html'">Create Requisition</button>
+                            <button class="btn btn-outline btn-sm" onclick="window.location='probation/list.html'">Probation Appraisal</button>
+                            <button class="btn btn-outline btn-sm" onclick="window.location='confirmation/list.html'">Generate Letter</button>
+                        </div>
+                    </div>
+                    <div class="dashboard-sidebar-section">
+                        <h3>System Info</h3>
+                        <div style="font-size:12px;color:var(--gray-600)">
+                            <div style="display:flex;justify-content:space-between;padding:4px 0"><span>Version</span><span style="font-weight:500">2.0.0</span></div>
+                            <div style="display:flex;justify-content:space-between;padding:4px 0"><span>Last Sync</span><span style="font-weight:500">Today 09:30</span></div>
+                            <div style="display:flex;justify-content:space-between;padding:4px 0"><span>Employees</span><span style="font-weight:500" id="sysEmpCount">0</span></div>
+                            <div style="display:flex;justify-content:space-between;padding:4px 0;border:none"><span>Open Positions</span><span style="font-weight:500" id="sysJobCount">0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        function renderDashboard() {
+            var probs = DATA.probations;
+            var pending = probs.filter(function(p){ return p.status === 'Pending' || p.status === 'In Progress'; });
+            var completed = probs.filter(function(p){ return p.status === 'Completed'; });
+            var dueCount = 0;
+            var now = new Date();
+            var monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            pending.forEach(function(p){
+                var end = new Date(p.end_date);
+                if (end >= now && end <= monthEnd) dueCount++;
+            });
+
+            document.getElementById('statPending').textContent = pending.length;
+            document.getElementById('statCompleted').textContent = completed.length;
+            document.getElementById('statDueMonth').textContent = dueCount;
+            document.getElementById('statConfirm').textContent = DATA.confirmations.filter(function(c){ return c.status === 'Generated'; }).length;
+
+            var tbody = document.getElementById('probationBody');
+            tbody.innerHTML = '';
+            var emps = DATA.employees;
+            probs.forEach(function(p){
+                var emp = null;
+                for (var i = 0; i < emps.length; i++) { if (emps[i].id === p.employee_id) { emp = emps[i]; break; } }
+                if (!emp) return;
+                var days = getDaysRemaining(p.end_date);
+                var statusText = days > 0 ? (days <= 7 ? 'Urgent' : 'In Progress') : 'Completed';
+                var statusDays = days > 0 ? days + ' days' : 'Completed';
+                var badgeClass = days > 7 ? 'badge-in-progress' : (days > 0 ? 'badge-pending' : 'badge-completed');
+                var row = document.createElement('tr');
+                row.innerHTML = '<td><strong>' + emp.first_name + ' ' + emp.last_name + '</strong><br><span class="text-muted">' + emp.code + '</span></td>' +
+                    '<td>' + getDeptName(emp.designation_id ? emp.designation_id : emp.dept_id) + '</td>' +
+                    '<td>' + getDesignationName(emp.designation_id) + '</td>' +
+                    '<td>' + formatDate(p.joining_date) + '</td>' +
+                    '<td>' + formatDate(p.end_date) + '</td>' +
+                    '<td><strong>' + (days > 0 ? days : '0') + '</strong> days</td>' +
+                    '<td><span class="badge ' + badgeClass + '">' + statusText + '</span></td>' +
+                    '<td><button class="btn btn-sm btn-primary" onclick="window.location=\'probation/list.html\'">View</button></td>';
+                tbody.appendChild(row);
+            });
+
+            if (probs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted" style="padding:32px">No probation records found</td></tr>';
+            }
+
+            var recentContainer = document.getElementById('recentTimeline');
+            recentContainer.innerHTML = '';
+            var logs = DATA.lifecycleLogs.slice().reverse().slice(0, 6);
+            var icons = {
+                candidate_applied: '👤', screening_shortlisted: '🔍', interview_scheduled: '🤝',
+                interview_passed: '🤝', offer_created: '📄', offer_approved: '✅', offer_accepted: '📄',
+                pre_onboarding: '📋', employee_created: '👤', joined: '🚪',
+                probation_started: '📝', probation_completed: '📝', confirmed: '🎉'
+            };
+            logs.forEach(function(log){
+                var item = document.createElement('div');
+                item.className = 'timeline-item';
+                item.innerHTML = '<div class="tl-time">' + formatDateTime(log.date) + '</div>' +
+                    '<div class="tl-title">' + (icons[log.event] || '•') + ' ' + log.label + '</div>' +
+                    '<div class="tl-desc">' + log.desc + '</div>';
+                recentContainer.appendChild(item);
+            });
+            if (logs.length === 0) {
+                recentContainer.innerHTML = '<div class="text-muted" style="padding:16px 0">No recent activity</div>';
+            }
+
+            document.getElementById('lcRecruitment').textContent = DATA.jobs.filter(function(j){ return j.status === 'Active'; }).length;
+            document.getElementById('lcCandidates').textContent = DATA.candidates.length;
+            document.getElementById('lcScreening').textContent = DATA.candidates.filter(function(c){ return c.status === 'Applied'; }).length;
+            document.getElementById('lcInterview').textContent = DATA.candidates.filter(function(c){ return c.status === 'Interview' || c.status === 'Shortlisted'; }).length;
+            document.getElementById('lcOffer').textContent = DATA.offers.filter(function(o){ return o.status === 'Pending'; }).length;
+            document.getElementById('lcPreOnboard').textContent = DATA.candidates.filter(function(c){ return c.status === 'Offered'; }).length;
+            document.getElementById('lcProbation').textContent = probs.length;
+            document.getElementById('lcConfirm').textContent = DATA.confirmations.length;
+
+            var upcomingEl = document.getElementById('upcomingConfirmations');
+            upcomingEl.innerHTML = '';
+            var confs = DATA.confirmations;
+            if (confs.length === 0) {
+                upcomingEl.innerHTML = '<div class="text-muted" style="padding:8px 0">No upcoming confirmations</div>';
+            } else {
+                confs.forEach(function(c){
+                    var emp = null;
+                    for (var i = 0; i < emps.length; i++) { if (emps[i].id === c.employee_id) { emp = emps[i]; break; } }
+                    if (!emp) return;
+                    var item = document.createElement('div');
+                    item.className = 'upcoming-item';
+                    var initials = emp.first_name.charAt(0) + emp.last_name.charAt(0);
+                    item.innerHTML = '<div class="ui-avatar">' + initials + '</div>' +
+                        '<div class="ui-info"><div class="ui-name">' + emp.first_name + ' ' + emp.last_name + '</div>' +
+                        '<div class="ui-detail">' + c.designation + ' • ' + c.department + '</div></div>' +
+                        '<div class="ui-date">' + formatDate(c.eff_date) + '</div>';
+                    upcomingEl.appendChild(item);
+                });
+            }
+
+            document.getElementById('sysEmpCount').textContent = emps.length;
+            document.getElementById('sysJobCount').textContent = DATA.jobs.filter(function(j){ return j.status === 'Active'; }).length;
+        }
+        var BASE_URL = '.';
+        renderSidebar('dashboard');
+        renderHeader('Dashboard', 'Home / Dashboard');
+        renderDashboard();
+    </script>
+</body>
+</html>

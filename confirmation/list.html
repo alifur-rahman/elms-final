@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP HRIS - Confirmation</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Confirmation Letters</h2>
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <span class="search-icon">&#128269;</span>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search by employee or letter no..." onkeyup="filterTable('searchInput','confirmationTable')">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="confirmationTable">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Confirmation Date</th>
+                                    <th>Effective Date</th>
+                                    <th>Letter No</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="confirmationBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- View Letter Modal -->
+    <div class="modal-overlay" id="letterModal" onclick="if(event.target===this)closeModal('letterModal')">
+        <div class="modal modal-lg" style="max-width:700px">
+            <div class="modal-header">
+                <h3>Confirmation Letter</h3>
+                <button class="modal-close" onclick="closeModal('letterModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="letterModalBody"></div>
+            <div class="modal-footer no-print">
+                <button class="btn btn-primary" onclick="printLetter()">Print</button>
+                <button class="btn btn-outline" onclick="closeModal('letterModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        var BASE_URL = '..';
+        renderSidebar('confirmation');
+        renderHeader('Confirmation', 'Home / Confirmation');
+
+        function renderStats() {
+            var all = DATA.confirmations.length;
+            var generated = DATA.confirmations.filter(function(c) { return c.status === 'Generated'; }).length;
+            var sent = DATA.confirmations.filter(function(c) { return c.status === 'Sent'; }).length;
+            var acknowledged = DATA.confirmations.filter(function(c) { return c.status === 'Acknowledged'; }).length;
+            document.getElementById('statsGrid').innerHTML =
+                '<div class="stat-card"><div class="stat-icon blue">&#128196;</div><div class="stat-info"><h3>' + all + '</h3><p>Total Letters</p></div></div>' +
+                '<div class="stat-card"><div class="stat-icon yellow">&#128260;</div><div class="stat-info"><h3>' + generated + '</h3><p>Generated</p></div></div>' +
+                '<div class="stat-card"><div class="stat-icon green">&#128228;</div><div class="stat-info"><h3>' + sent + '</h3><p>Sent</p></div></div>' +
+                '<div class="stat-card"><div class="stat-icon green">&#9989;</div><div class="stat-info"><h3>' + acknowledged + '</h3><p>Acknowledged</p></div></div>';
+        }
+
+        function renderTable() {
+            var html = '';
+            for (var i = 0; i < DATA.confirmations.length; i++) {
+                var c = DATA.confirmations[i];
+                var name = getEmployeeName(c.employee_id);
+                html += '<tr>' +
+                    '<td>' + name + '</td>' +
+                    '<td>' + formatDate(c.conf_date) + '</td>' +
+                    '<td>' + formatDate(c.eff_date) + '</td>' +
+                    '<td>' + c.letter_no + '</td>' +
+                    '<td><span class="badge ' + getBadgeClass(c.status) + '">' + c.status + '</span></td>' +
+                    '<td>' +
+                        '<div class="btn-group">' +
+                            '<button class="btn btn-sm btn-outline" onclick="viewLetter(' + i + ')">View Letter</button>' +
+                            '<button class="btn btn-sm btn-primary" onclick="sendLetter(' + i + ')">Send</button>' +
+                            '<button class="btn btn-sm btn-outline" onclick="printLetter(' + i + ')">Print</button>' +
+                        '</div>' +
+                    '</td>' +
+                    '</tr>';
+            }
+            document.getElementById('confirmationBody').innerHTML = html || '<tr><td colspan="6" class="text-muted text-center">No confirmation letters found</td></tr>';
+        }
+
+        function viewLetter(index) {
+            var c = DATA.confirmations[index];
+            if (!c) return;
+            var e = DATA.employees.find(function(emp) { return emp.id === c.employee_id; });
+            var name = getEmployeeName(c.employee_id);
+            var today = new Date();
+            var dateStr = today.toDateString();
+
+            var html = '<div class="letter-preview">' +
+                '<div class="letter-header">' +
+                    '<h2>ABC Corporation</h2>' +
+                    '<p>123 Business Park, Dhaka, Bangladesh</p>' +
+                '</div>' +
+                '<div class="letter-no">Ref: ' + c.letter_no + '<br>Date: ' + formatDate(c.conf_date) + '</div>' +
+                '<div class="letter-body">' +
+                    '<p><strong>To,</strong></p>' +
+                    '<p>' + name + '<br>' + (c.designation || '') + '<br>' + (c.department || '') + '<br>ABC Corporation</p>' +
+                    '<p style="margin-top:24px"><strong>Subject: Confirmation of Employment</strong></p>' +
+                    '<p>Dear ' + name + ',</p>' +
+                    '<p>We are pleased to inform you that based on your performance during the probation period, your employment with ABC Corporation has been confirmed effective from <strong>' + formatDate(c.eff_date) + '</strong>.</p>' +
+                    '<p>Your revised salary will be <strong>' + formatCurrency(c.salary_revision, 'BDT ') + '</strong> per month, effective from the confirmation date.</p>' +
+                    '<p>We appreciate your contribution and look forward to your continued success with the organization.</p>' +
+                    '<p>We wish you all the best in your future endeavors with us.</p>' +
+                '</div>' +
+                '<div class="letter-footer">' +
+                    '<p>Sincerely,</p>' +
+                    '<div class="signature-area">' +
+                        '<p style="font-weight:600">Authorized Signatory</p>' +
+                        '<p style="font-size:12px;color:var(--gray-500)">Human Resources Department<br>ABC Corporation</p>' +
+                        '<div class="sig-line">Authorized Signature</div>' +
+                    '</div>' +
+                '</div>' +
+                '</div>';
+
+            document.getElementById('letterModalBody').innerHTML = html;
+            openModal('letterModal');
+        }
+
+        function sendLetter(index) {
+            var c = DATA.confirmations[index];
+            if (!c) return;
+            if (c.status === 'Sent') { showAlert('Letter already sent', 'warning'); return; }
+            c.status = 'Sent';
+            showAlert('success', 'Confirmation letter sent to ' + getEmployeeName(c.employee_id));
+            renderTable();
+            renderStats();
+        }
+
+        function printLetter(index) {
+            if (index !== undefined) viewLetter(index);
+            setTimeout(function() { window.print(); }, 300);
+        }
+
+        renderStats();
+        renderTable();
+    </script>
+</body>
+</html>

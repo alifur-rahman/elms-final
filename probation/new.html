@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP HRIS - New Probation Appraisal</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .profile-card { display: flex; gap: 24px; align-items: center; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+        .profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #1565c0); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; flex-shrink: 0; }
+        .profile-details { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+        .detail-item label { display: block; font-size: 11px; color: var(--gray-500); margin-bottom: 2px; }
+        .detail-item span { font-size: 13px; font-weight: 500; }
+        .workflow-steps { display: flex; align-items: center; gap: 0; margin-bottom: 24px; padding: 20px; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; overflow-x: auto; }
+        .workflow-step { display: flex; align-items: center; gap: 8px; position: relative; flex-shrink: 0; cursor: pointer; }
+        .workflow-step .step-circle { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--gray-300); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--gray-400); background: #fff; transition: all .2s; }
+        .workflow-step.active .step-circle { border-color: var(--primary); background: var(--primary); color: #fff; }
+        .workflow-step.done .step-circle { border-color: var(--success); background: var(--success); color: #fff; }
+        .workflow-step .step-info { display: flex; flex-direction: column; }
+        .workflow-step .step-label { font-size: 12px; font-weight: 500; white-space: nowrap; }
+        .workflow-step .step-user { font-size: 10px; color: var(--gray-500); }
+        .workflow-connector { width: 40px; height: 2px; background: var(--gray-300); flex-shrink: 0; margin: 0 8px; }
+        .workflow-connector.done { background: var(--success); }
+        .appraisal-section { background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+        .appraisal-section .section-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; font-weight: 600; font-size: 14px; }
+        .appraisal-section .section-body { padding: 16px; }
+        .appraisal-table { width: 100%; border-collapse: collapse; }
+        .appraisal-table th { text-align: left; font-size: 12px; color: var(--gray-500); padding: 8px 12px; border-bottom: 1px solid var(--gray-200); }
+        .appraisal-table td { padding: 12px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; font-size: 13px; }
+        .rating-group { display: flex; flex-direction: row-reverse; gap: 4px; justify-content: flex-end; }
+        .rating-group input[type="radio"] { display: none; }
+        .rating-group label { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--gray-300); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; color: var(--gray-400); }
+        .rating-group label:hover { border-color: var(--primary); color: var(--primary); }
+        .rating-group input:checked ~ label { border-color: var(--primary); background: var(--primary); color: #fff; }
+        .meter-bar { display: flex; align-items: center; gap: 12px; }
+        .bar-track { flex: 1; height: 12px; background: var(--gray-200); border-radius: 6px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #f44336, #ff9800, #ffc107, #4caf50, #1b5e20); transition: width 0.5s ease; }
+        .bar-label { font-size: 14px; font-weight: 600; color: var(--primary); white-space: nowrap; }
+        .rec-option { display: flex; align-items: center; gap: 8px; padding: 16px; border: 2px solid var(--gray-200); border-radius: 8px; cursor: pointer; transition: all .2s; }
+        .rec-option:hover { border-color: var(--primary); }
+        .rec-option input[type="radio"] { width: 18px; height: 18px; accent-color: var(--primary); }
+        .weight-badge { font-size: 11px; color: var(--gray-500); font-weight: 400; }
+        .form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .employee-selector { padding: 16px; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; }
+        .employee-selector label { font-weight: 500; font-size: 14px; white-space: nowrap; }
+        .employee-selector select { min-width: 280px; }
+    </style>
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <!-- Employee Selector -->
+            <div class="employee-selector">
+                <label>Select Employee</label>
+                <select class="form-control" id="empSelect" onchange="onEmployeeChange()">
+                    <option value="">-- Choose an employee --</option>
+                </select>
+                <span style="font-size:12px;color:var(--gray-500)">Only employees on probation or eligible for appraisal are shown</span>
+            </div>
+
+            <!-- Form (hidden until employee selected) -->
+            <div id="appraisalForm" style="display:none">
+                <!-- Profile Card -->
+                <div class="profile-card" id="profileCard"></div>
+
+                <!-- Integrated Data Alert -->
+                <div class="alert alert-info mb-24" id="integratedDataAlert">
+                    <div>
+                        <strong>&#128202; Integrated Data</strong> &mdash; Attendance, leave, and KPI data pulled automatically from Employee Master, Attendance &amp; Leave modules.
+                        <span style="display:block;margin-top:4px;font-size:12px;color:var(--gray-600)">
+                            &#10003; Attendance: <span id="attPct">94</span>% &nbsp;|&nbsp; &#10003; Late Marks: <span id="lateMarks">2</span> &nbsp;|&nbsp; &#10003; Leave Balance: <span id="leaveBal">11.5</span> days &nbsp;|&nbsp; &#10003; Training: <span id="trainPct">85</span>% Complete
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Workflow Stages -->
+                <div class="workflow-steps">
+                    <div class="workflow-step active" data-step="1">
+                        <div class="step-circle">1</div>
+                        <div class="step-info"><span class="step-label">Self Assessment</span><span class="step-user">Employee</span></div>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-step" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-info"><span class="step-label">Supervisor</span><span class="step-user">Pending</span></div>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-step" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-info"><span class="step-label">Dept. Head</span><span class="step-user">Pending</span></div>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-step" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-info"><span class="step-label">HR Review</span><span class="step-user">Pending</span></div>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-step" data-step="5">
+                        <div class="step-circle">5</div>
+                        <div class="step-info"><span class="step-label">GM</span><span class="step-user">Pending</span></div>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-step" data-step="6">
+                        <div class="step-circle">6</div>
+                        <div class="step-info"><span class="step-label">Managing Director</span><span class="step-user">Pending</span></div>
+                    </div>
+                </div>
+
+                <!-- Overall Score -->
+                <div class="card mb-24">
+                    <div class="card-header">
+                        <h2>&#128202; Overall Score</h2>
+                        <span style="font-size:24px;font-weight:700;color:var(--primary)" id="overallScore">0.00</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="meter-bar">
+                            <div class="bar-track">
+                                <div class="bar-fill" id="scoreBar" style="width:0%"></div>
+                            </div>
+                            <span class="bar-label" id="scoreLabel">0 / 5</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--gray-500)">
+                            <span>Poor</span><span>Average</span><span>Good</span><span>Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Container -->
+                <div id="categoryContainer"></div>
+
+                <!-- Manager Comments -->
+                <div class="card mb-24">
+                    <div class="card-header"><h2>&#128221; Supervisor Comments</h2></div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <textarea id="supervisorComments" class="form-control textarea-full" placeholder="Enter supervisor's evaluation and feedback..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-24">
+                    <div class="card-header"><h2>&#128221; Department Head Comments</h2></div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <textarea id="deptHeadComments" class="form-control textarea-full" placeholder="Enter department head's review..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-24">
+                    <div class="card-header"><h2>&#127977; HR Review</h2></div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <textarea id="hrReview" class="form-control textarea-full-lg" placeholder="Enter HR review, overall assessment, and any additional notes..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendation -->
+                <div class="card mb-24">
+                    <div class="card-header"><h2>&#128203; Recommendation</h2></div>
+                    <div class="card-body">
+                        <div class="form-row-4" style="margin-bottom:20px">
+                            <label class="rec-option" data-rec="Confirm" onclick="selectRecommendation(this)">
+                                <input type="radio" name="recommendation" value="Confirm">
+                                <div>
+                                    <div style="font-weight:600;color:var(--success)">&#10004; Confirm</div>
+                                    <div style="font-size:11px;color:var(--gray-500)">Employee passes probation</div>
+                                </div>
+                            </label>
+                            <label class="rec-option" data-rec="Extend" onclick="selectRecommendation(this)">
+                                <input type="radio" name="recommendation" value="Extend">
+                                <div>
+                                    <div style="font-weight:600;color:var(--warning)">&#8987; Extend Probation</div>
+                                    <div style="font-size:11px;color:var(--gray-500)">Needs more time</div>
+                                </div>
+                            </label>
+                            <label class="rec-option" data-rec="Transfer" onclick="selectRecommendation(this)">
+                                <input type="radio" name="recommendation" value="Transfer">
+                                <div>
+                                    <div style="font-weight:600;color:var(--primary)">&#128260; Transfer</div>
+                                    <div style="font-size:11px;color:var(--gray-500)">Better fit elsewhere</div>
+                                </div>
+                            </label>
+                            <label class="rec-option" data-rec="Terminate" onclick="selectRecommendation(this)">
+                                <input type="radio" name="recommendation" value="Terminate">
+                                <div>
+                                    <div style="font-weight:600;color:var(--danger)">&#10008; Terminate</div>
+                                    <div style="font-size:11px;color:var(--gray-500)">Does not meet requirements</div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div id="extendSection" style="display:none" class="alert alert-warning mb-16">
+                            <div>
+                                <strong>Extend Probation</strong>
+                                <div style="margin-top:8px">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Extension Period (Months)</label>
+                                            <select id="extensionMonths" class="form-control" onchange="updateExtendEndDate()">
+                                                <option>1</option><option>2</option><option selected>3</option><option>6</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>New Probation End Date</label>
+                                            <input type="date" id="newProbationEnd" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Reason for Extension</label>
+                                        <textarea id="extensionReason" class="form-control textarea-full" placeholder="Explain why probation needs to be extended..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="transferSection" style="display:none" class="alert alert-info mb-16">
+                            <div>
+                                <strong>Transfer Employee</strong>
+                                <div style="margin-top:8px">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Transfer to Department</label>
+                                            <select id="transferDept" class="form-control">
+                                                <option>Engineering</option><option>Marketing</option><option>Finance</option><option>HR</option><option>Operations</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>New Designation</label>
+                                            <input type="text" id="transferDesignation" class="form-control" placeholder="e.g., Junior Engineer">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Reason for Transfer</label>
+                                        <textarea id="transferReason" class="form-control textarea-full" placeholder="Explain why transfer is recommended..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Overall Remarks</label>
+                            <textarea id="overallRemarks" class="form-control textarea-full-lg" placeholder="Additional remarks or justification for the recommendation..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                        <a href="list.html" class="btn btn-outline">&#8592; Back to List</a>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline" onclick="showAlert('Draft saved successfully','success')">Save Draft</button>
+                        <button type="button" class="btn btn-primary btn-lg" onclick="submitAppraisal()">Submit Appraisal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        var BASE_URL = '..';
+        renderSidebar('probation');
+        renderHeader('New Probation Appraisal', 'Home / Probation / New Appraisal');
+
+        // Populate employee selector
+        function populateEmployees() {
+            var sel = document.getElementById('empSelect');
+            for (var i = 0; i < DATA.employees.length; i++) {
+                var e = DATA.employees[i];
+                var opt = document.createElement('option');
+                opt.value = e.id;
+                opt.textContent = e.first_name + ' ' + e.last_name + ' (' + e.employee_code + ')';
+                sel.appendChild(opt);
+            }
+            sel.value = '';
+        }
+
+        // On employee change
+        function onEmployeeChange() {
+            var id = parseInt(document.getElementById('empSelect').value);
+            if (!id) {
+                document.getElementById('appraisalForm').style.display = 'none';
+                return;
+            }
+            document.getElementById('appraisalForm').style.display = 'block';
+            loadProfile(id);
+            loadCategories();
+            renderWorkflow(1);
+        }
+
+        // Load profile card
+        function loadProfile(empId) {
+            var e = DATA.employees.find(function(emp) { return emp.id === empId; });
+            if (!e) return;
+            var initials = e.first_name.charAt(0) + e.last_name.charAt(0);
+            var dept = getDeptName(e.dept_id);
+            var desig = getDesignationName(e.designation_id);
+            var p = DATA.probations.find(function(pr) { return pr.employee_id === empId; });
+            document.getElementById('profileCard').innerHTML =
+                '<div class="profile-avatar">' + initials + '</div>' +
+                '<div class="profile-details">' +
+                    '<div class="detail-item"><label>Employee Code</label><span>' + e.employee_code + '</span></div>' +
+                    '<div class="detail-item"><label>Employee Name</label><span>' + e.first_name + ' ' + e.last_name + '</span></div>' +
+                    '<div class="detail-item"><label>Department</label><span>' + dept + '</span></div>' +
+                    '<div class="detail-item"><label>Designation</label><span>' + desig + '</span></div>' +
+                    '<div class="detail-item"><label>Joining Date</label><span>' + (p && p.joining_date ? formatDate(p.joining_date) : 'N/A') + '</span></div>' +
+                    '<div class="detail-item"><label>Probation End</label><span>' + (p && p.end_date ? formatDate(p.end_date) : 'N/A') + '</span></div>' +
+                    '<div class="detail-item"><label>Reporting Manager</label><span>' + getEmployeeName(e.reporting_manager) + '</span></div>' +
+                    '<div class="detail-item"><label>Current Leave</label><span>3.5 / 15 days</span></div>' +
+                    '<div class="detail-item"><label>Attendance %</label><span>94%</span></div>' +
+                    '<div class="detail-item"><label>Late %</label><span>2%</span></div>' +
+                '</div>';
+        }
+
+        // Render workflow stages
+        function renderWorkflow(currentStep) {
+            var steps = document.querySelectorAll('.workflow-step');
+            var conns = document.querySelectorAll('.workflow-connector');
+            for (var i = 0; i < steps.length; i++) {
+                steps[i].classList.remove('active', 'done');
+                var stepNum = parseInt(steps[i].getAttribute('data-step'));
+                if (stepNum < currentStep) {
+                    steps[i].classList.add('done');
+                    steps[i].querySelector('.step-circle').innerHTML = '&#10003;';
+                } else if (stepNum === currentStep) {
+                    steps[i].classList.add('active');
+                }
+                if (i < conns.length) {
+                    conns[i].classList.toggle('done', i < currentStep - 1);
+                }
+            }
+        }
+
+        // Load categories + questions
+        function loadCategories() {
+            var container = document.getElementById('categoryContainer');
+            container.innerHTML = '';
+            for (var c = 0; c < DATA.appraisalCategories.length; c++) {
+                var cat = DATA.appraisalCategories[c];
+                var section = document.createElement('div');
+                section.className = 'appraisal-section';
+                section.innerHTML =
+                    '<div class="section-header" style="background:#e8f0fe">' +
+                        '<span>' + cat.name + '</span>' +
+                        '<span class="weight-badge">Weight: ' + cat.weight + '% | Avg: <span class="section-avg" id="avg_' + cat.id + '">-</span></span>' +
+                    '</div>' +
+                    '<div class="section-body">' +
+                        '<table class="appraisal-table">' +
+                            '<thead><tr><th style="width:40%">Question</th><th style="width:35%">Rating (1-5)</th><th>Comments</th></tr></thead>' +
+                            '<tbody id="qBody_' + cat.id + '"></tbody>' +
+                        '</table>' +
+                    '</div>';
+                container.appendChild(section);
+                // Create sample questions per category
+                var tbody = document.getElementById('qBody_' + cat.id);
+                var sampleQs = [
+                    cat.name + ' - Demonstrates understanding of role requirements',
+                    cat.name + ' - Maintains consistent performance standards',
+                    cat.name + ' - Shows improvement and learning ability'
+                ];
+                for (var q = 0; q < sampleQs.length; q++) {
+                    var qid = cat.id + '_' + q;
+                    var tr = document.createElement('tr');
+                    tr.innerHTML =
+                        '<td>' + sampleQs[q] + '</td>' +
+                        '<td>' +
+                            '<div class="rating-group">' +
+                                '<input type="radio" name="rating_' + qid + '" id="r_' + qid + '_5" value="5" onchange="recalcScore()"><label for="r_' + qid + '_5">5</label>' +
+                                '<input type="radio" name="rating_' + qid + '" id="r_' + qid + '_4" value="4" onchange="recalcScore()"><label for="r_' + qid + '_4">4</label>' +
+                                '<input type="radio" name="rating_' + qid + '" id="r_' + qid + '_3" value="3" onchange="recalcScore()"><label for="r_' + qid + '_3">3</label>' +
+                                '<input type="radio" name="rating_' + qid + '" id="r_' + qid + '_2" value="2" onchange="recalcScore()"><label for="r_' + qid + '_2">2</label>' +
+                                '<input type="radio" name="rating_' + qid + '" id="r_' + qid + '_1" value="1" onchange="recalcScore()"><label for="r_' + qid + '_1">1</label>' +
+                            '</div>' +
+                        '</td>' +
+                        '<td><input type="text" class="form-control" placeholder="Optional comments..." style="min-width:120px"></td>';
+                    tbody.appendChild(tr);
+                }
+            }
+        }
+
+        // Calculate overall score
+        function recalcScore() {
+            var totalWeight = 0;
+            var weightedSum = 0;
+            for (var c = 0; c < DATA.appraisalCategories.length; c++) {
+                var cat = DATA.appraisalCategories[c];
+                var qs = document.querySelectorAll('#qBody_' + cat.id + ' tr');
+                var catSum = 0;
+                var catCount = 0;
+                for (var q = 0; q < qs.length; q++) {
+                    var checked = qs[q].querySelector('input[type="radio"]:checked');
+                    if (checked) {
+                        catSum += parseInt(checked.value);
+                        catCount++;
+                    }
+                }
+                var avg = catCount > 0 ? catSum / catCount : 0;
+                weightedSum += avg * cat.weight;
+                totalWeight += cat.weight;
+                document.getElementById('avg_' + cat.id).textContent = catCount > 0 ? avg.toFixed(1) : '-';
+            }
+            var overall = totalWeight > 0 ? (weightedSum / totalWeight) : 0;
+            document.getElementById('overallScore').textContent = overall.toFixed(2);
+            document.getElementById('scoreBar').style.width = (overall / 5 * 100) + '%';
+            document.getElementById('scoreLabel').textContent = overall.toFixed(1) + ' / 5';
+        }
+
+        // Recommendation selection
+        function selectRecommendation(el) {
+            document.querySelectorAll('.rec-option').forEach(function(l) {
+                l.style.borderColor = 'var(--gray-200)';
+                l.style.background = 'transparent';
+            });
+            var val = el.querySelector('input').value;
+            var colors = { Confirm: 'var(--success)', Extend: 'var(--warning)', Transfer: 'var(--primary)', Terminate: 'var(--danger)' };
+            var bgColors = { Confirm: '#e6f4ea', Extend: '#fef7e0', Transfer: '#e8f0fe', Terminate: '#fce8e6' };
+            el.style.borderColor = colors[val] || 'var(--gray-200)';
+            el.style.background = bgColors[val] || 'transparent';
+            el.querySelector('input').checked = true;
+            document.getElementById('extendSection').style.display = val === 'Extend' ? 'block' : 'none';
+            document.getElementById('transferSection').style.display = val === 'Transfer' ? 'block' : 'none';
+        }
+
+        function updateExtendEndDate() {
+            var months = parseInt(document.getElementById('extensionMonths').value);
+            var today = new Date();
+            var end = new Date(today.setMonth(today.getMonth() + months));
+            document.getElementById('newProbationEnd').value = end.toISOString().slice(0, 10);
+        }
+
+        // Submit
+        function submitAppraisal() {
+            var empId = document.getElementById('empSelect').value;
+            if (!empId) { showAlert('Please select an employee', 'error'); return; }
+            var rec = document.querySelector('input[name="recommendation"]:checked');
+            if (!rec) { showAlert('Please select a recommendation', 'error'); return; }
+            showAlert('Appraisal submitted successfully! It will now go through the approval workflow.', 'success');
+        }
+
+        // Format date helper
+        function formatDate(d) {
+            if (!d) return '';
+            var date = new Date(d + 'T00:00:00');
+            return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+        }
+
+        populateEmployees();
+    </script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Onboarding - ERP HRIS</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .progress-bar-container { display: flex; align-items: center; gap: 8px; }
+        .progress-bar { flex: 1; height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; max-width: 120px; }
+        .progress-bar .progress-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease; }
+        .progress-fill.complete { background: var(--success); }
+        .progress-fill.partial { background: var(--warning); }
+        .progress-fill.none { background: var(--gray-300); }
+        .progress-text { font-size: 12px; font-weight: 500; color: var(--gray-600); white-space: nowrap; }
+        .empty-state { text-align: center; padding: 48px 24px; color: var(--gray-500); }
+        .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+        .task-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--success); }
+        .task-completed { text-decoration: line-through; color: var(--gray-400); }
+    </style>
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Pre-Onboarding Checklist</h2>
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <span class="search-icon">&#128269;</span>
+                            <input type="text" id="preSearch" placeholder="Search candidate..." onkeyup="filterTable('preSearch','preTable')">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body" style="padding:0">
+                    <div class="table-container">
+                        <table id="preTable">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Job</th>
+                                    <th>Joining Date</th>
+                                    <th>Tasks Progress</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="preTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Task Checklist Modal -->
+    <div class="modal-overlay" id="taskChecklistModal" onclick="if(event.target===this)closeModal('taskChecklistModal')">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3>Task Checklist - <span id="taskCandidateName"></span></h3>
+                <button class="modal-close" onclick="closeModal('taskChecklistModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom:16px;text-align:right">
+                    <button class="btn btn-sm btn-primary" onclick="openAddTask()">+ Add Task</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:40px"></th>
+                                <th>Task</th>
+                                <th>Type</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="taskChecklistBody"></tbody>
+                    </table>
+                </div>
+                <div id="taskEmptyState" class="empty-state" style="display:none">
+                    <div class="empty-icon">📋</div>
+                    <p>No tasks for this candidate yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal-overlay" id="addTaskModal" onclick="if(event.target===this)closeModal('addTaskModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add Task</h3>
+                <button class="modal-close" onclick="closeModal('addTaskModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addTaskForm">
+                    <input type="hidden" id="addTaskCandidateId">
+                    <div class="form-group">
+                        <label>Task Name <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="taskName" placeholder="Enter task name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Task Type <span class="required">*</span></label>
+                        <select class="form-control" id="taskType" required>
+                            <option value="">Select type</option>
+                            <option value="Document">Document</option>
+                            <option value="Verification">Verification</option>
+                            <option value="Orientation">Orientation</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Formality">Formality</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="form-control" id="taskDesc" rows="3" placeholder="Task description..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date <span class="required">*</span></label>
+                        <input type="date" class="form-control" id="taskDue" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0">
+                        <button type="button" class="btn btn-primary" onclick="submitAddTask()">Add Task</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('addTaskModal')" style="margin-left:8px">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        var currentTaskCandidateId = 0;
+
+        function renderPreOnboarding() {
+            var candIds = [];
+            var offered = DATA.candidates.filter(function(c) { return c.status === 'Offered'; });
+            var joined = DATA.candidates.filter(function(c) { return c.status === 'Joined'; });
+            var combined = offered.concat(joined);
+
+            var tbody = document.getElementById('preTableBody');
+            if (combined.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📋</div><p>No candidates in pre-onboarding.</p></div></td></tr>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < combined.length; i++) {
+                var c = combined[i];
+                var jTitle = getJobTitle(c.job_id);
+                var offer = DATA.offers.find(function(o) { return o.candidate_id === c.id; });
+                var joinDate = offer ? formatDate(offer.joining_date) : '-';
+                var tasks = DATA.preOnboardingTasks.filter(function(t) { return t.candidate_id === c.id; });
+                var total = tasks.length;
+                var completed = tasks.filter(function(t) { return t.status === 'Completed'; }).length;
+                var pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+                var fillClass = pct === 100 ? 'complete' : pct > 0 ? 'partial' : 'none';
+                var progressHtml = '<div class="progress-bar-container">' +
+                    '<div class="progress-bar"><div class="progress-fill ' + fillClass + '" style="width:' + pct + '%"></div></div>' +
+                    '<span class="progress-text">' + completed + '/' + total + ' Completed</span>' +
+                '</div>';
+
+                html += '<tr>' +
+                    '<td><strong>' + getCandidateName(c.id) + '</strong></td>' +
+                    '<td>' + jTitle + '</td>' +
+                    '<td>' + joinDate + '</td>' +
+                    '<td>' + progressHtml + '</td>' +
+                    '<td><button class="btn btn-sm btn-primary" onclick="openTaskChecklist(' + c.id + ')">View Tasks</button></td>' +
+                '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function openTaskChecklist(candidateId) {
+            currentTaskCandidateId = candidateId;
+            var cName = getCandidateName(candidateId);
+            document.getElementById('taskCandidateName').textContent = cName;
+            document.getElementById('addTaskCandidateId').value = candidateId;
+
+            var tasks = DATA.preOnboardingTasks.filter(function(t) { return t.candidate_id === candidateId; });
+            var tbody = document.getElementById('taskChecklistBody');
+            var emptyState = document.getElementById('taskEmptyState');
+
+            if (tasks.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+                var html = '';
+                for (var i = 0; i < tasks.length; i++) {
+                    var t = tasks[i];
+                    var isCompleted = t.status === 'Completed';
+                    var checked = isCompleted ? 'checked' : '';
+                    var rowClass = isCompleted ? 'task-completed' : '';
+                    var badgeClass = getBadgeClass(t.status);
+                    var dueDate = formatDate(t.due);
+                    html += '<tr>' +
+                        '<td><input type="checkbox" class="task-checkbox" ' + checked + ' onchange="toggleTask(' + t.id + ', this.checked)"></td>' +
+                        '<td class="' + rowClass + '"><strong>' + t.task + '</strong>' + (t.desc ? '<br><span style="font-size:11px;color:var(--gray-500)">' + t.desc + '</span>' : '') + '</td>' +
+                        '<td><span class="badge badge-in-progress">' + t.type + '</span></td>' +
+                        '<td>' + dueDate + '</td>' +
+                        '<td><span class="badge ' + badgeClass + '">' + t.status + '</span></td>' +
+                    '</tr>';
+                }
+                tbody.innerHTML = html;
+            }
+            openModal('taskChecklistModal');
+        }
+
+        function toggleTask(taskId, checked) {
+            var task = DATA.preOnboardingTasks.find(function(t) { return t.id === taskId; });
+            if (task) {
+                task.status = checked ? 'Completed' : 'In Progress';
+                task.completed_at = checked ? new Date().toISOString().split('T')[0] : null;
+            }
+            showAlert('Task marked ' + (checked ? 'complete' : 'incomplete'), 'success');
+            // Refresh the task list
+            var cId = currentTaskCandidateId;
+            if (cId) openTaskChecklist(cId);
+            renderPreOnboarding();
+        }
+
+        function openAddTask() {
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskType').value = '';
+            document.getElementById('taskDesc').value = '';
+            document.getElementById('taskDue').value = '';
+            closeModal('taskChecklistModal');
+            openModal('addTaskModal');
+        }
+
+        function submitAddTask() {
+            var name = document.getElementById('taskName').value;
+            var type = document.getElementById('taskType').value;
+            var due = document.getElementById('taskDue').value;
+            var desc = document.getElementById('taskDesc').value;
+            var cId = parseInt(document.getElementById('addTaskCandidateId').value);
+            if (!name || !type || !due) {
+                showAlert('Please fill all required fields', 'error');
+                return;
+            }
+            var newId = DATA.preOnboardingTasks.length > 0 ? Math.max.apply(null, DATA.preOnboardingTasks.map(function(t) { return t.id; })) + 1 : 1;
+            DATA.preOnboardingTasks.push({
+                id: newId,
+                candidate_id: cId,
+                task: name,
+                type: type,
+                desc: desc || '',
+                due: due,
+                assigned: 'Admin User',
+                status: 'Pending'
+            });
+            showAlert('Task added successfully', 'success');
+            closeModal('addTaskModal');
+            openTaskChecklist(cId);
+            renderPreOnboarding();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderPreOnboarding();
+        });
+        var BASE_URL = '..';
+        renderSidebar('pre_onboarding');
+        renderHeader('Pre-Onboarding', 'Onboarding / Pre-Onboarding');
+    </script>
+</body>
+</html>

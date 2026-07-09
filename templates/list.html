@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter Templates - ERP HRIS</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div id="sidebar"></div>
+<main class="main-content">
+    <div id="header"></div>
+    <div class="page-content">
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Letter Templates</h2>
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="templateSearch" placeholder="Search templates..." onkeyup="filterTable('templateSearch','templateTable',0)">
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('addTemplateModal')">+ New Template</button>
+                </div>
+            </div>
+            <div class="card-body" style="padding:0">
+                <div class="table-container">
+                    <table id="templateTable">
+                        <thead>
+                            <tr><th>Template Name</th><th>Module</th><th>Status</th><th>Last Updated</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Standard Confirmation Letter</strong></td>
+                                <td>Confirmation</td>
+                                <td><span class="badge badge-completed">Active</span></td>
+                                <td>Jan 01, 2026</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-primary" onclick="openModal('viewTemplateModal')">View</button>
+                                        <button class="btn btn-sm btn-warning">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Offer Letter - Standard</strong></td>
+                                <td>Offer</td>
+                                <td><span class="badge badge-completed">Active</span></td>
+                                <td>Jan 01, 2026</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-primary">View</button>
+                                        <button class="btn btn-sm btn-warning">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Probation Extension Letter</strong></td>
+                                <td>Probation</td>
+                                <td><span class="badge badge-completed">Active</span></td>
+                                <td>Feb 15, 2026</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-primary">View</button>
+                                        <button class="btn btn-sm btn-warning">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Termination Letter</strong></td>
+                                <td>Probation</td>
+                                <td><span class="badge badge-pending">Inactive</span></td>
+                                <td>Mar 01, 2026</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-primary">View</button>
+                                        <button class="btn btn-sm btn-warning">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Template Modal -->
+        <div class="modal-overlay" id="viewTemplateModal" onclick="if(event.target===this)closeModal('viewTemplateModal')" style="display:none">
+            <div class="modal" style="max-width:700px">
+                <div class="modal-header">
+                    <h3>Standard Confirmation Letter</h3>
+                    <button class="modal-close" onclick="closeModal('viewTemplateModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="border:1px solid var(--gray-200);border-radius:8px;padding:24px;background:#fff;font-family:serif;line-height:1.8">
+                        <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:16px;margin-bottom:16px">
+                            <h2 style="margin:0">TechCorp International</h2>
+                            <p style="color:var(--gray-600);font-size:12px">Employee Lifecycle Management</p>
+                        </div>
+                        <p>Date: {{CONFIRM_DATE}}</p>
+                        <p>Dear {{EMP_NAME}},</p>
+                        <p><strong>Sub: Confirmation of Employment</strong></p>
+                        <p>Congratulations!</p>
+                        <p>Based on your performance during the probation period and the recommendation of the review committee, we are pleased to confirm your employment with TechCorp International.</p>
+                        <p>Your confirmation details are as follows:</p>
+                        <table style="width:100%;border-collapse:collapse;margin:12px 0">
+                            <tr><td style="padding:4px 8px;font-weight:500">Employee Code:</td><td>{{EMP_CODE}}</td></tr>
+                            <tr><td style="padding:4px 8px;font-weight:500">Designation:</td><td>{{DESIGNATION}}</td></tr>
+                            <tr><td style="padding:4px 8px;font-weight:500">Department:</td><td>{{DEPARTMENT}}</td></tr>
+                            <tr><td style="padding:4px 8px;font-weight:500">Effective Date:</td><td>{{EFF_DATE}}</td></tr>
+                            <tr><td style="padding:4px 8px;font-weight:500">Revised Salary:</td><td>{{SALARY}}</td></tr>
+                        </table>
+                        <p>We appreciate your contributions and look forward to your continued growth with the organization.</p>
+                        <br>
+                        <p>Best Regards,</p>
+                        <p style="margin-top:32px"><strong>Admin User</strong><br>Human Resources Manager<br>TechCorp International</p>
+                    </div>
+                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                        <button class="btn btn-primary" onclick="closeModal('viewTemplateModal');showAlert('Template updated','success')">Save Changes</button>
+                        <button class="btn" onclick="closeModal('viewTemplateModal')">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Template Modal -->
+        <div class="modal-overlay" id="addTemplateModal" onclick="if(event.target===this)closeModal('addTemplateModal')" style="display:none">
+            <div class="modal" style="max-width:700px">
+                <div class="modal-header">
+                    <h3>Create New Template</h3>
+                    <button class="modal-close" onclick="closeModal('addTemplateModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Template Name <span class="required">*</span></label>
+                        <input type="text" class="form-control" placeholder="Enter template name">
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Module <span class="required">*</span></label>
+                            <select class="form-control">
+                                <option>Confirmation</option>
+                                <option>Offer</option>
+                                <option>Probation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control"><option>Active</option><option>Inactive</option></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Template Content <span class="required">*</span></label>
+                        <textarea class="form-control" rows="15" style="font-family:monospace;font-size:13px" placeholder="Enter template HTML/content with merge tags..."></textarea>
+                    </div>
+                    <div style="font-size:12px;color:var(--gray-500);margin-bottom:16px">
+                        Available merge tags: {{EMP_NAME}}, {{EMP_CODE}}, {{DESIGNATION}}, {{DEPARTMENT}}, {{JOIN_DATE}}, {{CONFIRM_DATE}}, {{EFF_DATE}}, {{SALARY}}, {{COMPANY}}, {{HR_NAME}}
+                    </div>
+                    <div style="display:flex;gap:8px;justify-content:flex-end">
+                        <button class="btn btn-primary" onclick="closeModal('addTemplateModal');showAlert('Template created','success')">Create Template</button>
+                        <button class="btn" onclick="closeModal('addTemplateModal')">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+        var BASE_URL = '..';
+        renderSidebar('templates');
+renderHeader('Letter Templates', 'Home / Templates');
+</script>
+</body>
+</html>

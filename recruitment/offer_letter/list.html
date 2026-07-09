@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer Letter - ERP HRIS</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .letter-preview { background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 40px; max-width: 700px; margin: 0 auto; font-size: 13px; line-height: 1.7; }
+        .letter-preview .letter-header { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 24px; margin-bottom: 24px; }
+        .letter-preview .letter-header .company-name { font-size: 22px; font-weight: 700; color: var(--primary); }
+        .letter-preview .letter-header .company-sub { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+        .letter-preview .letter-date { text-align: right; margin-bottom: 20px; font-size: 12px; color: var(--gray-600); }
+        .letter-preview .letter-salutation { margin-bottom: 16px; }
+        .letter-preview .letter-body { margin-bottom: 20px; }
+        .letter-preview .letter-details { margin: 20px 0; }
+        .letter-preview .letter-details table { width: 100%; border-collapse: collapse; }
+        .letter-preview .letter-details td { padding: 8px 12px; border: 1px solid var(--gray-200); font-size: 13px; }
+        .letter-preview .letter-details td:first-child { font-weight: 600; width: 40%; background: var(--gray-50); }
+        .letter-preview .letter-terms { margin: 16px 0; padding: 16px; background: var(--gray-50); border-radius: 6px; font-size: 12px; }
+        .letter-preview .letter-terms h4 { font-size: 13px; margin-bottom: 8px; }
+        .letter-preview .letter-terms ul { padding-left: 20px; margin: 0; }
+        .letter-preview .letter-terms li { margin-bottom: 4px; }
+        .letter-preview .letter-footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--gray-200); }
+        .letter-preview .letter-footer .signature { margin-top: 40px; }
+        .letter-preview .letter-footer .signature-line { width: 200px; border-top: 1px solid var(--gray-900); margin-top: 40px; padding-top: 8px; font-size: 12px; color: var(--gray-600); }
+        .empty-state { text-align: center; padding: 48px 24px; color: var(--gray-500); }
+        .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Offer Letters</h2>
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <span class="search-icon">&#128269;</span>
+                            <input type="text" id="offerSearch" placeholder="Search candidate or status..." onkeyup="filterTable('offerSearch','offerTable')">
+                        </div>
+                        <select class="form-control" id="statusFilter" onchange="filterByStatus()">
+                            <option value="">All Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Accepted">Accepted</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body" style="padding:0">
+                    <div class="table-container">
+                        <table id="offerTable">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Position</th>
+                                    <th>Offered Salary</th>
+                                    <th>Joining Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="offerTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Send Offer Letter Modal -->
+    <div class="modal-overlay" id="sendOfferModal" onclick="if(event.target===this)closeModal('sendOfferModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Send Offer Letter</h3>
+                <button class="modal-close" onclick="closeModal('sendOfferModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="sendOfferInfo"></div>
+                <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--gray-200)">
+                    <button class="btn btn-primary" onclick="submitSendOffer()">Send Offer Letter</button>
+                    <button class="btn btn-outline" onclick="closeModal('sendOfferModal')" style="margin-left:8px">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Offer Letter Modal -->
+    <div class="modal-overlay" id="viewOfferModal" onclick="if(event.target===this)closeModal('viewOfferModal')">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3>Offer Letter</h3>
+                <button class="modal-close" onclick="closeModal('viewOfferModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="letter-preview" id="letterPreview"></div>
+                <div style="margin-top:20px;text-align:right">
+                    <button class="btn btn-primary" onclick="window.print()">Print</button>
+                    <button class="btn btn-outline" onclick="closeModal('viewOfferModal')" style="margin-left:8px">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/data.js"></script>
+    <script src="../../js/app.js"></script>
+    <script>
+        var offerList = [];
+
+        function renderOffers() {
+            offerList = DATA.offers.slice();
+            var tbody = document.getElementById('offerTableBody');
+            if (offerList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📄</div><p>No offer letters found.</p></div></td></tr>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < offerList.length; i++) {
+                var o = offerList[i];
+                var cName = getCandidateName(o.candidate_id);
+                var cand = DATA.candidates.find(function(c) { return c.id === o.candidate_id; });
+                var jTitle = cand ? getJobTitle(cand.job_id) : 'N/A';
+                var salary = formatCurrency(o.salary, '৳');
+                var jDate = formatDate(o.joining_date);
+                var badge = '<span class="badge ' + getBadgeClass(o.status) + '">' + o.status + '</span>';
+                var action = '';
+                if (o.status === 'Accepted') {
+                    action = '<button class="btn btn-sm btn-success" onclick="window.open(\'../../employee_master/list.html\',\'_blank\')">Create Employee</button>';
+                } else if (o.status === 'Pending') {
+                    action = '<div class="btn-group">' +
+                        '<button class="btn btn-sm btn-primary" onclick="openSendOffer(' + o.id + ')">Send</button>' +
+                        '<button class="btn btn-sm btn-outline" onclick="showAlert(\'Edit offer feature coming soon\',\'info\')">Edit</button>' +
+                        '<button class="btn btn-sm btn-outline" onclick="openViewOffer(' + o.id + ')">View</button>' +
+                    '</div>';
+                } else if (o.status === 'Rejected') {
+                    action = '<span class="badge badge-terminate">Rejected</span>';
+                } else {
+                    action = '<button class="btn btn-sm btn-outline" onclick="openViewOffer(' + o.id + ')">View</button>';
+                }
+                html += '<tr>' +
+                    '<td><strong>' + cName + '</strong></td>' +
+                    '<td>' + jTitle + '</td>' +
+                    '<td>' + salary + '</td>' +
+                    '<td>' + jDate + '</td>' +
+                    '<td>' + badge + '</td>' +
+                    '<td>' + action + '</td>' +
+                '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function filterByStatus() {
+            var val = document.getElementById('statusFilter').value.toLowerCase();
+            var rows = document.querySelectorAll('#offerTable tbody tr');
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].querySelectorAll('td');
+                if (cells.length < 5) continue;
+                if (!val) { rows[i].style.display = ''; continue; }
+                var statusCell = cells[4].textContent.toLowerCase().trim();
+                rows[i].style.display = statusCell === val ? '' : 'none';
+            }
+        }
+
+        function openSendOffer(offerId) {
+            var o = DATA.offers.find(function(o) { return o.id === offerId; });
+            if (!o) return;
+            var cName = getCandidateName(o.candidate_id);
+            var cand = DATA.candidates.find(function(c) { return c.id === o.candidate_id; });
+            var jTitle = cand ? getJobTitle(cand.job_id) : 'N/A';
+            var dept = getDeptName(o.dept_id);
+            var desig = getDesignationName(o.designation_id);
+            var salary = formatCurrency(o.salary, '৳');
+            var jDate = formatDate(o.joining_date);
+
+            document.getElementById('sendOfferInfo').innerHTML =
+                '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
+                    '<div><label style="font-size:12px;color:var(--gray-500)">Candidate</label><div style="font-weight:500">' + cName + '</div></div>' +
+                    '<div><label style="font-size:12px;color:var(--gray-500)">Position</label><div style="font-weight:500">' + jTitle + '</div></div>' +
+                    '<div><label style="font-size:12px;color:var(--gray-500)">Department</label><div>' + dept + '</div></div>' +
+                    '<div><label style="font-size:12px;color:var(--gray-500)">Designation</label><div>' + desig + '</div></div>' +
+                    '<div><label style="font-size:12px;color:var(--gray-500)">Offered Salary</label><div style="font-weight:600;color:var(--success)">' + salary + '</div></div>' +
+                    '<div><label style="font-size:12px;color:var(--gray-500)">Joining Date</label><div>' + jDate + '</div></div>' +
+                    '<div><label style="font-size:12px;color:var(--gray-500)">Probation</label><div>' + o.probation_months + ' months</div></div>' +
+                '</div>';
+            document.getElementById('sendOfferInfo').dataset.offerId = offerId;
+            openModal('sendOfferModal');
+        }
+
+        function submitSendOffer() {
+            showAlert('Offer letter sent to candidate', 'success');
+            closeModal('sendOfferModal');
+        }
+
+        function openViewOffer(offerId) {
+            var o = DATA.offers.find(function(o) { return o.id === offerId; });
+            if (!o) return;
+            var c = DATA.candidates.find(function(c) { return c.id === o.candidate_id; });
+            var cName = c ? c.first_name + ' ' + c.last_name : 'N/A';
+            var cEmail = c ? c.email : 'N/A';
+            var cPhone = c ? c.phone : 'N/A';
+            var jTitle = c ? getJobTitle(c.job_id) : 'N/A';
+            var dept = getDeptName(o.dept_id);
+            var desig = getDesignationName(o.designation_id);
+            var salary = formatCurrency(o.salary, '৳');
+            var jDate = formatDate(o.joining_date);
+            var today = new Date();
+            var dateStr = formatDate(today.toISOString().split('T')[0]);
+            var terms = [
+                'This offer is contingent upon successful background verification.',
+                'The probation period is ' + o.probation_months + ' months from the date of joining.',
+                'All company policies and code of conduct must be adhered to.',
+                'This offer letter is valid for 7 days from the date of issuance.',
+                'Joining formalities include submission of all required documents.'
+            ];
+            var termsHtml = '';
+            for (var i = 0; i < terms.length; i++) {
+                termsHtml += '<li>' + terms[i] + '</li>';
+            }
+
+            document.getElementById('letterPreview').innerHTML =
+                '<div class="letter-header">' +
+                    '<div class="company-name">ERP HRIS Ltd.</div>' +
+                    '<div class="company-sub">123 Business Avenue, Dhaka, Bangladesh | info@erphris.com | +880 1700-000000</div>' +
+                '</div>' +
+                '<div class="letter-date">Date: ' + dateStr + '</div>' +
+                '<div class="letter-salutation">' +
+                    '<strong>To,</strong><br>' +
+                    cName + '<br>' +
+                    cEmail + '<br>' +
+                    cPhone +
+                '</div>' +
+                '<div class="letter-body">' +
+                    '<p><strong>Sub: Offer of Employment</strong></p>' +
+                    '<p>Dear ' + cName + ',</p>' +
+                    '<p>We are pleased to offer you the position of <strong>' + desig + '</strong> in the <strong>' + dept + '</strong> department at ERP HRIS Ltd. We were impressed with your qualifications and believe your skills will be a valuable addition to our team.</p>' +
+                '</div>' +
+                '<div class="letter-details">' +
+                    '<table>' +
+                        '<tr><td>Position</td><td>' + jTitle + ' (' + desig + ')</td></tr>' +
+                        '<tr><td>Department</td><td>' + dept + '</td></tr>' +
+                        '<tr><td>Offered Salary</td><td>' + salary + '/month</td></tr>' +
+                        '<tr><td>Joining Date</td><td>' + jDate + '</td></tr>' +
+                        '<tr><td>Probation Period</td><td>' + o.probation_months + ' months</td></tr>' +
+                        '<tr><td>Reporting Manager</td><td>' + getEmployeeName(o.reporting_manager) + '</td></tr>' +
+                        '<tr><td>Work Location</td><td>' + (c ? getJobTitle(c.job_id) : '') + '</td></tr>' +
+                    '</table>' +
+                '</div>' +
+                '<div class="letter-terms">' +
+                    '<h4>Terms &amp; Conditions</h4>' +
+                    '<ul>' + termsHtml + '</ul>' +
+                '</div>' +
+                '<div class="letter-footer">' +
+                    '<p>We look forward to welcoming you to our team. Please sign and return a copy of this letter to confirm your acceptance.</p>' +
+                    '<div class="signature">' +
+                        '<p>Sincerely,</p>' +
+                        '<div class="signature-line">Authorized Signatory<br>ERP HRIS Ltd.</div>' +
+                    '</div>' +
+                '</div>';
+            openModal('viewOfferModal');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderOffers();
+        });
+        var BASE_URL = '../..';
+        renderSidebar('offer_letter');
+        renderHeader('Offer Letter', 'Recruitment / Offer Letter');
+    </script>
+</body>
+</html>

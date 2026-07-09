@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP HRIS - Lifecycle Timeline</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .employee-selector { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .employee-selector label { font-weight: 500; font-size: 13px; color: var(--gray-700); }
+        .employee-selector select { min-width: 320px; }
+        .lifecycle-timeline { position: relative; padding-left: 40px; margin: 32px 0; }
+        .lifecycle-timeline::before { content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 3px; background: var(--gray-200); border-radius: 2px; }
+        .lt-event { position: relative; padding-bottom: 32px; }
+        .lt-event:last-child { padding-bottom: 0; }
+        .lt-event .lt-icon { position: absolute; left: -32px; top: 0; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 3px solid var(--gray-300); background: #fff; z-index: 1; }
+        .lt-event.completed .lt-icon { background: var(--success); border-color: var(--success); color: #fff; }
+        .lt-event.current .lt-icon { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 0 0 4px rgba(26,115,232,.2); }
+        .lt-event.upcoming .lt-icon { background: #fff; border-color: var(--gray-300); color: var(--gray-400); }
+        .lt-event .lt-card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 14px 18px; margin-left: 16px; border-left: 3px solid var(--gray-300); }
+        .lt-event.completed .lt-card { border-left-color: var(--success); }
+        .lt-event.current .lt-card { border-left-color: var(--primary); }
+        .lt-event .lt-date { font-size: 11px; color: var(--gray-500); }
+        .lt-event .lt-label { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-top: 2px; }
+        .lt-event .lt-desc { font-size: 12px; color: var(--gray-600); margin-top: 4px; }
+        .lt-event .lt-status { margin-top: 8px; }
+        .summary-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 24px; display: grid; grid-template-columns: auto 1fr; gap: 20px 32px; align-items: start; }
+        .summary-card .sc-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; grid-row: span 2; }
+        .summary-card .sc-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+        .summary-card .sc-item label { display: block; font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+        .summary-card .sc-item span { font-size: 14px; font-weight: 500; color: var(--gray-900); }
+        .no-data { text-align: center; padding: 48px 24px; color: var(--gray-500); }
+        .no-data .nd-icon { font-size: 48px; margin-bottom: 12px; }
+        .no-data h3 { font-size: 16px; color: var(--gray-700); margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <div class="employee-selector card" style="padding:16px 24px;margin-bottom:24px">
+                <label for="empSelect">Select Employee:</label>
+                <select class="form-control" id="empSelect" onchange="window.renderTimeline(this.value)" style="max-width:400px">
+                    <option value="">-- Select Employee --</option>
+                    <option value="1">John Doe (EMP-2026-000001)</option>
+                </select>
+            </div>
+
+            <div id="timelineContainer">
+                <div class="no-data">
+                    <div class="nd-icon">🔍</div>
+                    <h3>Select an Employee</h3>
+                    <p>Choose an employee from the dropdown above to view their lifecycle timeline</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        window.renderTimeline = function(empId) {
+            var container = document.getElementById('timelineContainer');
+            if (!empId) {
+                container.innerHTML = '<div class="no-data"><div class="nd-icon">🔍</div><h3>Select an Employee</h3><p>Choose an employee from the dropdown above to view their lifecycle timeline</p></div>';
+                return;
+            }
+            empId = parseInt(empId);
+            var emp = null;
+            for (var i = 0; i < DATA.employees.length; i++) { if (DATA.employees[i].id === empId) { emp = DATA.employees[i]; break; } }
+            if (!emp) {
+                container.innerHTML = '<div class="no-data"><div class="nd-icon">⚠️</div><h3>Employee Not Found</h3></div>';
+                return;
+            }
+
+            var logs = DATA.lifecycleLogs.filter(function(l){ return l.emp_id === empId; });
+            logs.sort(function(a,b){ return new Date(a.date) - new Date(b.date); });
+
+            var eventIcons = {
+                candidate_applied: '👤', screening_shortlisted: '🔍', interview_scheduled: '🤝',
+                interview_passed: '🤝', offer_created: '📄', offer_approved: '✅', offer_accepted: '📄',
+                pre_onboarding: '📋', employee_created: '👤', joined: '🚪',
+                probation_started: '📝', probation_completed: '📝', confirmed: '🎉'
+            };
+
+            var eventLabels = {
+                candidate_applied: 'Applied', screening_shortlisted: 'Screening Passed',
+                interview_scheduled: 'Interview', interview_passed: 'Interview Passed',
+                offer_created: 'Offer Created', offer_approved: 'Offer Approved', offer_accepted: 'Offer Accepted',
+                pre_onboarding: 'Pre-Onboarding', employee_created: 'Employee Created',
+                joined: 'Joined', probation_started: 'Probation Started',
+                probation_completed: 'Probation Completed', confirmed: 'Confirmed'
+            };
+
+            var keyEvents = ['candidate_applied', 'screening_shortlisted', 'interview_scheduled', 'offer_created', 'pre_onboarding', 'joined', 'probation_started', 'confirmed'];
+            var uniqueEvents = [];
+            var seen = {};
+            for (var i = 0; i < logs.length; i++) {
+                var log = logs[i];
+                if (keyEvents.indexOf(log.event) !== -1 && !seen[log.event]) {
+                    uniqueEvents.push(log);
+                    seen[log.event] = true;
+                }
+            }
+            if (uniqueEvents.length === 0) uniqueEvents = logs;
+
+            var lastCompletedIndex = -1;
+            for (var i = uniqueEvents.length - 1; i >= 0; i--) {
+                var ev = uniqueEvents[i];
+                var isComplete = ev.event === 'confirmed' || ev.event === 'probation_completed' || ev.event === 'joined' || ev.event === 'probation_started' || ev.event === 'employee_created' || ev.event === 'offer_accepted' || ev.event === 'offer_approved' || ev.event === 'pre_onboarding';
+                if (isComplete) { lastCompletedIndex = i; break; }
+            }
+
+            var html = '<div class="lifecycle-timeline">';
+            for (var i = 0; i < uniqueEvents.length; i++) {
+                var ev = uniqueEvents[i];
+                var cls = 'lt-event';
+                if (i <= lastCompletedIndex) cls += ' completed';
+                else if (i === lastCompletedIndex + 1) cls += ' current';
+                else cls += ' upcoming';
+                var icon = eventIcons[ev.event] || '•';
+                var label = eventLabels[ev.event] || ev.label;
+                var statusBadge = i <= lastCompletedIndex ? '<span class="badge badge-completed">✓ Completed</span>' :
+                    (i === lastCompletedIndex + 1 ? '<span class="badge badge-in-progress">In Progress</span>' : '<span class="badge badge-pending">Upcoming</span>');
+                html += '<div class="' + cls + '">';
+                html += '<div class="lt-icon">' + icon + '</div>';
+                html += '<div class="lt-card">';
+                html += '<div class="lt-date">' + formatDateTime(ev.date) + '</div>';
+                html += '<div class="lt-label">' + label + '</div>';
+                html += '<div class="lt-desc">' + ev.desc + '</div>';
+                html += '<div class="lt-status">' + statusBadge + '</div>';
+                html += '</div></div>';
+            }
+            html += '</div>';
+
+            var salary = emp.salary ? formatCurrency(emp.salary, '$') : '-';
+            var status = emp.status || 'Active';
+            var statusBadge = getBadgeClass(status);
+            var deptName = getDeptName(emp.dept_id);
+            var desigName = getDesignationName(emp.designation_id);
+
+            html += '<div class="summary-card mt-24">';
+            html += '<div class="sc-avatar">' + emp.first_name.charAt(0) + emp.last_name.charAt(0) + '</div>';
+            html += '<div class="sc-details">';
+            html += '<div class="sc-item"><label>Employee</label><span>' + emp.first_name + ' ' + emp.last_name + '</span></div>';
+            html += '<div class="sc-item"><label>Code</label><span>' + emp.code + '</span></div>';
+            html += '<div class="sc-item"><label>Designation</label><span>' + desigName + '</span></div>';
+            html += '<div class="sc-item"><label>Department</label><span>' + deptName + '</span></div>';
+            html += '<div class="sc-item"><label>Status</label><span><span class="badge ' + statusBadge + '">' + status + '</span></span></div>';
+            html += '<div class="sc-item"><label>Salary</label><span>' + salary + '</span></div>';
+            html += '<div class="sc-item"><label>Joining Date</label><span>' + formatDate(emp.joining_date) + '</span></div>';
+            html += '<div class="sc-item"><label>Type</label><span>' + (emp.type || 'Permanent') + '</span></div>';
+            html += '</div></div>';
+
+            container.innerHTML = html;
+        };
+
+        var BASE_URL = '..';
+        renderSidebar('lifecycle');
+        renderHeader('Lifecycle Timeline', 'Home / Lifecycle / Timeline');
+    </script>
+</body>
+</html>

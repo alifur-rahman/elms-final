@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview - HRIS</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tab-bar { display:flex; gap:0; margin-bottom:24px; border-bottom:2px solid var(--gray-200); }
+        .tab-bar .tab-btn { padding:12px 24px; border:none; background:none; cursor:pointer; font-size:14px; font-weight:500; color:var(--gray-600); border-bottom:2px solid transparent; margin-bottom:-2px; transition:var(--transition); font-family:inherit; }
+        .tab-bar .tab-btn.active { color:var(--primary); border-bottom-color:var(--primary); }
+        .tab-bar .tab-btn:hover { color:var(--primary); }
+        .tab-content { display:none; }
+        .tab-content.active { display:block; }
+    </style>
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">📅</div>
+                    <div class="stat-info"><h3 id="statScheduled">0</h3><p>Total Scheduled</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div class="stat-info"><h3 id="statCompleted">0</h3><p>Completed</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">⏳</div>
+                    <div class="stat-info"><h3 id="statPendingFeedback">0</h3><p>Pending Feedback</p></div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tab-bar">
+                <button class="tab-btn active" onclick="switchTab('upcoming',this)">Upcoming</button>
+                <button class="tab-btn" onclick="switchTab('completed',this)">Completed</button>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 id="tableTitle">Upcoming Interviews</h2>
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchInput" placeholder="Search..." onkeyup="filterTable('searchInput','interviewTable')">
+                        </div>
+                        <button class="btn btn-primary" onclick="window.openScheduleModal()">+ Schedule Interview</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content active" id="tabUpcoming">
+                        <div class="table-container">
+                            <table id="upcomingTable">
+                                <thead>
+                                    <tr>
+                                        <th>Candidate</th>
+                                        <th>Job</th>
+                                        <th>Date / Time</th>
+                                        <th>Type</th>
+                                        <th>Interviewer</th>
+                                        <th>Round</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="upcomingTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-content" id="tabCompleted">
+                        <div class="table-container">
+                            <table id="completedTable">
+                                <thead>
+                                    <tr>
+                                        <th>Candidate</th>
+                                        <th>Job</th>
+                                        <th>Date</th>
+                                        <th>Rating</th>
+                                        <th>Decision</th>
+                                        <th>Feedback</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="completedTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Schedule Interview Modal -->
+    <div class="modal-overlay" id="scheduleModal" onclick="if(event.target===this)closeModal('scheduleModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Schedule Interview</h3>
+                <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label>Candidate <span class="required">*</span></label>
+                        <select class="form-control" id="siCandidateId" required></select>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Interview Date & Time <span class="required">*</span></label>
+                            <input type="datetime-local" class="form-control" id="siDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Interview Type <span class="required">*</span></label>
+                            <select class="form-control" id="siType" required>
+                                <option value="">Select</option>
+                                <option value="Phone">Phone</option>
+                                <option value="Video">Video</option>
+                                <option value="In-Person">In-Person</option>
+                                <option value="Technical">Technical</option>
+                                <option value="Panel">Panel</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Interviewer Name <span class="required">*</span></label>
+                            <input type="text" class="form-control" id="siInterviewer" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Round <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="siRound" min="1" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Round Name</label>
+                        <input type="text" class="form-control" id="siRoundName" placeholder="e.g. Technical Screening">
+                    </div>
+                    <div class="mt-24">
+                        <button type="button" class="btn btn-primary" onclick="window.scheduleInterview()">Schedule Interview</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('scheduleModal')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Feedback Modal -->
+    <div class="modal-overlay" id="feedbackModal" onclick="if(event.target===this)closeModal('feedbackModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Record Feedback</h3>
+                <button class="modal-close" onclick="closeModal('feedbackModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="feedbackForm" onsubmit="return false;">
+                    <input type="hidden" id="fbInterviewId">
+
+                    <div class="form-group">
+                        <label>Rating (1-5) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="fbRating" min="1" max="5" step="0.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Decision <span class="required">*</span></label>
+                        <select class="form-control" id="fbDecision" required>
+                            <option value="">Select</option>
+                            <option value="Pass">Pass</option>
+                            <option value="Fail">Fail</option>
+                            <option value="Hold">Hold</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Feedback</label>
+                        <textarea class="form-control" id="fbFeedback" rows="4" placeholder="Enter detailed feedback..."></textarea>
+                    </div>
+                    <div class="mt-24">
+                        <button type="button" class="btn btn-primary" onclick="window.saveFeedback()">Save Feedback</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('feedbackModal')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        function renderInterviews() {
+            var upcomingBody = document.getElementById('upcomingTableBody');
+            var completedBody = document.getElementById('completedTableBody');
+            upcomingBody.innerHTML = '';
+            completedBody.innerHTML = '';
+
+            var stats = { scheduled: 0, completed: 0, pendingFeedback: 0 };
+
+            for (var i = 0; i < DATA.interviews.length; i++) {
+                var iv = DATA.interviews[i];
+                var candidate = null;
+                for (var j = 0; j < DATA.candidates.length; j++) {
+                    if (DATA.candidates[j].id === iv.candidate_id) { candidate = DATA.candidates[j]; break; }
+                }
+                var candidateName = candidate ? candidate.first_name + ' ' + candidate.last_name : 'N/A';
+                var jobTitle = candidate ? getJobTitle(candidate.job_id) : 'N/A';
+
+                if (iv.status === 'Completed') {
+                    stats.completed++;
+                    var row = '<tr>' +
+                        '<td><strong>' + candidateName + '</strong></td>' +
+                        '<td>' + jobTitle + '</td>' +
+                        '<td>' + formatDate(iv.date) + '</td>' +
+                        '<td>' + (iv.rating || '-') + '</td>' +
+                        '<td><span class="badge ' + getBadgeClass(iv.decision) + '">' + (iv.decision || '-') + '</span></td>' +
+                        '<td>' + (iv.feedback || '-') + '</td>' +
+                    '</tr>';
+                    completedBody.innerHTML += row;
+                } else {
+                    stats.scheduled++;
+                    var row = '<tr>' +
+                        '<td><strong>' + candidateName + '</strong></td>' +
+                        '<td>' + jobTitle + '</td>' +
+                        '<td>' + formatDateTime(iv.date) + '</td>' +
+                        '<td>' + (iv.type || '-') + '</td>' +
+                        '<td>' + (iv.interviewer || '-') + '</td>' +
+                        '<td>' + (iv.round_name || 'Round ' + iv.round) + '</td>' +
+                        '<td><span class="badge ' + getBadgeClass(iv.status) + '">' + (iv.status || 'Scheduled') + '</span></td>' +
+                        '<td><button class="btn btn-sm btn-primary" onclick="window.openFeedback(' + iv.id + ')">Record Feedback</button></td>' +
+                    '</tr>';
+                    upcomingBody.innerHTML += row;
+                }
+            }
+
+            // Also show shortlisted candidates without interviews as "pending scheduling"
+            for (var i = 0; i < DATA.candidates.length; i++) {
+                var c = DATA.candidates[i];
+                if (c.status !== 'Shortlisted' && c.status !== 'Interview') continue;
+                var hasInterview = false;
+                for (var j = 0; j < DATA.interviews.length; j++) {
+                    if (DATA.interviews[j].candidate_id === c.id) { hasInterview = true; break; }
+                }
+                if (!hasInterview) {
+                    stats.pendingFeedback++;
+                    var row = '<tr>' +
+                        '<td><strong>' + c.first_name + ' ' + c.last_name + '</strong></td>' +
+                        '<td>' + getJobTitle(c.job_id) + '</td>' +
+                        '<td>-</td>' +
+                        '<td>-</td>' +
+                        '<td>-</td>' +
+                        '<td>-</td>' +
+                        '<td><span class="badge badge-pending">Not Scheduled</span></td>' +
+                        '<td><button class="btn btn-sm btn-primary" onclick="window.openScheduleForCandidate(' + c.id + ')">Schedule</button></td>' +
+                    '</tr>';
+                    upcomingBody.innerHTML += row;
+                }
+            }
+
+            document.getElementById('statScheduled').textContent = stats.scheduled;
+            document.getElementById('statCompleted').textContent = stats.completed;
+            document.getElementById('statPendingFeedback').textContent = stats.pendingFeedback;
+        }
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+            if (btn) btn.classList.add('active');
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            document.getElementById('tableTitle').textContent = tab.charAt(0).toUpperCase() + tab.slice(1) + ' Interviews';
+        }
+
+        window.openScheduleModal = function() {
+            document.getElementById('scheduleForm').reset();
+            loadCandidateSelect();
+            openModal('scheduleModal');
+        };
+
+        window.openScheduleForCandidate = function(candidateId) {
+            loadCandidateSelect();
+            document.getElementById('siCandidateId').value = candidateId;
+            openModal('scheduleModal');
+        };
+
+        function loadCandidateSelect() {
+            var sel = document.getElementById('siCandidateId');
+            sel.innerHTML = '<option value="">Select Candidate</option>';
+            for (var i = 0; i < DATA.candidates.length; i++) {
+                var c = DATA.candidates[i];
+                if (c.status === 'Shortlisted' || c.status === 'Interview') {
+                    var opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.first_name + ' ' + c.last_name + ' - ' + getJobTitle(c.job_id);
+                    sel.appendChild(opt);
+                }
+            }
+        }
+
+        window.scheduleInterview = function() {
+            var candidateId = parseInt(document.getElementById('siCandidateId').value);
+            var date = document.getElementById('siDate').value;
+            var type = document.getElementById('siType').value;
+            var interviewer = document.getElementById('siInterviewer').value.trim();
+            var round = parseInt(document.getElementById('siRound').value);
+            var roundName = document.getElementById('siRoundName').value.trim();
+
+            if (!candidateId || !date || !type || !interviewer || !round) {
+                showAlert('Please fill in all required fields', 'error');
+                return;
+            }
+
+            var maxId = 0;
+            for (var i = 0; i < DATA.interviews.length; i++) {
+                if (DATA.interviews[i].id > maxId) maxId = DATA.interviews[i].id;
+            }
+
+            var dateStr = date.replace('T', ' ');
+
+            DATA.interviews.push({
+                id: maxId + 1,
+                candidate_id: candidateId,
+                date: dateStr,
+                type: type,
+                interviewer: interviewer,
+                round: round,
+                round_name: roundName || 'Round ' + round,
+                rating: null,
+                feedback: '',
+                decision: '',
+                status: 'Scheduled'
+            });
+
+            // Update candidate status
+            for (var i = 0; i < DATA.candidates.length; i++) {
+                if (DATA.candidates[i].id === candidateId) {
+                    DATA.candidates[i].status = 'Interview';
+                    break;
+                }
+            }
+
+            showAlert('Interview scheduled successfully', 'success');
+            closeModal('scheduleModal');
+            renderInterviews();
+        };
+
+        window.openFeedback = function(interviewId) {
+            document.getElementById('feedbackForm').reset();
+            document.getElementById('fbInterviewId').value = interviewId;
+
+            var iv = null;
+            for (var i = 0; i < DATA.interviews.length; i++) {
+                if (DATA.interviews[i].id === interviewId) { iv = DATA.interviews[i]; break; }
+            }
+            if (iv) {
+                if (iv.rating) document.getElementById('fbRating').value = iv.rating;
+                if (iv.decision) document.getElementById('fbDecision').value = iv.decision;
+                if (iv.feedback) document.getElementById('fbFeedback').value = iv.feedback;
+            }
+
+            openModal('feedbackModal');
+        };
+
+        window.saveFeedback = function() {
+            var interviewId = parseInt(document.getElementById('fbInterviewId').value);
+            var rating = parseFloat(document.getElementById('fbRating').value);
+            var decision = document.getElementById('fbDecision').value;
+            var feedback = document.getElementById('fbFeedback').value.trim();
+
+            if (!rating || !decision) {
+                showAlert('Please fill in rating and decision', 'error');
+                return;
+            }
+            if (rating < 1 || rating > 5) {
+                showAlert('Rating must be between 1 and 5', 'error');
+                return;
+            }
+
+            for (var i = 0; i < DATA.interviews.length; i++) {
+                if (DATA.interviews[i].id === interviewId) {
+                    DATA.interviews[i].rating = rating;
+                    DATA.interviews[i].decision = decision;
+                    DATA.interviews[i].feedback = feedback;
+                    DATA.interviews[i].status = 'Completed';
+                    break;
+                }
+            }
+
+            showAlert('Feedback recorded successfully', 'success');
+            closeModal('feedbackModal');
+            renderInterviews();
+        };
+
+        renderInterviews();
+        var BASE_URL = '..';
+        renderSidebar('interview');
+        renderHeader('Interview', 'Home / Recruitment / Interview');
+    </script>
+</body>
+</html>

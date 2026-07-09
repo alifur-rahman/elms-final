@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP HRIS - Recruitment Pipeline</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .pipeline-flow { display: flex; align-items: center; gap: 0; margin-bottom: 24px; overflow-x: auto; padding: 16px 20px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+        .pf-step { display: flex; flex-direction: column; align-items: center; min-width: 80px; padding: 8px 12px; text-align: center; }
+        .pf-step .pf-count { font-size: 22px; font-weight: 700; color: var(--primary); }
+        .pf-step .pf-icon { font-size: 18px; margin: 4px 0; }
+        .pf-step .pf-label { font-size: 11px; color: var(--gray-500); white-space: nowrap; }
+        .pf-connector { width: 40px; height: 2px; background: var(--gray-300); flex-shrink: 0; }
+        .quick-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .qs-card { background: #fff; border-radius: 8px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.08); display: flex; align-items: center; gap: 14px; }
+        .qs-card .qs-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .qs-card .qs-icon.blue { background: #e8f0fe; color: var(--primary); }
+        .qs-card .qs-icon.green { background: #e6f4ea; color: var(--success); }
+        .qs-card .qs-icon.yellow { background: #fef7e0; color: var(--warning); }
+        .qs-card .qs-icon.red { background: #fce8e6; color: var(--danger); }
+        .qs-card .qs-info h4 { font-size: 22px; font-weight: 700; line-height: 1.2; }
+        .qs-card .qs-info p { font-size: 12px; color: var(--gray-500); }
+        .view-job-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; }
+        .view-job-details .vj-item label { display: block; font-size: 11px; color: var(--gray-500); text-transform: uppercase; font-weight: 600; letter-spacing: .4px; }
+        .view-job-details .vj-item span { font-size: 14px; font-weight: 500; color: var(--gray-900); }
+        .view-job-desc { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200); }
+        .view-job-desc h4 { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .view-job-desc p { font-size: 13px; color: var(--gray-600); line-height: 1.6; white-space: pre-line; }
+    </style>
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <div class="card-header" style="background:#fff;border-radius:8px 8px 0 0;margin-bottom:0">
+                <h2>Open Positions</h2>
+                <div class="btn-group">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="searchJobs" placeholder="Search positions..." onkeyup="filterTable('searchJobs','jobsTable')" style="border:none;padding:7px 8px;font-size:13px;outline:none;width:200px;font-family:inherit">
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('createRequisitionModal')">+ Create Requisition</button>
+                </div>
+            </div>
+            <div class="card mb-24" style="border-radius:0 0 8px 8px;margin-top:0">
+                <div class="card-body" style="padding:0">
+                    <div class="table-container">
+                        <table id="jobsTable">
+                            <thead>
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Department</th>
+                                    <th>Location</th>
+                                    <th>Vacancies</th>
+                                    <th>Filled</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Deadline</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jobsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-header" style="background:#fff;border-radius:8px 8px 0 0;margin-bottom:0">
+                <h2>Candidate Pipeline</h2>
+            </div>
+            <div class="card mb-24" style="border-radius:0 0 8px 8px;margin-top:0">
+                <div class="card-body">
+                    <div class="pipeline-flow" id="pipelineFlow"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h2>Quick Stats</h2></div>
+                <div class="card-body">
+                    <div class="quick-stats" id="quickStats"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="viewJobModal" onclick="if(event.target===this)closeModal('viewJobModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="viewJobTitle">Job Details</h3>
+                <button class="modal-close" onclick="closeModal('viewJobModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="view-job-details" id="viewJobDetails"></div>
+                <div class="view-job-desc" id="viewJobDesc"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline btn-sm" onclick="closeModal('viewJobModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="createRequisitionModal" onclick="if(event.target===this)closeModal('createRequisitionModal')">
+        <div class="modal modal-requisition">
+            <div class="modal-header">
+                <h3>📋 Create New Requisition</h3>
+                <button class="modal-close" onclick="closeModal('createRequisitionModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="requisitionForm" onsubmit="event.preventDefault();window.ajaxSubmitRequisition()">
+                    <div class="requisition-section">
+                        <div class="section-title"><span class="section-step">1</span> Basic Information</div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Job Title <span class="required">*</span></label>
+                                <input type="text" class="form-control" id="reqJobTitle" placeholder="e.g. Senior PHP Developer" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Department <span class="required">*</span></label>
+                                <select class="form-control" id="reqDepartment" required>
+                                    <option value="">Select Department</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Location</label>
+                                <input type="text" class="form-control" id="reqLocation" placeholder="e.g. Dhaka, Bangladesh" value="Dhaka, Bangladesh">
+                            </div>
+                            <div class="form-group">
+                                <label>Employment Type <span class="required">*</span></label>
+                                <select class="form-control" id="reqType" required>
+                                    <option value="Full Time">Full Time</option>
+                                    <option value="Part Time">Part Time</option>
+                                    <option value="Contract">Contract</option>
+                                    <option value="Internship">Internship</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Number of Vacancies <span class="required">*</span></label>
+                                <input type="number" class="form-control" id="reqVacancies" min="1" value="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Application Deadline <span class="required">*</span></label>
+                                <input type="date" class="form-control" id="reqDeadline" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="requisition-section">
+                        <div class="section-title"><span class="section-step">2</span> Qualifications & Salary</div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Minimum Education</label>
+                                <select class="form-control" id="reqEducation">
+                                    <option value="High School">High School</option>
+                                    <option value="Diploma">Diploma</option>
+                                    <option value="Bachelor" selected>Bachelor</option>
+                                    <option value="Master">Master</option>
+                                    <option value="PhD">PhD</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Minimum Experience (years)</label>
+                                <input type="number" class="form-control" id="reqExperience" min="0" step="0.5" value="2" placeholder="e.g. 3.5">
+                            </div>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Salary Range (Min)</label>
+                                <input type="number" class="form-control" id="reqSalaryMin" min="0" step="1000" placeholder="e.g. 45000">
+                            </div>
+                            <div class="form-group">
+                                <label>Salary Range (Max)</label>
+                                <input type="number" class="form-control" id="reqSalaryMax" min="0" step="1000" placeholder="e.g. 65000">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Required Skills</label>
+                            <div class="tag-input-wrapper" id="skillsWrapper" onclick="document.getElementById('skillsInput').focus()">
+                                <div class="tags-container" id="skillsTags"></div>
+                                <input type="text" class="tag-input" id="skillsInput" placeholder="Type skill and press Enter" onkeydown="if(event.key==='Enter'||event.key===','){event.preventDefault();window.addSkill()}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="requisition-section">
+                        <div class="section-title"><span class="section-step">3</span> Details</div>
+                        <div class="form-group">
+                            <label>Job Description</label>
+                            <textarea class="form-control textarea-full-lg" id="reqDescription" placeholder="Describe the role and responsibilities..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Responsibilities</label>
+                            <textarea class="form-control textarea-full" id="reqResponsibilities" placeholder="List key responsibilities (one per line)"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Benefits</label>
+                            <textarea class="form-control textarea-full" id="reqBenefits" placeholder="List benefits (one per line)"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="requisition-section">
+                        <div class="section-title"><span class="section-step">4</span> Status & Priority</div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Priority</label>
+                                <select class="form-control" id="reqPriority">
+                                    <option value="High">High</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select class="form-control" id="reqStatus">
+                                    <option value="Active" selected>Active</option>
+                                    <option value="On Hold">On Hold</option>
+                                    <option value="Closed">Closed</option>
+                                    <option value="Draft">Draft</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('createRequisitionModal')">Cancel</button>
+                <button class="btn btn-primary" id="reqSubmitBtn" onclick="window.ajaxSubmitRequisition()">✨ Create Requisition</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        var reqSkills = [];
+
+        window.addSkill = function() {
+            var input = document.getElementById('skillsInput');
+            var val = input.value.trim().replace(/,/g, '');
+            if (!val) return;
+            if (reqSkills.indexOf(val) === -1) {
+                reqSkills.push(val);
+                renderSkills();
+            }
+            input.value = '';
+        };
+
+        function renderSkills() {
+            var container = document.getElementById('skillsTags');
+            container.innerHTML = '';
+            reqSkills.forEach(function(s, i) {
+                var tag = document.createElement('span');
+                tag.className = 'tag';
+                tag.innerHTML = s + '<span class="tag-remove" onclick="window.removeSkill(' + i + ')">&times;</span>';
+                container.appendChild(tag);
+            });
+        }
+
+        window.removeSkill = function(idx) {
+            reqSkills.splice(idx, 1);
+            renderSkills();
+        };
+
+        window.ajaxSubmitRequisition = function() {
+            var title = document.getElementById('reqJobTitle').value.trim();
+            var dept = document.getElementById('reqDepartment').value;
+            var location = document.getElementById('reqLocation').value.trim();
+            var type = document.getElementById('reqType').value;
+            var vacancies = parseInt(document.getElementById('reqVacancies').value);
+            var deadline = document.getElementById('reqDeadline').value;
+            var education = document.getElementById('reqEducation').value;
+            var experience = parseFloat(document.getElementById('reqExperience').value) || 0;
+            var salaryMin = parseFloat(document.getElementById('reqSalaryMin').value) || 0;
+            var salaryMax = parseFloat(document.getElementById('reqSalaryMax').value) || 0;
+            var description = document.getElementById('reqDescription').value.trim();
+            var responsibilities = document.getElementById('reqResponsibilities').value.trim();
+            var benefits = document.getElementById('reqBenefits').value.trim();
+            var priority = document.getElementById('reqPriority').value;
+            var status = document.getElementById('reqStatus').value;
+
+            if (!title) { showAlert('Please enter a job title', 'error'); return; }
+            if (!dept) { showAlert('Please select a department', 'error'); return; }
+            if (!deadline) { showAlert('Please select a deadline date', 'error'); return; }
+
+            var btn = document.getElementById('reqSubmitBtn');
+            var origText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Submitting...';
+
+            setTimeout(function() {
+                var data = {
+                    title: title, dept_id: parseInt(dept), location: location, type: type,
+                    vacancies: vacancies, deadline: deadline, education: education,
+                    experience: experience, salary_min: salaryMin, salary_max: salaryMax,
+                    skills: reqSkills.join(', '), description: description,
+                    responsibilities: responsibilities, benefits: benefits,
+                    priority: priority, status: status
+                };
+                console.log('Requisition Data:', data);
+                btn.disabled = false;
+                btn.innerHTML = origText;
+                showAlert('Requisition "' + title + '" created successfully!', 'success');
+                closeModal('createRequisitionModal');
+                document.getElementById('requisitionForm').reset();
+                reqSkills = [];
+                renderSkills();
+            }, 1200);
+        };
+
+        window.viewJob = function(jobId) {
+            var job = null;
+            for (var i = 0; i < DATA.jobs.length; i++) { if (DATA.jobs[i].id === jobId) { job = DATA.jobs[i]; break; } }
+            if (!job) return;
+            document.getElementById('viewJobTitle').textContent = job.title;
+            var deptName = getDeptName(job.dept_id);
+            var statusBadge = '<span class="badge ' + getBadgeClass(job.status) + '">' + job.status + '</span>';
+            var priorityBadge = '<span class="badge ' + getBadgeClass(job.priority) + '">' + job.priority + '</span>';
+            var details = document.getElementById('viewJobDetails');
+            details.innerHTML =
+                '<div class="vj-item"><label>Department</label><span>' + deptName + '</span></div>' +
+                '<div class="vj-item"><label>Location</label><span>' + job.location + '</span></div>' +
+                '<div class="vj-item"><label>Type</label><span>' + job.type + '</span></div>' +
+                '<div class="vj-item"><label>Vacancies</label><span>' + job.vacancies + '</span></div>' +
+                '<div class="vj-item"><label>Filled</label><span>' + (job.filled || 0) + '</span></div>' +
+                '<div class="vj-item"><label>Experience</label><span>' + job.experience + ' years</span></div>' +
+                '<div class="vj-item"><label>Education</label><span>' + job.education + '</span></div>' +
+                '<div class="vj-item"><label>Salary Range</label><span>' + formatCurrency(job.salary_min, '$') + ' - ' + formatCurrency(job.salary_max, '$') + '</span></div>' +
+                '<div class="vj-item"><label>Deadline</label><span>' + formatDate(job.deadline) + '</span></div>' +
+                '<div class="vj-item"><label>Skills</label><span>' + (job.skills || 'N/A') + '</span></div>' +
+                '<div class="vj-item"><label>Priority</label><span>' + priorityBadge + '</span></div>' +
+                '<div class="vj-item"><label>Status</label><span>' + statusBadge + '</span></div>';
+            var descDiv = document.getElementById('viewJobDesc');
+            var descHtml = '';
+            if (job.description) descHtml += '<h4>📄 Description</h4><p>' + job.description + '</p>';
+            if (job.responsibilities) descHtml += '<h4 class="mt-16">✓ Responsibilities</h4><p>' + job.responsibilities + '</p>';
+            if (job.benefits) descHtml += '<h4 class="mt-16">🎁 Benefits</h4><p>' + job.benefits + '</p>';
+            descDiv.innerHTML = descHtml;
+            openModal('viewJobModal');
+        };
+
+        function renderPage() {
+            var tbody = document.getElementById('jobsBody');
+            tbody.innerHTML = '';
+            DATA.jobs.forEach(function(job) {
+                var deptName = getDeptName(job.dept_id);
+                var statusBadge = '<span class="badge ' + getBadgeClass(job.status) + '">' + job.status + '</span>';
+                var priorityBadge = '<span class="badge ' + getBadgeClass(job.priority) + '">' + job.priority + '</span>';
+                var row = document.createElement('tr');
+                row.innerHTML =
+                    '<td><strong>' + job.title + '</strong></td>' +
+                    '<td>' + deptName + '</td>' +
+                    '<td>' + job.location + '</td>' +
+                    '<td>' + job.vacancies + '</td>' +
+                    '<td>' + (job.filled || 0) + '</td>' +
+                    '<td>' + statusBadge + '</td>' +
+                    '<td>' + priorityBadge + '</td>' +
+                    '<td>' + formatDate(job.deadline) + '</td>' +
+                    '<td><button class="btn btn-sm btn-primary" onclick="window.viewJob(' + job.id + ')">View</button></td>';
+                tbody.appendChild(row);
+            });
+
+            var pipelineStages = [
+                { key: 'Applied', icon: '👤', filter: function(c) { return c.status === 'Applied'; } },
+                { key: 'Shortlisted', icon: '📋', filter: function(c) { return c.status === 'Shortlisted'; } },
+                { key: 'Interview', icon: '🤝', filter: function(c) { return c.status === 'Interview'; } },
+                { key: 'Selected', icon: '✅', filter: function(c) { return c.status === 'Selected'; } },
+                { key: 'Offered', icon: '📄', filter: function(c) { return c.status === 'Offered'; } },
+                { key: 'Joined', icon: '🚪', filter: function(c) { return c.status === 'Joined'; } }
+            ];
+            var pipeHtml = '';
+            for (var i = 0; i < pipelineStages.length; i++) {
+                var stage = pipelineStages[i];
+                var count = DATA.candidates.filter(stage.filter).length;
+                pipeHtml += '<div class="pf-step"><div class="pf-count">' + count + '</div><div class="pf-icon">' + stage.icon + '</div><div class="pf-label">' + stage.key + '</div></div>';
+                if (i < pipelineStages.length - 1) pipeHtml += '<div class="pf-connector"></div>';
+            }
+            document.getElementById('pipelineFlow').innerHTML = pipeHtml;
+
+            var stats = [
+                { icon: '🎯', color: 'blue', count: DATA.jobs.length, label: 'Total Positions' },
+                { icon: '✅', color: 'green', count: DATA.jobs.filter(function(j){ return j.status === 'Active'; }).length, label: 'Active' },
+                { icon: '👥', color: 'blue', count: DATA.candidates.length, label: 'Total Candidates' },
+                { icon: '📄', color: 'yellow', count: DATA.offers.filter(function(o){ return o.status === 'Pending'; }).length, label: 'Pending Offers' },
+                { icon: '🚪', color: 'green', count: DATA.candidates.filter(function(c){ return c.status === 'Joined'; }).length, label: 'Joined' },
+                { icon: '📊', color: 'red', count: DATA.jobs.reduce(function(s, j){ return s + j.vacancies - (j.filled || 0); }, 0), label: 'Remaining Vacancies' }
+            ];
+            var statsHtml = '';
+            stats.forEach(function(s) {
+                statsHtml += '<div class="qs-card"><div class="qs-icon ' + s.color + '">' + s.icon + '</div><div class="qs-info"><h4>' + s.count + '</h4><p>' + s.label + '</p></div></div>';
+            });
+            document.getElementById('quickStats').innerHTML = statsHtml;
+
+            var deptSelect = document.getElementById('reqDepartment');
+            if (deptSelect && deptSelect.options.length <= 1) {
+                DATA.departments.forEach(function(d) {
+                    var opt = document.createElement('option');
+                    opt.value = d.id;
+                    opt.textContent = d.name;
+                    deptSelect.appendChild(opt);
+                });
+                var today = new Date();
+                var threeMonthsLater = new Date(today.getFullYear(), today.getMonth() + 3, today.getDate());
+                document.getElementById('reqDeadline').value = threeMonthsLater.toISOString().split('T')[0];
+            }
+        }
+
+        var BASE_URL = '..';
+        renderSidebar('recruitment');
+        renderHeader('Recruitment Pipeline', 'Home / Recruitment / Pipeline');
+        renderPage();
+    </script>
+</body>
+</html>

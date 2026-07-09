@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidates - HRIS</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <!-- Stats -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">📋</div>
+                    <div class="stat-info"><h3 id="statApplied">0</h3><p>Total Applied</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">⭐</div>
+                    <div class="stat-info"><h3 id="statShortlisted">0</h3><p>Shortlisted</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">🤝</div>
+                    <div class="stat-info"><h3 id="statInterviewed">0</h3><p>Interviewed</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">📄</div>
+                    <div class="stat-info"><h3 id="statOffered">0</h3><p>Offered</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">✕</div>
+                    <div class="stat-info"><h3 id="statRejected">0</h3><p>Rejected</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div class="stat-info"><h3 id="statJoined">0</h3><p>Joined</p></div>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>All Candidates</h2>
+                    <div class="filter-bar">
+                        <select class="form-control" id="statusFilter" onchange="filterBySelect('statusFilter','candidateTable',6)">
+                            <option value="">All Status</option>
+                            <option value="Applied">Applied</option>
+                            <option value="Shortlisted">Shortlisted</option>
+                            <option value="Interview">Interview</option>
+                            <option value="Offered">Offered</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Joined">Joined</option>
+                        </select>
+                        <select class="form-control" id="deptFilter" onchange="filterByDept()">
+                            <option value="">All Departments</option>
+                        </select>
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchInput" placeholder="Search candidates..." onkeyup="filterTable('searchInput','candidateTable')">
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal('addCandidateModal')">+ Add Candidate</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="candidateTable">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Candidate Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Job Applied</th>
+                                    <th>Applied Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="candidateTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- View Candidate Modal -->
+    <div class="modal-overlay" id="viewCandidateModal" onclick="if(event.target===this)closeModal('viewCandidateModal')">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3>Candidate Details</h3>
+                <button class="modal-close" onclick="closeModal('viewCandidateModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row-2" id="viewCandidateBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Candidate Modal -->
+    <div class="modal-overlay" id="addCandidateModal" onclick="if(event.target===this)closeModal('addCandidateModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add Candidate</h3>
+                <button class="modal-close" onclick="closeModal('addCandidateModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addCandidateForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label>Job Applied <span class="required">*</span></label>
+                        <select class="form-control" id="acJobId" required></select>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>First Name <span class="required">*</span></label>
+                            <input type="text" class="form-control" id="acFirstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name <span class="required">*</span></label>
+                            <input type="text" class="form-control" id="acLastName" required>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Email <span class="required">*</span></label>
+                            <input type="email" class="form-control" id="acEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" class="form-control" id="acPhone">
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Expected Salary</label>
+                            <input type="number" class="form-control" id="acExpectedSalary" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Status <span class="required">*</span></label>
+                            <select class="form-control" id="acStatus" required>
+                                <option value="Applied">Applied</option>
+                                <option value="Shortlisted">Shortlisted</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-24">
+                        <button type="button" class="btn btn-primary" onclick="window.addCandidate()">Save Candidate</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('addCandidateModal')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        function renderCandidates() {
+            var tbody = document.getElementById('candidateTableBody');
+            tbody.innerHTML = '';
+            var stats = { Applied: 0, Shortlisted: 0, Interview: 0, Offered: 0, Rejected: 0, Joined: 0 };
+            for (var i = 0; i < DATA.candidates.length; i++) {
+                var c = DATA.candidates[i];
+                if (stats[c.status] !== undefined) stats[c.status]++;
+                var row = '<tr>' +
+                    '<td>' + (c.code || '-') + '</td>' +
+                    '<td><strong>' + c.first_name + ' ' + c.last_name + '</strong></td>' +
+                    '<td>' + (c.email || '-') + '</td>' +
+                    '<td>' + (c.phone || '-') + '</td>' +
+                    '<td>' + getJobTitle(c.job_id) + '</td>' +
+                    '<td>' + formatDate(c.applied_at) + '</td>' +
+                    '<td><span class="badge ' + getBadgeClass(c.status) + '">' + c.status + '</span></td>' +
+                    '<td>' +
+                        '<div class="btn-group">' +
+                            '<button class="btn btn-sm btn-outline" onclick="window.viewCandidate(' + c.id + ')">View</button>' +
+                            '<select class="form-control" style="width:auto;min-width:100px;padding:4px 8px;font-size:12px;" onchange="window.changeStatus(' + c.id + ',this.value)">' +
+                                '<option value="">Status</option>' +
+                                '<option value="Applied">Applied</option>' +
+                                '<option value="Shortlisted">Shortlisted</option>' +
+                                '<option value="Interview">Interview</option>' +
+                                '<option value="Offered">Offered</option>' +
+                                '<option value="Rejected">Rejected</option>' +
+                                '<option value="Joined">Joined</option>' +
+                            '</select>' +
+                        '</div>' +
+                    '</td>' +
+                '</tr>';
+                tbody.innerHTML += row;
+            }
+            document.getElementById('statApplied').textContent = stats.Applied;
+            document.getElementById('statShortlisted').textContent = stats.Shortlisted;
+            document.getElementById('statInterviewed').textContent = stats.Interview;
+            document.getElementById('statOffered').textContent = stats.Offered;
+            document.getElementById('statRejected').textContent = stats.Rejected;
+            document.getElementById('statJoined').textContent = stats.Joined;
+        }
+
+        window.changeStatus = function(candidateId, newStatus) {
+            if (!newStatus) return;
+            for (var i = 0; i < DATA.candidates.length; i++) {
+                if (DATA.candidates[i].id === candidateId) {
+                    DATA.candidates[i].status = newStatus;
+                    showAlert('Status updated to ' + newStatus, 'success');
+                    renderCandidates();
+                    return;
+                }
+            }
+        };
+
+        window.viewCandidate = function(id) {
+            var c = null;
+            for (var i = 0; i < DATA.candidates.length; i++) {
+                if (DATA.candidates[i].id === id) { c = DATA.candidates[i]; break; }
+            }
+            if (!c) return;
+            var html = '';
+            var fields = [
+                { label: 'Code', val: c.code || '-' },
+                { label: 'Full Name', val: c.first_name + ' ' + c.last_name },
+                { label: 'Email', val: c.email || '-' },
+                { label: 'Phone', val: c.phone || '-' },
+                { label: 'NID', val: c.nid || '-' },
+                { label: 'Blood Group', val: c.blood_group || '-' },
+                { label: 'Date of Birth', val: c.dob ? formatDate(c.dob) : '-' },
+                { label: 'Gender', val: c.gender || '-' },
+                { label: 'Job Applied', val: getJobTitle(c.job_id) },
+                { label: 'Current Salary', val: c.current_salary ? formatCurrency(c.current_salary, 'BDT ') : '-' },
+                { label: 'Expected Salary', val: c.expected_salary ? formatCurrency(c.expected_salary, 'BDT ') : '-' },
+                { label: 'Status', val: '<span class="badge ' + getBadgeClass(c.status) + '">' + c.status + '</span>' },
+                { label: 'Applied At', val: c.applied_at ? formatDateTime(c.applied_at) : '-' },
+                { label: 'Present Address', val: c.present_address || '-', full: true },
+                { label: 'Permanent Address', val: c.permanent_address || '-', full: true }
+            ];
+            for (var i = 0; i < fields.length; i++) {
+                var f = fields[i];
+                if (f.full) {
+                    html += '<div class="form-group" style="grid-column:1/-1"><label>' + f.label + '</label><div>' + f.val + '</div></div>';
+                } else {
+                    html += '<div class="form-group"><label>' + f.label + '</label><div>' + f.val + '</div></div>';
+                }
+            }
+            document.getElementById('viewCandidateBody').innerHTML = html;
+            openModal('viewCandidateModal');
+        };
+
+        window.addCandidate = function() {
+            var jobId = document.getElementById('acJobId').value;
+            var firstName = document.getElementById('acFirstName').value.trim();
+            var lastName = document.getElementById('acLastName').value.trim();
+            var email = document.getElementById('acEmail').value.trim();
+            var phone = document.getElementById('acPhone').value.trim();
+            var expectedSalary = document.getElementById('acExpectedSalary').value;
+            var status = document.getElementById('acStatus').value;
+
+            if (!jobId || !firstName || !lastName || !email || !status) {
+                showAlert('Please fill in all required fields', 'error');
+                return;
+            }
+            if (email.indexOf('@') === -1 || email.indexOf('.') === -1) {
+                showAlert('Please enter a valid email address', 'error');
+                return;
+            }
+
+            var maxId = 0;
+            for (var i = 0; i < DATA.candidates.length; i++) {
+                if (DATA.candidates[i].id > maxId) maxId = DATA.candidates[i].id;
+            }
+            var code = 'CAND-2026-' + String(maxId + 1).padStart(4, '0');
+
+            DATA.candidates.push({
+                id: maxId + 1,
+                job_id: parseInt(jobId),
+                code: code,
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                phone: phone,
+                expected_salary: expectedSalary ? parseFloat(expectedSalary) : null,
+                status: status,
+                applied_at: new Date().toISOString().slice(0, 16).replace('T', ' ')
+            });
+
+            showAlert('Candidate added successfully', 'success');
+            closeModal('addCandidateModal');
+            document.getElementById('addCandidateForm').reset();
+            renderCandidates();
+        };
+
+        function filterByDept() {
+            var deptVal = document.getElementById('deptFilter').value.toLowerCase();
+            var rows = document.querySelectorAll('#candidateTable tbody tr');
+            for (var i = 0; i < rows.length; i++) {
+                var jobCell = rows[i].querySelectorAll('td')[4];
+                if (!deptVal || (jobCell && jobCell.textContent.toLowerCase().indexOf(deptVal) !== -1)) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+
+        function loadDeptFilter() {
+            var sel = document.getElementById('deptFilter');
+            for (var i = 0; i < DATA.departments.length; i++) {
+                var opt = document.createElement('option');
+                opt.value = DATA.departments[i].name;
+                opt.textContent = DATA.departments[i].name;
+                sel.appendChild(opt);
+            }
+        }
+
+        function loadJobSelect() {
+            var sel = document.getElementById('acJobId');
+            for (var i = 0; i < DATA.jobs.length; i++) {
+                var opt = document.createElement('option');
+                opt.value = DATA.jobs[i].id;
+                opt.textContent = DATA.jobs[i].title;
+                sel.appendChild(opt);
+            }
+        }
+
+        renderCandidates();
+        loadDeptFilter();
+        loadJobSelect();
+        var BASE_URL = '..';
+        renderSidebar('candidates');
+        renderHeader('Candidates', 'Home / Recruitment / Candidates');
+    </script>
+</body>
+</html>

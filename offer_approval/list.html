@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer Approval - ERP HRIS</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tab-bar { display: flex; gap: 0; border-bottom: 2px solid var(--gray-200); margin-bottom: 24px; }
+        .tab-btn { padding: 10px 24px; font-size: 13px; font-weight: 500; background: none; border: none; cursor: pointer; color: var(--gray-500); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: var(--transition); font-family: inherit; }
+        .tab-btn:hover { color: var(--gray-700); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .empty-state { text-align: center; padding: 48px 24px; color: var(--gray-500); }
+        .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state p { font-size: 14px; }
+        .approval-level { display: flex; align-items: center; gap: 8px; }
+        .approval-level .level-line { display: flex; flex-direction: column; align-items: center; }
+        .approval-level .level-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .approval-level .level-dot.approved { background: var(--success); }
+        .approval-level .level-dot.pending { background: var(--warning); }
+        .approval-level .level-dot.rejected { background: var(--danger); }
+        .approval-level .level-label { font-size: 11px; color: var(--gray-500); }
+        .text-muted { color: var(--gray-500); font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+
+            <div class="tab-bar">
+                <button class="tab-btn active" onclick="switchTab('readyTab',this)">Ready for Offer</button>
+                <button class="tab-btn" onclick="switchTab('pendingTab',this)">Pending Approval</button>
+            </div>
+
+            <!-- Section 1: Ready for Offer -->
+            <div id="readyTab" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Ready for Offer</h2>
+                        <div class="filter-bar">
+                            <div class="search-box">
+                                <span class="search-icon">&#128269;</span>
+                                <input type="text" id="readySearch" placeholder="Search candidates..." onkeyup="filterTable('readySearch','readyTable',1)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding:0">
+                        <div class="table-container">
+                            <table id="readyTable">
+                                <thead>
+                                    <tr>
+                                        <th>Candidate</th>
+                                        <th>Job Applied</th>
+                                        <th>Status</th>
+                                        <th>Expected Salary</th>
+                                        <th>Applied Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="readyTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Pending Approval -->
+            <div id="pendingTab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Pending Approval</h2>
+                        <div class="filter-bar">
+                            <div class="search-box">
+                                <span class="search-icon">&#128269;</span>
+                                <input type="text" id="pendingSearch" placeholder="Search..." onkeyup="filterTable('pendingSearch','pendingTable',0)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding:0">
+                        <div class="table-container">
+                            <table id="pendingTable">
+                                <thead>
+                                    <tr>
+                                        <th>Candidate</th>
+                                        <th>Job</th>
+                                        <th>Offered Salary</th>
+                                        <th>Joining Date</th>
+                                        <th>Approval Level</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Create Offer Modal -->
+    <div class="modal-overlay" id="createOfferModal" onclick="if(event.target===this)closeModal('createOfferModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Create Offer</h3>
+                <button class="modal-close" onclick="closeModal('createOfferModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="createOfferForm">
+                    <input type="hidden" id="offerCandidateId" name="candidate_id">
+                    <div class="form-group">
+                        <label>Candidate</label>
+                        <input type="text" class="form-control" id="offerCandidateName" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Offered Salary <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="offeredSalary" name="offered_salary" placeholder="Enter offered salary" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Joining Date <span class="required">*</span></label>
+                        <input type="date" class="form-control" id="joiningDate" name="joining_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Designation <span class="required">*</span></label>
+                        <select class="form-control" id="offerDesignation" name="designation_id" required>
+                            <option value="">Select designation</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <input type="text" class="form-control" id="offerDept" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Probation (months)</label>
+                        <input type="number" class="form-control" id="probationMonths" name="probation_months" value="6" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea class="form-control" id="offerNotes" name="notes" rows="3" placeholder="Any additional notes..."></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0">
+                        <button type="button" class="btn btn-primary" onclick="submitCreateOffer()">Create Offer</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('createOfferModal')" style="margin-left:8px">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approval Action Modal -->
+    <div class="modal-overlay" id="approvalActionModal" onclick="if(event.target===this)closeModal('approvalActionModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Approval Action</h3>
+                <button class="modal-close" onclick="closeModal('approvalActionModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="approvalActionForm">
+                    <input type="hidden" id="approvalOfferId" name="offer_id">
+                    <input type="hidden" id="approvalId" name="approval_id">
+                    <div class="form-group">
+                        <label>Candidate</label>
+                        <input type="text" class="form-control" id="approvalCandidateName" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Action <span class="required">*</span></label>
+                        <div class="btn-group" style="margin-top:4px">
+                            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid var(--gray-300);border-radius:6px;background:var(--gray-50)">
+                                <input type="radio" name="approvalAction" value="Approved" checked> Approve
+                            </label>
+                            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid var(--gray-300);border-radius:6px;background:var(--gray-50)">
+                                <input type="radio" name="approvalAction" value="Rejected"> Reject
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Comment</label>
+                        <textarea class="form-control" id="approvalComment" name="comment" rows="3" placeholder="Add a comment..."></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0">
+                        <button type="button" class="btn btn-primary" onclick="submitApprovalAction()">Submit</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('approvalActionModal')" style="margin-left:8px">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        var selectedCandidates = [];
+        var pendingOffers = [];
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+            document.getElementById(tabId).classList.add('active');
+            if (btn) btn.classList.add('active');
+        }
+
+        function renderReadyForOffer() {
+            var selected = DATA.candidates.filter(function(c) { return c.status === 'Selected'; });
+            var offeredPending = DATA.candidates.filter(function(c) {
+                if (c.status !== 'Offered') return false;
+                var off = DATA.offers.find(function(o) { return o.candidate_id === c.id && o.status === 'Pending'; });
+                return !!off;
+            });
+            selectedCandidates = selected.concat(offeredPending);
+
+            var tbody = document.getElementById('readyTableBody');
+            if (selectedCandidates.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📋</div><p>No candidates ready for offer at this time.</p></div></td></tr>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < selectedCandidates.length; i++) {
+                var c = selectedCandidates[i];
+                var jobTitle = getJobTitle(c.job_id);
+                var badgeClass = getBadgeClass(c.status);
+                var salary = c.expected_salary ? formatCurrency(c.expected_salary, '৳') : '-';
+                var applied = formatDate(c.applied_at);
+                var action = '';
+                if (c.status === 'Selected') {
+                    action = '<button class="btn btn-sm btn-success" onclick="openCreateOffer(' + c.id + ')">Create Offer</button>';
+                } else {
+                    action = '<span class="badge badge-in-progress">Pending Approval</span>';
+                }
+                html += '<tr>' +
+                    '<td><strong>' + getCandidateName(c.id) + '</strong></td>' +
+                    '<td>' + jobTitle + '</td>' +
+                    '<td><span class="badge ' + badgeClass + '">' + c.status + '</span></td>' +
+                    '<td>' + salary + '</td>' +
+                    '<td>' + applied + '</td>' +
+                    '<td>' + action + '</td>' +
+                '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function renderPendingApproval() {
+            pendingOffers = DATA.offers.filter(function(o) { return o.status === 'Pending'; });
+            var tbody = document.getElementById('pendingTableBody');
+            if (pendingOffers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">✅</div><p>No pending approvals.</p></div></td></tr>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < pendingOffers.length; i++) {
+                var o = pendingOffers[i];
+                var cName = getCandidateName(o.candidate_id);
+                var jTitle = getJobTitle(DATA.candidates.find(function(c) { return c.id === o.candidate_id; }).job_id);
+                var salary = formatCurrency(o.salary, '৳');
+                var jDate = formatDate(o.joining_date);
+                var approvals = DATA.offerApprovals.filter(function(a) { return a.offer_id === o.id; });
+                var levelHtml = '';
+                for (var j = 0; j < approvals.length; j++) {
+                    var a = approvals[j];
+                    var dotClass = a.status === 'Approved' ? 'approved' : a.status === 'Rejected' ? 'rejected' : 'pending';
+                    levelHtml += '<div class="approval-level"><div class="level-line"><div class="level-dot ' + dotClass + '"></div></div><div class="level-label">Level ' + a.level + ': ' + a.status + '</div></div>';
+                }
+                if (!levelHtml) levelHtml = '<span class="text-muted">No approval levels</span>';
+                var stHtml = '<span class="badge ' + getBadgeClass(o.status) + '">' + o.status + '</span>';
+                var action = '<div class="btn-group">' +
+                    '<button class="btn btn-sm btn-success" onclick="openApprovalAction(' + o.id + ')">Approve</button>' +
+                    '<button class="btn btn-sm btn-danger" onclick="openApprovalAction(' + o.id + ')">Reject</button>' +
+                '</div>';
+                html += '<tr>' +
+                    '<td><strong>' + cName + '</strong></td>' +
+                    '<td>' + jTitle + '</td>' +
+                    '<td>' + salary + '</td>' +
+                    '<td>' + jDate + '</td>' +
+                    '<td>' + levelHtml + '</td>' +
+                    '<td>' + stHtml + '</td>' +
+                    '<td>' + action + '</td>' +
+                '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function openCreateOffer(candidateId) {
+            var c = DATA.candidates.find(function(c) { return c.id === candidateId; });
+            if (!c) return;
+            document.getElementById('offerCandidateId').value = c.id;
+            document.getElementById('offerCandidateName').value = getCandidateName(c.id);
+            document.getElementById('offeredSalary').value = c.expected_salary || '';
+            document.getElementById('joiningDate').value = '';
+            document.getElementById('probationMonths').value = 6;
+            document.getElementById('offerNotes').value = '';
+            var job = DATA.jobs.find(function(j) { return j.id === c.job_id; });
+            var deptName = job ? getDeptName(job.dept_id) : '';
+            document.getElementById('offerDept').value = deptName;
+
+            var desSel = document.getElementById('offerDesignation');
+            desSel.innerHTML = '<option value="">Select designation</option>';
+            var deptId = job ? job.dept_id : 0;
+            var filtered = DATA.designations.filter(function(d) { return d.dept_id === deptId; });
+            for (var i = 0; i < filtered.length; i++) {
+                var opt = document.createElement('option');
+                opt.value = filtered[i].id;
+                opt.textContent = filtered[i].name;
+                desSel.appendChild(opt);
+            }
+            openModal('createOfferModal');
+        }
+
+        function submitCreateOffer() {
+            var salary = document.getElementById('offeredSalary').value;
+            var date = document.getElementById('joiningDate').value;
+            var des = document.getElementById('offerDesignation').value;
+            if (!salary || !date || !des) {
+                showAlert('Please fill all required fields', 'error');
+                return;
+            }
+            showAlert('Offer created and sent for approval', 'success');
+            closeModal('createOfferModal');
+        }
+
+        function openApprovalAction(offerId) {
+            var o = DATA.offers.find(function(o) { return o.id === offerId; });
+            if (!o) return;
+            document.getElementById('approvalOfferId').value = offerId;
+            document.getElementById('approvalCandidateName').value = getCandidateName(o.candidate_id);
+            var approval = DATA.offerApprovals.find(function(a) { return a.offer_id === offerId && a.status === 'Pending'; });
+            if (approval) {
+                document.getElementById('approvalId').value = approval.id;
+            } else {
+                document.getElementById('approvalId').value = '';
+            }
+            document.getElementById('approvalComment').value = '';
+            document.querySelector('input[name="approvalAction"][value="Approved"]').checked = true;
+            openModal('approvalActionModal');
+        }
+
+        function submitApprovalAction() {
+            var action = document.querySelector('input[name="approvalAction"]:checked');
+            var val = action ? action.value : 'Approved';
+            showAlert('Offer ' + val.toLowerCase(), 'success');
+            closeModal('approvalActionModal');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderReadyForOffer();
+            renderPendingApproval();
+        });
+        var BASE_URL = '..';
+        renderSidebar('offer_approval');
+        renderHeader('Offer Approval', 'Recruitment / Offer Approval');
+    </script>
+</body>
+</html>

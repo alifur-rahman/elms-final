@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screening - HRIS</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <!-- Stats -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">⏳</div>
+                    <div class="stat-info"><h3 id="statPending">0</h3><p>Pending Screening</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">⭐</div>
+                    <div class="stat-info"><h3 id="statShortlisted">0</h3><p>Shortlisted</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">✕</div>
+                    <div class="stat-info"><h3 id="statRejected">0</h3><p>Rejected</p></div>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Screening List</h2>
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchInput" placeholder="Search candidate or job..." onkeyup="filterTable('searchInput','screeningTable')">
+                        </div>
+                        <select class="form-control" id="deptFilter" onchange="filterByDept()">
+                            <option value="">All Departments</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="screeningTable">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Job</th>
+                                    <th>Applied Date</th>
+                                    <th>Screening Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="screeningTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Screening Form Modal -->
+    <div class="modal-overlay" id="screeningModal" onclick="if(event.target===this)closeModal('screeningModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="screeningModalTitle">Screen Candidate</h3>
+                <button class="modal-close" onclick="closeModal('screeningModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="screeningForm" onsubmit="return false;">
+                    <input type="hidden" id="scCandidateId">
+                    <input type="hidden" id="scScreeningId">
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Rating (1-5) <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="scRating" min="1" max="5" step="0.5" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Communication Score (1-5) <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="scCommunication" min="1" max="5" step="0.5" required>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Experience Match <span class="required">*</span></label>
+                            <select class="form-control" id="scExperience" required>
+                                <option value="">Select</option>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Skill Match <span class="required">*</span></label>
+                            <select class="form-control" id="scSkill" required>
+                                <option value="">Select</option>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Education Match <span class="required">*</span></label>
+                            <select class="form-control" id="scEducation" required>
+                                <option value="">Select</option>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Result <span class="required">*</span></label>
+                            <select class="form-control" id="scResult" required>
+                                <option value="">Select</option>
+                                <option value="Shortlist">Shortlist</option>
+                                <option value="Reject">Reject</option>
+                                <option value="Hold">Hold</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Overall Remarks</label>
+                        <textarea class="form-control" id="scRemarks" rows="3"></textarea>
+                    </div>
+                    <div class="mt-24">
+                        <button type="button" class="btn btn-primary" onclick="window.saveScreening()">Save Screening</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('screeningModal')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        function renderScreening() {
+            var tbody = document.getElementById('screeningTableBody');
+            tbody.innerHTML = '';
+            var stats = { pending: 0, shortlisted: 0, rejected: 0 };
+
+            for (var i = 0; i < DATA.candidates.length; i++) {
+                var c = DATA.candidates[i];
+                var screening = null;
+                for (var j = 0; j < DATA.screenings.length; j++) {
+                    if (DATA.screenings[j].candidate_id === c.id) { screening = DATA.screenings[j]; break; }
+                }
+
+                if (c.status === 'Applied') stats.pending++;
+                if (screening && screening.result === 'Shortlist') stats.shortlisted++;
+                if (screening && screening.result === 'Reject') stats.rejected++;
+
+                var statusHtml = '';
+                if (screening) {
+                    statusHtml = 'Rating: ' + screening.rating + ' | <span class="badge ' + getBadgeClass(screening.result) + '">' + screening.result + '</span>';
+                } else {
+                    statusHtml = '<span class="badge badge-pending">Pending</span>';
+                }
+
+                var actionHtml = '';
+                if (screening) {
+                    actionHtml = '<button class="btn btn-sm btn-warning" onclick="window.openScreening(' + c.id + ',' + screening.id + ')">Edit Screening</button>';
+                } else {
+                    actionHtml = '<button class="btn btn-sm btn-primary" onclick="window.openScreening(' + c.id + ',0)">Screen Now</button>';
+                }
+
+                var row = '<tr>' +
+                    '<td><strong>' + c.first_name + ' ' + c.last_name + '</strong></td>' +
+                    '<td>' + getJobTitle(c.job_id) + '</td>' +
+                    '<td>' + formatDate(c.applied_at) + '</td>' +
+                    '<td>' + statusHtml + '</td>' +
+                    '<td>' + actionHtml + '</td>' +
+                '</tr>';
+                tbody.innerHTML += row;
+            }
+
+            document.getElementById('statPending').textContent = stats.pending;
+            document.getElementById('statShortlisted').textContent = stats.shortlisted;
+            document.getElementById('statRejected').textContent = stats.rejected;
+        }
+
+        window.openScreening = function(candidateId, screeningId) {
+            document.getElementById('scCandidateId').value = candidateId;
+            document.getElementById('scScreeningId').value = screeningId;
+
+            if (screeningId) {
+                var screening = null;
+                for (var i = 0; i < DATA.screenings.length; i++) {
+                    if (DATA.screenings[i].id === screeningId) { screening = DATA.screenings[i]; break; }
+                }
+                if (screening) {
+                    document.getElementById('scRating').value = screening.rating;
+                    document.getElementById('scCommunication').value = screening.communication_score;
+                    document.getElementById('scExperience').value = screening.experience_match;
+                    document.getElementById('scSkill').value = screening.skill_match;
+                    document.getElementById('scEducation').value = screening.education_match;
+                    document.getElementById('scResult').value = screening.result;
+                    document.getElementById('scRemarks').value = screening.remarks || '';
+                }
+                document.getElementById('screeningModalTitle').textContent = 'Edit Screening';
+            } else {
+                document.getElementById('screeningForm').reset();
+                document.getElementById('scCandidateId').value = candidateId;
+                document.getElementById('screeningModalTitle').textContent = 'Screen Candidate';
+            }
+            openModal('screeningModal');
+        };
+
+        window.saveScreening = function() {
+            var candidateId = parseInt(document.getElementById('scCandidateId').value);
+            var screeningId = parseInt(document.getElementById('scScreeningId').value);
+            var rating = parseFloat(document.getElementById('scRating').value);
+            var communication = parseFloat(document.getElementById('scCommunication').value);
+            var experience = document.getElementById('scExperience').value;
+            var skill = document.getElementById('scSkill').value;
+            var education = document.getElementById('scEducation').value;
+            var result = document.getElementById('scResult').value;
+            var remarks = document.getElementById('scRemarks').value.trim();
+
+            if (!rating || !communication || !experience || !skill || !education || !result) {
+                showAlert('Please fill in all required fields', 'error');
+                return;
+            }
+            if (rating < 1 || rating > 5 || communication < 1 || communication > 5) {
+                showAlert('Rating and Communication Score must be between 1 and 5', 'error');
+                return;
+            }
+
+            if (screeningId) {
+                for (var i = 0; i < DATA.screenings.length; i++) {
+                    if (DATA.screenings[i].id === screeningId) {
+                        DATA.screenings[i].rating = rating;
+                        DATA.screenings[i].communication_score = communication;
+                        DATA.screenings[i].experience_match = experience;
+                        DATA.screenings[i].skill_match = skill;
+                        DATA.screenings[i].education_match = education;
+                        DATA.screenings[i].result = result;
+                        DATA.screenings[i].remarks = remarks;
+                        break;
+                    }
+                }
+                showAlert('Screening updated successfully', 'success');
+            } else {
+                var maxId = 0;
+                for (var i = 0; i < DATA.screenings.length; i++) {
+                    if (DATA.screenings[i].id > maxId) maxId = DATA.screenings[i].id;
+                }
+
+                // Update candidate status based on result
+                for (var i = 0; i < DATA.candidates.length; i++) {
+                    if (DATA.candidates[i].id === candidateId) {
+                        if (result === 'Shortlist') DATA.candidates[i].status = 'Shortlisted';
+                        else if (result === 'Reject') DATA.candidates[i].status = 'Rejected';
+                        else DATA.candidates[i].status = 'Applied';
+                        break;
+                    }
+                }
+
+                DATA.screenings.push({
+                    id: maxId + 1,
+                    candidate_id: candidateId,
+                    screened_by: 'Admin User',
+                    date: new Date().toISOString().slice(0, 10),
+                    rating: rating,
+                    experience_match: experience,
+                    skill_match: skill,
+                    education_match: education,
+                    communication_score: communication,
+                    remarks: remarks,
+                    result: result
+                });
+                showAlert('Screening saved successfully', 'success');
+            }
+
+            closeModal('screeningModal');
+            renderScreening();
+        };
+
+        function filterByDept() {
+            var deptVal = document.getElementById('deptFilter').value.toLowerCase();
+            var rows = document.querySelectorAll('#screeningTable tbody tr');
+            for (var i = 0; i < rows.length; i++) {
+                var jobCell = rows[i].querySelectorAll('td')[1];
+                if (!deptVal || (jobCell && jobCell.textContent.toLowerCase().indexOf(deptVal) !== -1)) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+
+        function loadDeptFilter() {
+            var sel = document.getElementById('deptFilter');
+            for (var i = 0; i < DATA.departments.length; i++) {
+                var opt = document.createElement('option');
+                opt.value = DATA.departments[i].name;
+                opt.textContent = DATA.departments[i].name;
+                sel.appendChild(opt);
+            }
+        }
+
+        renderScreening();
+        loadDeptFilter();
+        var BASE_URL = '..';
+        renderSidebar('screening');
+        renderHeader('Screening', 'Home / Recruitment / Screening');
+    </script>
+</body>
+</html>

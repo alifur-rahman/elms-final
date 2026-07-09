@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP HRIS - Approval Management</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .level-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+        .level-pill.current { background: #e8f0fe; color: var(--primary); }
+        .level-pill.done { background: #e6f4ea; color: var(--success); }
+        .level-pill.pending { background: var(--gray-100); color: var(--gray-500); }
+        .level-pill.rejected { background: #fce8e6; color: var(--danger); }
+        .level-pill .lp-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+        .level-pill.current .lp-dot { background: var(--primary); }
+        .level-pill.done .lp-dot { background: var(--success); }
+        .level-pill.pending .lp-dot { background: var(--gray-400); }
+        .level-pill.rejected .lp-dot { background: var(--danger); }
+        .approval-timeline { position: relative; padding-left: 24px; }
+        .approval-timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--gray-200); }
+        .tl-item { position: relative; padding: 12px 0 12px 20px; }
+        .tl-item::before { content: ''; position: absolute; left: -18px; top: 16px; width: 10px; height: 10px; border-radius: 50%; background: var(--gray-300); }
+        .tl-item.done::before { background: var(--success); }
+        .tl-item.current::before { background: var(--primary); box-shadow: 0 0 0 3px rgba(26,115,232,0.2); }
+        .tl-item.rejected::before { background: var(--danger); }
+        .tl-item .tl-time { font-size: 11px; color: var(--gray-500); }
+        .tl-item .tl-label { font-size: 13px; font-weight: 500; }
+        .tl-item .tl-user { font-size: 11px; color: var(--gray-500); }
+        .tl-item .tl-comment { font-size: 12px; color: var(--gray-600); margin-top: 4px; padding: 8px 12px; background: var(--gray-50); border-radius: 6px; }
+        .level-chain { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+        .chain-step { display: flex; align-items: center; gap: 4px; font-size: 11px; padding: 4px 10px; border-radius: 4px; background: var(--gray-100); color: var(--gray-500); }
+        .chain-step.active { background: #e8f0fe; color: var(--primary); font-weight: 600; }
+        .chain-step.done { background: #e6f4ea; color: var(--success); }
+        .chain-step.rejected { background: #fce8e6; color: var(--danger); }
+        .chain-arrow { color: var(--gray-400); font-size: 12px; }
+        .approval-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .score-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+        .score-card { text-align: center; padding: 12px 8px; border: 1px solid var(--gray-200); border-radius: 6px; background: var(--gray-50); }
+        .score-card .sc-val { font-size: 18px; font-weight: 700; }
+        .score-card .sc-label { font-size: 10px; color: var(--gray-500); margin-top: 2px; }
+        .score-card .sc-weight { font-size: 9px; color: var(--gray-400); }
+        .decision-option { display: flex; align-items: center; gap: 8px; padding: 12px 20px; border: 2px solid var(--gray-200); border-radius: 8px; cursor: pointer; transition: all .2s; }
+        .decision-option:hover { border-color: var(--primary); }
+        .decision-option input[type="radio"] { width: 16px; height: 16px; accent-color: var(--primary); }
+        .audit-warning { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; background: #fef7e0; border: 1px solid #f9ab00; border-radius: 6px; font-size: 12px; color: var(--gray-700); }
+        .audit-warning .aw-icon { font-size: 18px; flex-shrink: 0; }
+        @media (max-width:768px) { .approval-detail-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <!-- Stats -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">&#9200;</div>
+                    <div class="stat-info"><h3 id="statPending">0</h3><p>Pending Approval</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">&#10004;</div>
+                    <div class="stat-info"><h3 id="statApproved">0</h3><p>Approved Today</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">&#9888;</div>
+                    <div class="stat-info"><h3 id="statUrgent">0</h3><p>Urgent (&lt; 7 days)</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">&#128220;</div>
+                    <div class="stat-info"><h3 id="statCompleted">1</h3><p>Completed</p></div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-24">
+                <div class="card-header">
+                    <h2>Approval Queue</h2>
+                    <div class="filter-bar">
+                        <select class="form-control" id="levelFilter" onchange="applyFilters()">
+                            <option value="">All Levels</option>
+                            <option value="Supervisor">Supervisor</option>
+                            <option value="Dept Head">Dept Head</option>
+                            <option value="HR Review">HR Review</option>
+                            <option value="GM">GM</option>
+                            <option value="MD">Managing Director</option>
+                        </select>
+                        <select class="form-control" id="deptFilter" onchange="applyFilters()">
+                            <option value="">All Departments</option>
+                        </select>
+                        <div class="search-box">
+                            <span class="search-icon">&#128269;</span>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search employee..." onkeyup="applyFilters()">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body" style="padding:0">
+                    <div class="table-container">
+                        <table id="approvalTable">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Score</th>
+                                    <th>Current Level</th>
+                                    <th>Status</th>
+                                    <th>Days Left</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="approvalBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Approval Action Modal -->
+            <div class="modal-overlay" id="approvalModal" onclick="if(event.target===this)closeModal('approvalModal')">
+                <div class="modal" style="max-width:700px">
+                    <div class="modal-header">
+                        <h3>Approval Action</h3>
+                        <button class="modal-close" onclick="closeModal('approvalModal')">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="actProbationId">
+                        <input type="hidden" id="actCurrentLevel">
+
+                        <div class="approval-detail-grid">
+                            <div>
+                                <div class="profile-card" style="margin:0;padding:16px" id="actProfileCard"></div>
+                            </div>
+                            <div>
+                                <h4 style="font-size:13px;margin-bottom:12px">Approval Chain</h4>
+                                <div id="actLevelChain" class="level-chain"></div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-16">
+                            <div class="card-header"><h2>&#128221; Appraisal Summary</h2></div>
+                            <div class="card-body" style="font-size:13px">
+                                <div id="actSummary"></div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-16">
+                            <div class="card-header"><h2>&#128202; Section Scores</h2></div>
+                            <div class="card-body">
+                                <div id="actScoreCards" class="score-card-grid"></div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-16">
+                            <div class="card-header"><h2>&#128220; Approval History</h2></div>
+                            <div class="card-body">
+                                <div id="actHistory" class="approval-timeline"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Your Decision <span class="required">*</span></label>
+                            <div style="display:flex;gap:16px;margin-top:8px;flex-wrap:wrap">
+                                <label class="decision-option" id="actApproveLabel" onclick="selectDecision('Approved')">
+                                    <input type="radio" name="actDecision" value="Approved" checked>
+                                    <span style="font-weight:600;color:var(--success)">&#10004; Approve</span>
+                                </label>
+                                <label class="decision-option" id="actSendBackLabel" onclick="selectDecision('Send Back')">
+                                    <input type="radio" name="actDecision" value="Send Back">
+                                    <span style="font-weight:600;color:var(--warning)">&#8635; Send Back</span>
+                                </label>
+                                <label class="decision-option" id="actRejectLabel" onclick="selectDecision('Rejected')">
+                                    <input type="radio" name="actDecision" value="Rejected">
+                                    <span style="font-weight:600;color:var(--danger)">&#10008; Reject</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Comments <span class="required">*</span></label>
+                            <textarea id="actComments" class="form-control textarea-full" placeholder="Enter comments for this approval decision..."></textarea>
+                        </div>
+                        <div class="audit-warning mb-16">
+                            <span class="aw-icon">&#9888;</span>
+                            <div><strong>Audit Trail:</strong> All decisions are logged with timestamp and user identity. This action will be recorded in the employee's permanent lifecycle audit trail and cannot be undone.</div>
+                        </div>
+                        <div style="display:flex;justify-content:flex-end;gap:8px">
+                            <button class="btn btn-outline" onclick="closeModal('approvalModal')">Cancel</button>
+                            <button class="btn btn-primary" onclick="submitApproval()">Submit Decision</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        var BASE_URL = '..';
+        renderSidebar('probation_approve');
+        renderHeader('Approval Management', 'Home / Probation / Approval Management');
+
+        var APPROVAL_LEVELS = ['Self Assessment', 'Supervisor', 'Dept Head', 'HR Review', 'GM', 'Managing Director'];
+        var APPROVAL_HISTORY = [
+            { level: 'Self Assessment', user: 'John Doe (Employee)', decision: 'Completed', comment: 'Self assessment submitted', date: '2026-07-20 10:00' },
+            { level: 'Supervisor', user: 'David Clark (Supervisor)', decision: 'Approved', comment: 'John has performed well this period. Recommend confirmation.', date: '2026-07-22 14:30' },
+            { level: 'Dept Head', user: 'Sarah Lee (Dept Head)', decision: '', comment: '', date: '' }
+        ];
+
+        function getCurrentLevel(p) {
+            if (!p || p.status === 'Completed') return { idx: 5, label: 'Managing Director', done: true };
+            if (p.status === 'Draft') return { idx: 0, label: 'Self Assessment', done: false };
+            return { idx: 1, label: 'Supervisor', done: false };
+        }
+
+        function renderStats() {
+            var pending = 0, urgent = 0;
+            for (var i = 0; i < DATA.probations.length; i++) {
+                var p = DATA.probations[i];
+                if (p.status === 'Pending' || p.status === 'In Progress') pending++;
+            }
+            document.getElementById('statPending').textContent = pending;
+            document.getElementById('statApproved').textContent = '2';
+            document.getElementById('statUrgent').textContent = pending > 0 ? '1' : '0';
+        }
+
+        function populateDeptFilter() {
+            var sel = document.getElementById('deptFilter');
+            for (var i = 0; i < DATA.departments.length; i++) {
+                sel.innerHTML += '<option value="' + DATA.departments[i].name.toLowerCase() + '">' + DATA.departments[i].name + '</option>';
+            }
+        }
+
+        function applyFilters() {
+            var levelVal = document.getElementById('levelFilter').value.toLowerCase();
+            var deptVal = document.getElementById('deptFilter').value;
+            var searchVal = document.getElementById('searchInput').value.toLowerCase();
+            var rows = document.querySelectorAll('#approvalTable tbody tr');
+            for (var i = 0; i < rows.length; i++) {
+                var level = (rows[i].getAttribute('data-level') || '').toLowerCase();
+                var dept = (rows[i].getAttribute('data-dept') || '').toLowerCase();
+                var name = (rows[i].getAttribute('data-name') || '').toLowerCase();
+                var show = true;
+                if (levelVal && level.indexOf(levelVal) === -1) show = false;
+                if (deptVal && dept !== deptVal) show = false;
+                if (searchVal && name.indexOf(searchVal) === -1) show = false;
+                rows[i].style.display = show ? '' : 'none';
+            }
+        }
+
+        function renderTable() {
+            var html = '';
+            for (var i = 0; i < DATA.probations.length; i++) {
+                var p = DATA.probations[i];
+                var e = DATA.employees.find(function(emp) { return emp.id === p.employee_id; });
+                if (!e) continue;
+                var name = getEmployeeName(p.employee_id);
+                var dept = getDeptName(e.dept_id);
+                var level = getCurrentLevel(p);
+                var daysLeft = getDaysRemaining(p.end_date || '2026-08-01');
+                var statBadge = '<span class="badge ' + getBadgeClass(p.status) + '">' + p.status + '</span>';
+                var levelHtml = '';
+                if (level.done) {
+                    levelHtml = '<span class="level-pill done"><span class="lp-dot"></span>Completed</span>';
+                } else {
+                    levelHtml = '<span class="level-pill current"><span class="lp-dot"></span>' + level.label + '</span>';
+                }
+                html += '<tr data-level="' + level.label.toLowerCase() + '" data-dept="' + dept.toLowerCase() + '" data-name="' + name.toLowerCase() + '">' +
+                    '<td><strong>' + name + '</strong><br><span class="text-muted">' + e.employee_code + '</span></td>' +
+                    '<td>' + dept + '</td>' +
+                    '<td>' + (p.score ? p.score.toFixed(2) : '-') + '</td>' +
+                    '<td>' + levelHtml + '</td>' +
+                    '<td>' + statBadge + '</td>' +
+                    '<td class="' + (daysLeft <= 7 ? 'text-danger' : '') + '" style="font-weight:600">' + daysLeft + ' days</td>' +
+                    '<td><button class="btn btn-sm btn-primary" onclick="openApproval(' + p.id + ')">Review &amp; Approve</button></td>' +
+                '</tr>';
+            }
+            document.getElementById('approvalBody').innerHTML = html || '<tr><td colspan="7" class="text-muted text-center">No probations found</td></tr>';
+        }
+
+        function getLevelIndex(label) {
+            for (var i = 0; i < APPROVAL_LEVELS.length; i++) {
+                if (APPROVAL_LEVELS[i].toLowerCase() === label.toLowerCase()) return i;
+            }
+            return -1;
+        }
+
+        function openApproval(pid) {
+            var p = DATA.probations.find(function(pr) { return pr.id === pid; });
+            if (!p) return;
+            document.getElementById('actProbationId').value = pid;
+            var level = getCurrentLevel(p);
+            document.getElementById('actCurrentLevel').value = level.label;
+
+            // Profile
+            var e = DATA.employees.find(function(emp) { return emp.id === p.employee_id; });
+            var initials = e ? e.first_name.charAt(0) + e.last_name.charAt(0) : 'NA';
+            document.getElementById('actProfileCard').innerHTML =
+                '<div class="profile-avatar" style="width:48px;height:48px;font-size:16px">' + initials + '</div>' +
+                '<div class="profile-details" style="grid-template-columns:1fr">' +
+                    '<div class="detail-item"><label>Employee</label><span>' + getEmployeeName(p.employee_id) + '</span></div>' +
+                    '<div class="detail-item"><label>Department</label><span>' + (e ? getDeptName(e.dept_id) : '') + '</span></div>' +
+                    '<div class="detail-item"><label>Score</label><span>' + (p.score ? p.score.toFixed(2) : '-') + ' / 5</span></div>' +
+                    '<div class="detail-item"><label>End Date</label><span>' + (p.end_date || 'N/A') + '</span></div>' +
+                '</div>';
+
+            // Level chain
+            var chainHtml = '';
+            for (var i = 0; i < APPROVAL_LEVELS.length; i++) {
+                var l = APPROVAL_LEVELS[i];
+                var cls = '';
+                if (i < level.idx) cls = 'done';
+                else if (i === level.idx && !level.done) cls = 'active';
+                else if (level.done && i === level.idx) cls = 'done';
+                chainHtml += '<div class="chain-step ' + cls + '">' + (cls === 'done' ? '&#10003;' : '') + l + '</div>';
+                if (i < APPROVAL_LEVELS.length - 1) chainHtml += '<span class="chain-arrow">&#8594;</span>';
+            }
+            document.getElementById('actLevelChain').innerHTML = chainHtml;
+
+            // Summary with recommendation badge
+            var recColors = { Confirm: 'badge-confirm', Extend: 'badge-extend', Transfer: 'badge-transfer', Terminate: 'badge-terminate' };
+            var recBadgeClass = recColors[p.recommendation] || 'badge-pending';
+            document.getElementById('actSummary').innerHTML =
+                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+                    '<span><strong>Probation Period:</strong> ' + (p.joining_date ? formatDate(p.joining_date) : 'Feb 1, 2026') + ' to ' + (p.end_date ? formatDate(p.end_date) : 'Aug 1, 2026') + '</span>' +
+                    '<span class="badge ' + recBadgeClass + '" style="font-size:13px;padding:4px 16px">' + (p.recommendation || 'Pending') + '</span>' +
+                '</div>' +
+                '<p><strong>Status:</strong> ' + p.status + '</p>' +
+                '<p><strong>Remarks:</strong> ' + (p.remarks || 'No remarks yet') + '</p>';
+
+            // Section Scores
+            var scoreHtml = '';
+            for (var c = 0; c < DATA.appraisalCategories.length; c++) {
+                var cat = DATA.appraisalCategories[c];
+                var catScore = (Math.random() * 2 + 2.5).toFixed(1);
+                var pct = (parseFloat(catScore) / 5 * 100);
+                scoreHtml += '<div class="score-card">' +
+                    '<div class="sc-val" style="color:' + (pct >= 80 ? 'var(--success)' : pct >= 60 ? 'var(--warning)' : 'var(--danger)') + '">' + catScore + '</div>' +
+                    '<div class="sc-weight">' + cat.weight + '%</div>' +
+                    '<div class="sc-label">' + cat.name + '</div>' +
+                '</div>';
+            }
+            document.getElementById('actScoreCards').innerHTML = scoreHtml;
+
+            // History
+            var histHtml = '';
+            for (var h = 0; h < APPROVAL_HISTORY.length; h++) {
+                var ah = APPROVAL_HISTORY[h];
+                var hcls = '';
+                if (ah.decision === 'Approved' || ah.decision === 'Completed') hcls = 'done';
+                else if (ah.decision === 'Rejected') hcls = 'rejected';
+                else hcls = 'current';
+                histHtml += '<div class="tl-item ' + hcls + '">' +
+                    '<div class="tl-time">' + (ah.date || 'Pending') + '</div>' +
+                    '<div class="tl-label">' + ah.level + ' — ' + ah.user + '</div>' +
+                    '<div class="tl-user">Decision: ' + (ah.decision || 'Awaiting') + '</div>' +
+                    (ah.comment ? '<div class="tl-comment">"' + ah.comment + '"</div>' : '') +
+                '</div>';
+            }
+            document.getElementById('actHistory').innerHTML = histHtml || '<div class="text-muted">No approval history yet</div>';
+
+            document.getElementById('actComments').value = '';
+            selectDecision('Approved');
+            openModal('approvalModal');
+        }
+
+        function selectDecision(val) {
+            var colors = { Approved: 'var(--success)', 'Send Back': 'var(--warning)', Rejected: 'var(--danger)' };
+            var bgColors = { Approved: '#e6f4ea', 'Send Back': '#fef7e0', Rejected: '#fce8e6' };
+            var labels = ['actApproveLabel', 'actSendBackLabel', 'actRejectLabel'];
+            for (var i = 0; i < labels.length; i++) {
+                var el = document.getElementById(labels[i]);
+                if (!el) continue;
+                el.style.borderColor = 'var(--gray-200)';
+                el.style.background = 'transparent';
+            }
+            var key = val === 'Send Back' ? 'Send Back' : val;
+            var selEl = val === 'Approved' ? document.getElementById('actApproveLabel') : val === 'Send Back' ? document.getElementById('actSendBackLabel') : document.getElementById('actRejectLabel');
+            if (selEl) {
+                selEl.style.borderColor = colors[key] || 'var(--gray-200)';
+                selEl.style.background = bgColors[key] || 'transparent';
+            }
+            document.querySelector('input[name="actDecision"][value="' + val + '"]').checked = true;
+        }
+
+        function submitApproval() {
+            var decision = document.querySelector('input[name="actDecision"]:checked');
+            var comments = document.getElementById('actComments').value;
+            if (!decision) { showAlert('Please select a decision', 'error'); return; }
+            if (!comments.trim()) { showAlert('Please enter comments', 'error'); return; }
+            var label = decision.value === 'Send Back' ? 'Sent Back for revision' : decision.value;
+            showAlert('Decision recorded: ' + label, 'success');
+            closeModal('approvalModal');
+            renderTable();
+        }
+
+        populateDeptFilter();
+        renderStats();
+        renderTable();
+    </script>
+</body>
+</html>

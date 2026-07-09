@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP HRIS - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .welcome-card {
+            background: linear-gradient(135deg, #1a1d29 0%, #2d5a87 100%);
+            border-radius: 16px;
+            padding: 48px 40px;
+            color: #fff;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        .welcome-card h1 { font-size: 28px; margin-bottom: 8px; }
+        .welcome-card p { color: rgba(255,255,255,.7); font-size: 14px; margin-bottom: 24px; }
+        .welcome-card .brand-badge { display: inline-block; padding: 4px 16px; background: rgba(255,255,255,.12); border-radius: 20px; font-size: 12px; margin-bottom: 16px; }
+        .lifecycle-flow { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 32px 0; padding: 24px; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+        .flow-step { display: flex; flex-direction: column; align-items: center; text-decoration: none; padding: 12px 16px; border-radius: 8px; transition: all .2s ease; min-width: 80px; }
+        .flow-step:hover { background: var(--gray-50); transform: translateY(-2px); }
+        .flow-step .flow-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 8px; border: 2px solid var(--gray-200); background: #fff; }
+        .flow-step:hover .flow-icon { border-color: var(--primary); background: #e8f0fe; }
+        .flow-step .flow-label { font-size: 11px; font-weight: 500; color: var(--gray-700); text-align: center; }
+        .flow-connector { width: 32px; height: 2px; background: var(--gray-300); flex-shrink: 0; }
+        .quick-links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+        .quick-link-card { background: #fff; border-radius: 12px; padding: 20px 16px; text-align: center; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,.08); transition: all .2s ease; border: 1px solid var(--gray-200); }
+        .quick-link-card:hover { transform: translateY(-3px); box-shadow: 0 4px 16px rgba(0,0,0,.12); border-color: var(--primary); }
+        .quick-link-card .ql-icon { font-size: 28px; margin-bottom: 8px; }
+        .quick-link-card .ql-label { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+        .quick-link-card .ql-count { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
+        .quick-link-card .ql-badge { display: inline-block; margin-top: 6px; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; background: var(--danger); color: #fff; }
+    </style>
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <div class="welcome-card">
+                <div class="brand-badge">ERP HRIS v2.0</div>
+                <h1>Employee Lifecycle Management System</h1>
+                <p>End-to-end HR operations from recruitment to confirmation</p>
+            </div>
+
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">🎯</div>
+                    <div class="stat-info"><h3>3</h3><p>Open Positions</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">👥</div>
+                    <div class="stat-info"><h3>5</h3><p>Active Candidates</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">📝</div>
+                    <div class="stat-info"><h3>1</h3><p>Pending Probation</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">🎉</div>
+                    <div class="stat-info"><h3>1</h3><p>Upcoming Confirmations</p></div>
+                </div>
+            </div>
+
+            <div class="card mb-24">
+                <div class="card-header"><h2>Employee Lifecycle Flow</h2></div>
+                <div class="card-body">
+                    <div class="lifecycle-flow">
+                        <a href="recruitment/list.html" class="flow-step"><div class="flow-icon">🎯</div><div class="flow-label">Recruitment</div></a>
+                        <div class="flow-connector"></div>
+                        <a href="candidates/list.html" class="flow-step"><div class="flow-icon">👥</div><div class="flow-label">Candidates</div></a>
+                        <div class="flow-connector"></div>
+                        <a href="screening/list.html" class="flow-step"><div class="flow-icon">🔍</div><div class="flow-label">Screening</div></a>
+                        <div class="flow-connector"></div>
+                        <a href="interview/list.html" class="flow-step"><div class="flow-icon">🤝</div><div class="flow-label">Interview</div></a>
+                        <div class="flow-connector"></div>
+                        <a href="offer_approval/list.html" class="flow-step"><div class="flow-icon">✅</div><div class="flow-label">Offer</div></a>
+                        <div class="flow-connector"></div>
+                        <a href="pre_onboarding/list.html" class="flow-step"><div class="flow-icon">📋</div><div class="flow-label">Pre-Onboarding</div></a>
+                        <div class="flow-connector"></div>
+                        <a href="joining/list.html" class="flow-step"><div class="flow-icon">🚪</div><div class="flow-label">Joining</div></a>
+                        <div class="flow-connector"></div>
+                        <a href="probation/list.html" class="flow-step"><div class="flow-icon">📝</div><div class="flow-label">Probation</div></a>
+                        <div class="flow-connector"></div>
+                        <a href="confirmation/list.html" class="flow-step"><div class="flow-icon">🎉</div><div class="flow-label">Confirmation</div></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h2>Quick Module Access</h2></div>
+                <div class="card-body">
+                    <div class="quick-links-grid">
+                        <a href="dashboard.html" class="quick-link-card"><div class="ql-icon">📊</div><div class="ql-label">Dashboard</div><div class="ql-count">Overview</div></a>
+                        <a href="recruitment/list.html" class="quick-link-card"><div class="ql-icon">🎯</div><div class="ql-label">Recruitment</div><div class="ql-count">Open Positions</div><div class="ql-badge">3</div></a>
+                        <a href="candidates/list.html" class="quick-link-card"><div class="ql-icon">👥</div><div class="ql-label">Candidates</div><div class="ql-count">Active Pipeline</div><div class="ql-badge">5</div></a>
+                        <a href="screening/list.html" class="quick-link-card"><div class="ql-icon">🔍</div><div class="ql-label">Screening</div><div class="ql-count">Pending Review</div></a>
+                        <a href="interview/list.html" class="quick-link-card"><div class="ql-icon">🤝</div><div class="ql-label">Interview</div><div class="ql-count">Scheduled</div></a>
+                        <a href="offer_approval/list.html" class="quick-link-card"><div class="ql-icon">✅</div><div class="ql-label">Offer Approval</div><div class="ql-count">Pending</div></a>
+                        <a href="pre_onboarding/list.html" class="quick-link-card"><div class="ql-icon">📋</div><div class="ql-label">Pre-Onboarding</div><div class="ql-count">Tasks</div></a>
+                        <a href="joining/list.html" class="quick-link-card"><div class="ql-icon">🚪</div><div class="ql-label">Joining</div><div class="ql-count">Upcoming</div></a>
+                        <a href="probation/list.html" class="quick-link-card"><div class="ql-icon">📝</div><div class="ql-label">Probation</div><div class="ql-count">Appraisals</div></a>
+                        <a href="confirmation/list.html" class="quick-link-card"><div class="ql-icon">🎉</div><div class="ql-label">Confirmation</div><div class="ql-count">Letters</div></a>
+                        <a href="employee_master/list.html" class="quick-link-card"><div class="ql-icon">👤</div><div class="ql-label">Employees</div><div class="ql-count">Master Data</div></a>
+                        <a href="reports/probation_summary.html" class="quick-link-card"><div class="ql-icon">📈</div><div class="ql-label">Reports</div><div class="ql-count">Analytics</div></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        var BASE_URL = '.';
+        renderSidebar('dashboard');
+        renderHeader('Dashboard', 'Home / Dashboard');
+    </script>
+</body>
+</html>

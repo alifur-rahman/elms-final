@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP HRIS - Generate Confirmation Letter</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .step-indicator { display:flex; align-items:center; gap:0; margin-bottom:32px; padding:16px 24px; background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); }
+        .step { display:flex; align-items:center; gap:8px; flex:1; }
+        .step .step-num { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; background:var(--gray-200); color:var(--gray-500); flex-shrink:0; }
+        .step.active .step-num { background:var(--primary); color:#fff; }
+        .step.completed .step-num { background:var(--success); color:#fff; }
+        .step .step-text { font-size:13px; font-weight:500; color:var(--gray-500); }
+        .step.active .step-text { color:var(--gray-900); }
+        .step.completed .step-text { color:var(--success); }
+        .step-connector { height:2px; flex:1; background:var(--gray-200); margin:0 12px; }
+        .step-connector.completed { background:var(--success); }
+        .step-content { display:none; }
+        .step-content.active { display:block; }
+        .preview-section { margin-top:24px; }
+        #letterPreview { display:none; }
+    </style>
+</head>
+<body>
+    <div id="sidebar"></div>
+    <main class="main-content">
+        <div id="header"></div>
+        <div class="page-content">
+            <div class="step-indicator">
+                <div class="step active" id="step1Indicator">
+                    <div class="step-num">1</div>
+                    <div class="step-text">Select Employee</div>
+                </div>
+                <div class="step-connector" id="conn1"></div>
+                <div class="step" id="step2Indicator">
+                    <div class="step-num">2</div>
+                    <div class="step-text">Enter Details</div>
+                </div>
+                <div class="step-connector" id="conn2"></div>
+                <div class="step" id="step3Indicator">
+                    <div class="step-num">3</div>
+                    <div class="step-text">Preview & Generate</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Select Employee -->
+            <div class="step-content active" id="step1">
+                <div class="card">
+                    <div class="card-header"><h2>Select Employee</h2></div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Employee <span class="required">*</span></label>
+                            <select class="form-control" id="employeeSelect" onchange="onEmployeeSelect()">
+                                <option value="">-- Select Employee --</option>
+                            </select>
+                        </div>
+                        <div id="selectedEmpInfo" style="display:none" class="mb-24"></div>
+                        <button class="btn btn-primary" onclick="goStep(2)">Next</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Enter Details -->
+            <div class="step-content" id="step2">
+                <div class="card">
+                    <div class="card-header"><h2>Confirmation Details</h2></div>
+                    <div class="card-body">
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Effective Date <span class="required">*</span></label>
+                                <input type="date" class="form-control" id="effDate" onchange="updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label>Salary Revision <span class="required">*</span></label>
+                                <input type="number" class="form-control" id="salaryRev" placeholder="BDT" oninput="updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Letter Template</label>
+                            <select class="form-control" id="letterTemplate" onchange="updatePreview()">
+                                <option value="standard">Standard Confirmation Letter</option>
+                            </select>
+                        </div>
+                        <div class="mt-24">
+                            <button class="btn btn-outline" onclick="goStep(1)">Back</button>
+                            <button class="btn btn-primary" onclick="goStep(3)">Next: Preview</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Preview & Generate -->
+            <div class="step-content" id="step3">
+                <div class="card">
+                    <div class="card-header"><h2>Preview & Generate</h2></div>
+                    <div class="card-body">
+                        <div id="letterPreview" class="preview-section"></div>
+                        <div id="noPreviewMsg" class="alert alert-info">Please fill all required fields to see preview</div>
+                        <div class="mt-24">
+                            <button class="btn btn-outline" onclick="goStep(2)">Back</button>
+                            <button class="btn btn-success" onclick="generateLetter()">Generate Letter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        var BASE_URL = '..';
+        renderSidebar('confirmation_generate');
+        renderHeader('Generate Confirmation Letter', 'Home / Confirmation / Generate Letter');
+
+        var selectedProbation = null;
+
+        function populateEmployeeSelect() {
+            var sel = document.getElementById('employeeSelect');
+            var list = DATA.probations.filter(function(p) { return p.status === 'Completed' && p.recommendation === 'Confirm'; });
+            for (var i = 0; i < list.length; i++) {
+                var p = list[i];
+                var alreadyConfirmed = DATA.confirmations.some(function(c) { return c.probation_id === p.id; });
+                if (alreadyConfirmed) continue;
+                var name = getEmployeeName(p.employee_id);
+                var e = DATA.employees.find(function(emp) { return emp.id === p.employee_id; });
+                var dept = e ? getDeptName(e.dept_id) : '';
+                sel.innerHTML += '<option value="' + p.id + '">' + name + ' (' + dept + ')</option>';
+            }
+        }
+
+        function onEmployeeSelect() {
+            var val = document.getElementById('employeeSelect').value;
+            var infoDiv = document.getElementById('selectedEmpInfo');
+            if (!val) { infoDiv.style.display = 'none'; return; }
+            var p = DATA.probations.find(function(pr) { return pr.id === parseInt(val); });
+            if (!p) return;
+            selectedProbation = p;
+            var e = DATA.employees.find(function(emp) { return emp.id === p.employee_id; });
+            var name = getEmployeeName(p.employee_id);
+            var dept = e ? getDeptName(e.dept_id) : '';
+            var desig = e ? getDesignationName(e.designation_id) : '';
+            infoDiv.style.display = 'block';
+            infoDiv.innerHTML = '<div class="profile-card" style="padding:16px;margin:0">' +
+                '<div class="profile-avatar" style="width:48px;height:48px;font-size:20px">' + name.charAt(0) + '</div>' +
+                '<div class="profile-details" style="grid-template-columns:repeat(3,1fr)">' +
+                    '<div class="detail-item"><label>Name</label><span>' + name + '</span></div>' +
+                    '<div class="detail-item"><label>Department</label><span>' + dept + '</span></div>' +
+                    '<div class="detail-item"><label>Designation</label><span>' + desig + '</span></div>' +
+                    '<div class="detail-item"><label>Probation Score</label><span>' + (p.score ? p.score.toFixed(2) : '-') + '</span></div>' +
+                    '<div class="detail-item"><label>Current Salary</label><span>' + (e ? formatCurrency(e.salary, 'BDT ') : '') + '</span></div>' +
+                '</div></div>';
+            document.getElementById('effDate').value = '';
+            document.getElementById('salaryRev').value = e ? e.salary : '';
+            document.getElementById('letterPreview').style.display = 'none';
+            document.getElementById('noPreviewMsg').style.display = 'block';
+        }
+
+        function goStep(step) {
+            for (var i = 1; i <= 3; i++) {
+                document.getElementById('step' + i).classList.remove('active');
+                document.getElementById('step' + i + 'Indicator').classList.remove('active');
+                document.getElementById('step' + i + 'Indicator').classList.remove('completed');
+            }
+            for (var i = 1; i < step; i++) {
+                document.getElementById('step' + i + 'Indicator').classList.add('completed');
+                if (i < 3) document.getElementById('conn' + i).classList.add('completed');
+            }
+            document.getElementById('step' + step).classList.add('active');
+            document.getElementById('step' + step + 'Indicator').classList.add('active');
+            if (step === 3) updatePreview();
+        }
+
+        function buildLetterHtml() {
+            if (!selectedProbation) return '';
+            var effDate = document.getElementById('effDate').value;
+            var salaryRev = document.getElementById('salaryRev').value;
+            if (!effDate || !salaryRev) return '';
+            var e = DATA.employees.find(function(emp) { return emp.id === selectedProbation.employee_id; });
+            var name = getEmployeeName(selectedProbation.employee_id);
+            var desig = e ? getDesignationName(e.designation_id) : '';
+            var dept = e ? getDeptName(e.dept_id) : '';
+            var letterNo = 'CONF/2026/' + String(DATA.confirmations.length + 1).padStart(6,'0');
+
+            return '<div class="letter-preview" id="letterContent">' +
+                '<div class="letter-header">' +
+                    '<h2>ABC Corporation</h2>' +
+                    '<p>123 Business Park, Dhaka, Bangladesh</p>' +
+                '</div>' +
+                '<div class="letter-no">Ref: ' + letterNo + '<br>Date: ' + formatDate(new Date().toISOString().slice(0,10)) + '</div>' +
+                '<div class="letter-body">' +
+                    '<p><strong>To,</strong></p>' +
+                    '<p>' + name + '<br>' + desig + '<br>' + dept + '<br>ABC Corporation</p>' +
+                    '<p style="margin-top:24px"><strong>Subject: Confirmation of Employment</strong></p>' +
+                    '<p>Dear ' + name + ',</p>' +
+                    '<p>We are pleased to inform you that based on your performance during the probation period, your employment with ABC Corporation has been confirmed effective from <strong>' + formatDate(effDate) + '</strong>.</p>' +
+                    '<p>Your revised salary will be <strong>' + formatCurrency(parseFloat(salaryRev), 'BDT ') + '</strong> per month, effective from the confirmation date.</p>' +
+                    '<p>We appreciate your contribution and look forward to your continued success with the organization.</p>' +
+                    '<p>We wish you all the best in your future endeavors with us.</p>' +
+                '</div>' +
+                '<div class="letter-footer">' +
+                    '<p>Sincerely,</p>' +
+                    '<div class="signature-area">' +
+                        '<p style="font-weight:600">Authorized Signatory</p>' +
+                        '<p style="font-size:12px;color:var(--gray-500)">Human Resources Department<br>ABC Corporation</p>' +
+                        '<div class="sig-line">Authorized Signature</div>' +
+                    '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function updatePreview() {
+            var html = buildLetterHtml();
+            var preview = document.getElementById('letterPreview');
+            var noMsg = document.getElementById('noPreviewMsg');
+            if (html) {
+                preview.innerHTML = html;
+                preview.style.display = 'block';
+                noMsg.style.display = 'none';
+            } else {
+                preview.style.display = 'none';
+                noMsg.style.display = 'block';
+            }
+        }
+
+        function generateLetter() {
+            if (!selectedProbation) { showAlert('Please select an employee', 'error'); return; }
+            var effDate = document.getElementById('effDate').value;
+            var salaryRev = document.getElementById('salaryRev').value;
+            if (!effDate || !salaryRev) { showAlert('Please fill all required fields', 'error'); return; }
+            var e = DATA.employees.find(function(emp) { return emp.id === selectedProbation.employee_id; });
+            if (!e) return;
+            var already = DATA.confirmations.some(function(c) { return c.probation_id === selectedProbation.id; });
+            if (already) { showAlert('Confirmation already generated for this employee', 'error'); return; }
+            var newId = DATA.confirmations.length + 1;
+            DATA.confirmations.push({
+                id: newId,
+                employee_id: selectedProbation.employee_id,
+                probation_id: selectedProbation.id,
+                conf_date: new Date().toISOString().slice(0,10),
+                eff_date: effDate,
+                salary_revision: parseFloat(salaryRev),
+                designation: getDesignationName(e.designation_id),
+                department: getDeptName(e.dept_id),
+                letter_no: 'CONF/2026/' + String(newId).padStart(6,'0'),
+                status: 'Generated'
+            });
+            e.salary = parseFloat(salaryRev);
+            showAlert('success', 'Confirmation letter generated successfully');
+            document.getElementById('employeeSelect').value = '';
+            document.getElementById('effDate').value = '';
+            document.getElementById('salaryRev').value = '';
+            document.getElementById('selectedEmpInfo').style.display = 'none';
+            document.getElementById('letterPreview').style.display = 'none';
+            document.getElementById('noPreviewMsg').style.display = 'block';
+            selectedProbation = null;
+            goStep(1);
+            populateEmployeeSelect();
+        }
+
+        populateEmployeeSelect();
+    </script>
+</body>
+</html>

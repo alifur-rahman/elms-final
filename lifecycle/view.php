@@ -4,22 +4,18 @@ $pageTitle   = 'Lifecycle Timeline';
 $activePage  = 'lifecycle';
 $breadcrumb  = 'Home / Lifecycle / Timeline';
 $pageStyles  = '
-.employee-selector { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-.employee-selector label { font-weight: 500; font-size: 13px; color: var(--gray-700); }
-.employee-selector select { min-width: 320px; }
+.selector-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+.selector-bar label { font-weight: 500; font-size: 13px; color: var(--gray-700); }
+.selector-bar select { min-width: 360px; }
 .lifecycle-timeline { position: relative; padding-left: 40px; margin: 32px 0; }
 .lifecycle-timeline::before { content: ""; position: absolute; left: 20px; top: 0; bottom: 0; width: 3px; background: var(--gray-200); border-radius: 2px; }
 .lt-event { position: relative; padding-bottom: 32px; }
 .lt-event:last-child { padding-bottom: 0; }
 .lt-event .lt-icon { position: absolute; left: -32px; top: 0; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 3px solid var(--gray-300); background: #fff; z-index: 1; }
-.lt-event.completed .lt-icon { background: var(--success); border-color: var(--success); color: #fff; }
-.lt-event.current .lt-icon { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 0 0 4px rgba(26,115,232,.2); }
-.lt-event.upcoming .lt-icon { background: #fff; border-color: var(--gray-300); color: var(--gray-400); }
-.lt-event .lt-card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 14px 18px; margin-left: 16px; border-left: 3px solid var(--gray-300); }
-.lt-event.completed .lt-card { border-left-color: var(--success); }
-.lt-event.current .lt-card { border-left-color: var(--primary); }
+.lt-event.all .lt-icon { background: var(--primary); border-color: var(--primary); color: #fff; }
+.lt-event .lt-card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 14px 18px; margin-left: 16px; border-left: 3px solid var(--primary); }
 .lt-event .lt-date { font-size: 11px; color: var(--gray-500); }
-.lt-event .lt-label { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-top: 2px; }
+.lt-event .lt-label { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-top: 2px; text-transform: capitalize; }
 .lt-event .lt-desc { font-size: 12px; color: var(--gray-600); margin-top: 4px; }
 .lt-event .lt-status { margin-top: 8px; }
 .summary-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 24px; display: grid; grid-template-columns: auto 1fr; gap: 20px 32px; align-items: start; }
@@ -30,121 +26,125 @@ $pageStyles  = '
 .no-data { text-align: center; padding: 48px 24px; color: var(--gray-500); }
 .no-data .nd-icon { font-size: 48px; margin-bottom: 12px; }
 .no-data h3 { font-size: 16px; color: var(--gray-700); margin-bottom: 4px; }
+.action-icon { margin-right: 6px; font-size: 14px; }
 ';
 $pageScripts = '
-window.renderTimeline = function(empId) {
+var candidatesData = [];
+
+window.renderTimeline = function(candId) {
     var container = document.getElementById("timelineContainer");
-    if (!empId) {
-        container.innerHTML = "<div class=\"no-data\"><div class=\"nd-icon\">&#x1F50D;</div><h3>Select an Employee</h3><p>Choose an employee from the dropdown above to view their lifecycle timeline</p></div>";
+    if (!candId) {
+        container.innerHTML = "<div class=\"no-data\"><div class=\"nd-icon\">&#x1F50D;</div><h3>Select a Candidate</h3><p>Choose a candidate from the dropdown above to view their lifecycle timeline</p></div>";
         return;
     }
-    empId = parseInt(empId);
-    var emp = null;
-    for (var i = 0; i < DATA.employees.length; i++) { if (DATA.employees[i].id === empId) { emp = DATA.employees[i]; break; } }
-    if (!emp) {
-        container.innerHTML = "<div class=\"no-data\"><div class=\"nd-icon\">&#x26A0;&#xFE0F;</div><h3>Employee Not Found</h3></div>";
+    candId = parseInt(candId);
+    var cand = null;
+    for (var i = 0; i < candidatesData.length; i++) { if (candidatesData[i].id === candId) { cand = candidatesData[i]; break; } }
+    if (!cand) {
+        container.innerHTML = "<div class=\"no-data\"><div class=\"nd-icon\">&#x26A0;&#xFE0F;</div><h3>Candidate Not Found</h3></div>";
         return;
     }
 
-    var logs = DATA.lifecycleLogs.filter(function(l){ return l.emp_id === empId; });
-    logs.sort(function(a,b){ return new Date(a.date) - new Date(b.date); });
+    apiGet("ajax/logs.php?candidate_id=" + candId, null, function(res) {
+        var logs = res.success && res.data ? res.data : [];
 
-    var eventIcons = {
-        candidate_applied: "\uD83D\uDC64", screening_shortlisted: "\uD83D\uDD0D", interview_scheduled: "\uD83E\uDD1D",
-        interview_passed: "\uD83E\uDD1D", offer_created: "\uD83D\uDCC4", offer_approved: "\u2705", offer_accepted: "\uD83D\uDCC4",
-        pre_onboarding: "\uD83D\uDCCB", employee_created: "\uD83D\uDC64", joined: "\uD83D\uDEAA",
-        probation_started: "\uD83D\uDCDD", probation_completed: "\uD83D\uDCDD", confirmed: "\uD83C\uDF89"
-    };
+        // Status event icons
+        var icons = {
+            candidate_created: "\uD83D\uDC64", candidate_updated: "\u270F\uFE0F", candidate_deleted: "\uD83D\uDDD1\uFE0F",
+            screening_shortlist: "\uD83D\uDD0D", screening_reject: "\u2715", screening_hold: "\u23F3",
+            screening_shortlist_update: "\uD83D\uDD0D", screening_reject_update: "\u2715", screening_hold_update: "\u23F3",
+            interview_scheduled: "\uD83E\uDD1D", interview_pass: "\u2705", interview_fail: "\u274C",
+            assessment_completed: "\uD83D\uDCDD", offer_created: "\uD83D\uDCC4"
+        };
+        var labels = {
+            candidate_created: "Applied", candidate_updated: "Profile Updated", candidate_deleted: "Deleted",
+            screening_shortlist: "Screening Shortlisted", screening_reject: "Screening Rejected", screening_hold: "Screening Hold",
+            screening_shortlist_update: "Screening Updated (Shortlisted)",
+            screening_reject_update: "Screening Updated (Rejected)",
+            screening_hold_update: "Screening Updated (Hold)",
+            interview_scheduled: "Interview Scheduled", interview_pass: "Interview Passed", interview_fail: "Interview Failed",
+            assessment_completed: "Assessment Completed", offer_created: "Offer Created"
+        };
 
-    var eventLabels = {
-        candidate_applied: "Applied", screening_shortlisted: "Screening Passed",
-        interview_scheduled: "Interview", interview_passed: "Interview Passed",
-        offer_created: "Offer Created", offer_approved: "Offer Approved", offer_accepted: "Offer Accepted",
-        pre_onboarding: "Pre-Onboarding", employee_created: "Employee Created",
-        joined: "Joined", probation_started: "Probation Started",
-        probation_completed: "Probation Completed", confirmed: "Confirmed"
-    };
+        var html = "<div class=\"lifecycle-timeline\">";
 
-    var keyEvents = ["candidate_applied", "screening_shortlisted", "interview_scheduled", "offer_created", "pre_onboarding", "joined", "probation_started", "confirmed"];
-    var uniqueEvents = [];
-    var seen = {};
-    for (var i = 0; i < logs.length; i++) {
-        var log = logs[i];
-        if (keyEvents.indexOf(log.event) !== -1 && !seen[log.event]) {
-            uniqueEvents.push(log);
-            seen[log.event] = true;
+        if (logs.length === 0) {
+            html += "<p style=\"color:var(--gray-500);padding:24px;text-align:center\">No lifecycle logs found for this candidate.</p>";
+        } else {
+            for (var i = 0; i < logs.length; i++) {
+                var log = logs[i];
+                var icon = icons[log.action] || "\u2022";
+                var label = labels[log.action] || log.action.replace(/_/g, " ");
+                var fromStr = log.from_status ? log.from_status + " \u2192 " : "";
+                var toStr = log.to_status || "";
+                var desc = fromStr + toStr;
+                if (log.notes) desc += (desc ? " | " : "") + log.notes;
+
+                html += "<div class=\"lt-event all\">";
+                html += "<div class=\"lt-icon\">" + icon + "</div>";
+                html += "<div class=\"lt-card\">";
+                html += "<div class=\"lt-date\">" + formatDateTime(log.created_at) + "</div>";
+                html += "<div class=\"lt-label\"><span class=\"action-icon\">" + icon + "</span>" + label + "</div>";
+                html += "<div class=\"lt-desc\">" + desc + "</div>";
+                html += "<div class=\"lt-status\"><span class=\"badge badge-completed\">\u2713 " + (toStr || "Done") + "</span></div>";
+                html += "</div></div>";
+            }
         }
-    }
-    if (uniqueEvents.length === 0) uniqueEvents = logs;
+        html += "</div>";
 
-    var lastCompletedIndex = -1;
-    for (var i = uniqueEvents.length - 1; i >= 0; i--) {
-        var ev = uniqueEvents[i];
-        var isComplete = ev.event === "confirmed" || ev.event === "probation_completed" || ev.event === "joined" || ev.event === "probation_started" || ev.event === "employee_created" || ev.event === "offer_accepted" || ev.event === "offer_approved" || ev.event === "pre_onboarding";
-        if (isComplete) { lastCompletedIndex = i; break; }
-    }
-
-    var html = "<div class=\"lifecycle-timeline\">";
-    for (var i = 0; i < uniqueEvents.length; i++) {
-        var ev = uniqueEvents[i];
-        var cls = "lt-event";
-        if (i <= lastCompletedIndex) cls += " completed";
-        else if (i === lastCompletedIndex + 1) cls += " current";
-        else cls += " upcoming";
-        var icon = eventIcons[ev.event] || "\u2022";
-        var label = eventLabels[ev.event] || ev.label;
-        var statusBadge = i <= lastCompletedIndex ? "<span class=\"badge badge-completed\">\u2713 Completed</span>" :
-            (i === lastCompletedIndex + 1 ? "<span class=\"badge badge-in-progress\">In Progress</span>" : "<span class=\"badge badge-pending\">Upcoming</span>");
-        html += "<div class=\"" + cls + "\">";
-        html += "<div class=\"lt-icon\">" + icon + "</div>";
-        html += "<div class=\"lt-card\">";
-        html += "<div class=\"lt-date\">" + formatDateTime(ev.date) + "</div>";
-        html += "<div class=\"lt-label\">" + label + "</div>";
-        html += "<div class=\"lt-desc\">" + ev.desc + "</div>";
-        html += "<div class=\"lt-status\">" + statusBadge + "</div>";
+        // Summary card
+        var name = cand.first_name + " " + cand.last_name;
+        var initials = cand.first_name.charAt(0) + cand.last_name.charAt(0);
+        var statusBadge = "badge-" + (cand.status_name ? cand.status_name.toLowerCase() : "pending");
+        html += "<div class=\"summary-card mt-24\">";
+        html += "<div class=\"sc-avatar\">" + initials + "</div>";
+        html += "<div class=\"sc-details\">";
+        html += "<div class=\"sc-item\"><label>Candidate</label><span>" + name + "</span></div>";
+        html += "<div class=\"sc-item\"><label>Code</label><span>" + (cand.code || "-") + "</span></div>";
+        html += "<div class=\"sc-item\"><label>Job</label><span>" + (cand.job_title || "N/A") + "</span></div>";
+        html += "<div class=\"sc-item\"><label>Status</label><span><span class=\"badge " + getBadgeClass(cand.status_name) + "\">" + (cand.status_name || "Unknown") + "</span></span></div>";
+        html += "<div class=\"sc-item\"><label>Applied At</label><span>" + formatDateTime(cand.applied_at) + "</span></div>";
         html += "</div></div>";
-    }
-    html += "</div>";
 
-    var salary = emp.salary ? formatCurrency(emp.salary, "$") : "-";
-    var status = emp.status || "Active";
-    var statusBadge = getBadgeClass(status);
-    var deptName = getDeptName(emp.dept_id);
-    var desigName = getDesignationName(emp.designation_id);
-
-    html += "<div class=\"summary-card mt-24\">";
-    html += "<div class=\"sc-avatar\">" + emp.first_name.charAt(0) + emp.last_name.charAt(0) + "</div>";
-    html += "<div class=\"sc-details\">";
-    html += "<div class=\"sc-item\"><label>Employee</label><span>" + emp.first_name + " " + emp.last_name + "</span></div>";
-    html += "<div class=\"sc-item\"><label>Code</label><span>" + emp.code + "</span></div>";
-    html += "<div class=\"sc-item\"><label>Designation</label><span>" + desigName + "</span></div>";
-    html += "<div class=\"sc-item\"><label>Department</label><span>" + deptName + "</span></div>";
-    html += "<div class=\"sc-item\"><label>Status</label><span><span class=\"badge " + statusBadge + "\">" + status + "</span></span></div>";
-    html += "<div class=\"sc-item\"><label>Salary</label><span>" + salary + "</span></div>";
-    html += "<div class=\"sc-item\"><label>Joining Date</label><span>" + formatDate(emp.joining_date) + "</span></div>";
-    html += "<div class=\"sc-item\"><label>Type</label><span>" + (emp.type || "Permanent") + "</span></div>";
-    html += "</div></div>";
-
-    container.innerHTML = html;
+        container.innerHTML = html;
+    }, function() {
+        container.innerHTML = "<div class=\"no-data\"><div class=\"nd-icon\">&#x26A0;&#xFE0F;</div><h3>Failed to Load Logs</h3></div>";
+    });
 };
-var BASE_URL = "..";
+
+function loadCandidateSelect() {
+    var sel = document.getElementById("candSelect");
+    sel.innerHTML = "<option value=\"\">-- Select Candidate --</option>";
+    apiGet("ajax/candidates.php", null, function(res) {
+        if (res.success && res.data) {
+            candidatesData = res.data;
+            candidatesData.forEach(function(c) {
+                var opt = document.createElement("option");
+                opt.value = c.id;
+                opt.textContent = c.first_name + " " + c.last_name + " (" + (c.code || "N/A") + ") - " + (c.job_title || "") + " [" + (c.status_name || "") + "]";
+                sel.appendChild(opt);
+            });
+        }
+    }, function() {});
+}
+
+loadCandidateSelect();
 ';
 
 ob_start();
 ?>
-<div class="employee-selector card" style="padding:16px 24px;margin-bottom:24px">
-    <label for="empSelect">Select Employee:</label>
-    <select class="form-control" id="empSelect" onchange="window.renderTimeline(this.value)" style="max-width:400px">
-        <option value="">-- Select Employee --</option>
-        <option value="1">John Doe (EMP-2026-000001)</option>
+<div class="selector-bar card" style="padding:16px 24px;margin-bottom:24px">
+    <label for="candSelect">Select Candidate:</label>
+    <select class="form-control" id="candSelect" onchange="window.renderTimeline(this.value)" style="max-width:500px">
+        <option value="">-- Select Candidate --</option>
     </select>
 </div>
 
 <div id="timelineContainer">
     <div class="no-data">
         <div class="nd-icon">&#x1F50D;</div>
-        <h3>Select an Employee</h3>
-        <p>Choose an employee from the dropdown above to view their lifecycle timeline</p>
+        <h3>Select a Candidate</h3>
+        <p>Choose a candidate from the dropdown above to view their lifecycle timeline</p>
     </div>
 </div>
 <?php

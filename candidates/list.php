@@ -50,6 +50,7 @@ function renderCandidates() {
                 "<div class=\"btn-group\">" +
                     "<button class=\"btn btn-sm btn-outline\" onclick=\"window.editCandidate(" + c.id + ")\" style=\"margin-right:4px\">Edit</button>" +
                     "<button class=\"btn btn-sm btn-primary\" onclick=\"window.viewCandidate(" + c.id + ")\" style=\"margin-right:4px\">View</button>" +
+                     "<button class=\"btn btn-sm btn-danger\" onclick=\"window.deleteCandidate(" + c.id + ")\" style=\"margin-left:4px\">&#x1F5D1;</button>" +
                     "<select class=\"form-control\" style=\"width:auto;min-width:90px;padding:4px 8px;font-size:12px;\" onchange=\"window.changeStatus(" + c.id + ",this.value)\">" +
                         "<option value=\"\">Status</option>" +
                         "<option value=\"Applied\">Applied</option>" +
@@ -59,7 +60,7 @@ function renderCandidates() {
                         "<option value=\"Rejected\">Rejected</option>" +
                         "<option value=\"Joined\">Joined</option>" +
                     "</select>" +
-                    "<button class=\"btn btn-sm btn-danger\" onclick=\"window.deleteCandidate(" + c.id + ")\" style=\"margin-left:4px\">&#x1F5D1;</button>" +
+                   
                 "</div>" +
             "</td>";
         tbody.appendChild(row);

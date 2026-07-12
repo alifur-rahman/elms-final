@@ -16,7 +16,7 @@ try {
         FROM candidates c
         LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
         LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN interviews i ON i.candidate_id = c.id
+        LEFT JOIN interview_log i ON i.candidate_id = c.id AND i.status != 'Rescheduled'
         GROUP BY c.id
         HAVING has_pass_interview = 1 OR c.status_id IN (4, 5, 6)
         ORDER BY c.created_at DESC

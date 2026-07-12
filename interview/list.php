@@ -143,17 +143,23 @@ function renderTable() {
 
         var actionsHtml = "";
         if (st === "schedule") {
-            actionsHtml = "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ")\">Schedule</button>";
+            actionsHtml = "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Schedule Interview\',false)\">Schedule</button>";
         } else if (st === "feedback") {
             actionsHtml =
                 "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openFeedback(" + c.interview_id + ")\" style=\"margin-right:4px\">Feedback</button>" +
                 "<button class=\"btn btn-sm btn-outline\" onclick=\"window.editInterview(" + c.interview_id + ")\">Edit</button>";
         } else if (st === "next_round") {
             actionsHtml =
-                "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ")\" style=\"margin-right:4px\">Next Round</button>" +
+                "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Next Round Interview\',false)\" style=\"margin-right:4px\">Next Round</button>" +
                 "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openFeedbackView(" + c.interview_id + ")\">View</button>";
         } else {
-            actionsHtml = "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openFeedbackView(" + c.interview_id + ")\">View</button>";
+            if (c.decision === "Fail" || c.decision === "Hold") {
+                actionsHtml =
+                    "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Reschedule Interview\',true)\" style=\"margin-right:4px\">Reschedule</button>" +
+                    "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openFeedbackView(" + c.interview_id + ")\">View</button>";
+            } else {
+                actionsHtml = "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openFeedbackView(" + c.interview_id + ")\">View</button>";
+            }
         }
 
         var historyBtn = c.interview_id
@@ -192,12 +198,14 @@ window.editInterview = function(interviewId) {
     document.getElementById("siRescheduleId").value = interviewId;
     document.getElementById("siRoundWrapper").style.display = "none";
     document.getElementById("scheduleModalTitle").textContent = "Edit Interview";
-    document.getElementById("siSubmitBtn").innerHTML = "&#x1F4DD; Update";
+    document.getElementById("siSubmitBtn").innerHTML = "&#x270F; Update";
+    loadCandidateSelect();
 
     for (var i = 0; i < candidatesData.length; i++) {
         var c = candidatesData[i];
         if (c.interview_id === interviewId) {
             document.getElementById("siCandidateId").value = c.candidate_id;
+            document.getElementById("siCandidateId").disabled = true;
             document.getElementById("siDate").value = c.date ? c.date.replace(" ", "T") : "";
             document.getElementById("siType").value = c.type || "";
             document.getElementById("siInterviewer").value = c.interviewer || "";
@@ -211,6 +219,8 @@ window.editInterview = function(interviewId) {
 
 window.openScheduleModal = function() {
     document.getElementById("scheduleForm").reset();
+    document.getElementById("siRescheduleId").value = "";
+    document.getElementById("siCandidateId").disabled = false;
     document.getElementById("siIsFinalRound").checked = false;
     document.getElementById("siRoundWrapper").style.display = "block";
     document.getElementById("scheduleModalTitle").textContent = "Schedule Interview";
@@ -219,13 +229,37 @@ window.openScheduleModal = function() {
     openModal("scheduleModal");
 };
 
-window.openScheduleForCandidate = function(candidateId) {
+window.openScheduleForCandidate = function(candidateId, title, disableSelect) {
+    document.getElementById("scheduleForm").reset();
+    document.getElementById("siRescheduleId").value = "";
     loadCandidateSelect();
+
+    // Ensure candidate exists in select (may not be in eligibleCandidates for Fail/Hold)
+    var sel = document.getElementById("siCandidateId");
+    var found = false;
+    for (var i = 0; i < sel.options.length; i++) {
+        if (parseInt(sel.options[i].value) === candidateId) { found = true; break; }
+    }
+    if (!found) {
+        var name = "";
+        for (var i = 0; i < candidatesData.length; i++) {
+            if (candidatesData[i].candidate_id === candidateId) {
+                name = candidatesData[i].first_name + " " + candidatesData[i].last_name + " - " + (candidatesData[i].job_title || "N/A");
+                break;
+            }
+        }
+        var opt = document.createElement("option");
+        opt.value = candidateId;
+        opt.textContent = name || ("Candidate #" + candidateId);
+        sel.appendChild(opt);
+    }
+
     document.getElementById("siCandidateId").value = candidateId;
+    document.getElementById("siCandidateId").disabled = disableSelect !== false;
     document.getElementById("siIsFinalRound").checked = false;
     document.getElementById("siRoundWrapper").style.display = "block";
-    document.getElementById("scheduleModalTitle").textContent = "Schedule Interview";
-    document.getElementById("siSubmitBtn").textContent = "\u2728 Schedule Interview";
+    document.getElementById("scheduleModalTitle").textContent = title || "Schedule Interview";
+    document.getElementById("siSubmitBtn").textContent = "\u2728 " + (title || "Schedule Interview");
     onCandidateSelect();
     openModal("scheduleModal");
 };
@@ -288,6 +322,7 @@ window.ajaxScheduleInterview = function() {
             btn.disabled = false;
             btn.innerHTML = origText;
             showAlert(res.message || "Interview rescheduled!", "success");
+            currentPage = 1;
             closeModal("scheduleModal");
             renderPage();
         }, function(err) {

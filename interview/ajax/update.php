@@ -23,7 +23,7 @@ try {
         exit;
     }
 
-    $check = $pdo->prepare("SELECT id, candidate_id FROM interviews WHERE id = :id");
+    $check = $pdo->prepare("SELECT id, candidate_id FROM interview_log WHERE id = :id");
     $check->execute([':id' => $id]);
     $existing = $check->fetch();
     if (!$existing) {
@@ -34,7 +34,6 @@ try {
 
     $candidate_id = (int) $existing['candidate_id'];
 
-    // Category scores
     $score_technical       = $body['score_technical'] ?? null;
     $score_communication   = $body['score_communication'] ?? null;
     $score_problem_solving = $body['score_problem_solving'] ?? null;
@@ -42,14 +41,13 @@ try {
     $decision              = trim($body['decision'] ?? '');
     $reject_reason         = trim($body['reject_reason'] ?? '');
     $feedback              = trim($body['feedback'] ?? '');
-    $status                = trim($body['status'] ?? 'Completed');
+    $status                = trim($body['status'] ?? '');
     $is_final_round_val    = array_key_exists('is_final_round', $body) ? (!empty($body['is_final_round']) ? 1 : 0) : null;
 
-    // Reschedule fields
+    // Reschedule / Edit fields
     $date        = array_key_exists('date', $body) ? trim($body['date']) : null;
     $type        = array_key_exists('type', $body) ? trim($body['type']) : null;
     $interviewer = array_key_exists('interviewer', $body) ? trim($body['interviewer']) : null;
-    $round       = array_key_exists('round', $body) ? (int) $body['round'] : null;
     $round_name  = array_key_exists('round_name', $body) ? trim($body['round_name']) : null;
 
     // Calculate overall rating from category scores
@@ -76,26 +74,27 @@ try {
     if ($feedback !== '') { $updates[] = 'feedback = :feedback'; $params[':feedback'] = $feedback; }
     if ($status !== '') { $updates[] = 'status = :status'; $params[':status'] = $status; }
     if ($is_final_round_val !== null) { $updates[] = 'is_final_round = :ifr'; $params[':ifr'] = $is_final_round_val; }
+
+    // Date / time / interviewer / round_name updates (for Edit)
     if ($date !== null) { $updates[] = 'date = :date'; $params[':date'] = str_replace('T', ' ', $date); }
     if ($type !== null) { $updates[] = 'type = :type'; $params[':type'] = $type; }
     if ($interviewer !== null) { $updates[] = 'interviewer = :interviewer'; $params[':interviewer'] = $interviewer; }
-    if ($round !== null) { $updates[] = 'round = :round'; $params[':round'] = $round; }
-    if ($round_name !== null) { $updates[] = 'round_name = :round_name'; $params[':round_name'] = $round_name ?: ('Round ' . ($round ?? 1)); }
+    if ($round_name !== null) { $updates[] = 'round_name = :round_name'; $params[':round_name'] = $round_name; }
 
     if (empty($updates)) {
+        $pdo->rollBack();
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'No fields to update']);
         exit;
     }
 
-    $sql = "UPDATE interviews SET " . implode(', ', $updates) . " WHERE id = :id";
+    $sql = "UPDATE interview_log SET " . implode(', ', $updates) . ", updated_at = NOW() WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 
     // Update candidate status based on decision + is_final_round
     if ($status === 'Completed' && $decision !== '') {
-        // Get the interview's is_final_round
-        $getIfr = $pdo->prepare("SELECT is_final_round FROM interviews WHERE id = :id");
+        $getIfr = $pdo->prepare("SELECT is_final_round FROM interview_log WHERE id = :id");
         $getIfr->execute([':id' => $id]);
         $finalRound = (bool) $getIfr->fetchColumn();
 
@@ -109,8 +108,7 @@ try {
                 $targetStatusName = 'Selected';
                 $logAction = 'interview_pass';
             } else {
-                // Keep as Interview for next round
-                $targetStatusId = 3;
+                $targetStatusId = 3; // Interview
                 $targetStatusName = 'Interview';
                 $logAction = 'interview_round_pass';
             }
@@ -148,7 +146,7 @@ try {
     ]);
 
 } catch (Exception $e) {
-    if ($pdo->inTransaction()) $pdo->rollBack();
+    if (isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
 }

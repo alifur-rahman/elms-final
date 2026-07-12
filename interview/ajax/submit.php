@@ -38,7 +38,7 @@ try {
 
     // Auto-calculate round if not set or zero
     if ($round <= 0) {
-        $maxStmt = $pdo->prepare("SELECT COALESCE(MAX(`round`), 0) FROM interviews WHERE candidate_id = :cid");
+        $maxStmt = $pdo->prepare("SELECT COALESCE(MAX(`round`), 0) FROM interview_log WHERE candidate_id = :cid AND status != 'Rescheduled'");
         $maxStmt->execute([':cid' => $candidate_id]);
         $round = (int) $maxStmt->fetchColumn() + 1;
     }
@@ -46,7 +46,7 @@ try {
     $pdo->beginTransaction();
 
     $stmt = $pdo->prepare("
-        INSERT INTO interviews
+        INSERT INTO interview_log
             (candidate_id, date, type, interviewer, round, round_name, is_final_round, status)
         VALUES
             (:candidate_id, :date, :type, :interviewer, :round, :round_name, :is_final_round, :status)

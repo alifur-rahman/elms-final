@@ -22,14 +22,14 @@ try {
         $cid = (int) $r['id'];
 
         // Count existing interviews & get max round
-        $cntStmt = $pdo->prepare("SELECT COUNT(*) AS cnt, COALESCE(MAX(`round`),0) AS mx FROM interviews WHERE candidate_id = :id");
+        $cntStmt = $pdo->prepare("SELECT COUNT(*) AS cnt, COALESCE(MAX(`round`),0) AS mx FROM interview_log WHERE candidate_id = :id AND status != 'Rescheduled'");
         $cntStmt->execute([':id' => $cid]);
         $cntRow = $cntStmt->fetch();
         $interviewCount = (int) ($cntRow['cnt'] ?? 0);
         $maxRound = (int) ($cntRow['mx'] ?? 0);
 
-        // Check if there's a pending scheduled interview for this candidate
-        $pendStmt = $pdo->prepare("SELECT id FROM interviews WHERE candidate_id = :id AND status = 'Scheduled' LIMIT 1");
+        // Check if there's a pending interview waiting for feedback
+        $pendStmt = $pdo->prepare("SELECT id FROM interview_log WHERE candidate_id = :id AND status = 'Waiting for Feedback' LIMIT 1");
         $pendStmt->execute([':id' => $cid]);
         $scheduledId = $pendStmt->fetchColumn();
         $scheduledId = $scheduledId ? (int) $scheduledId : null;

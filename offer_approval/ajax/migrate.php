@@ -10,7 +10,7 @@ try {
     // ========================================================================
     $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
 
-    $tables = ['offer_approvals', 'offers', 'interviews', 'screenings', 'candidate_logs', 'candidates', 'designations', 'candidate_statuses'];
+    $tables = ['offer_approvals', 'offers', 'interview_log', 'screenings', 'candidate_logs', 'candidates', 'designations', 'candidate_statuses'];
     foreach ($tables as $t) {
         $pdo->exec("DROP TABLE IF EXISTS $t");
     }
@@ -121,29 +121,29 @@ try {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
-    // interviews (FK → candidates)
+    // interview_log (FK → candidates)
     // ========================================================================
-    $pdo->exec("CREATE TABLE interviews (
+    $pdo->exec("CREATE TABLE interview_log (
         id INT AUTO_INCREMENT PRIMARY KEY,
         candidate_id INT NOT NULL,
+        round INT NOT NULL,
+        round_name VARCHAR(100),
+        type VARCHAR(50) NOT NULL,
+        interviewer VARCHAR(100) NOT NULL,
         date DATETIME NOT NULL,
-        type VARCHAR(50) DEFAULT NULL,
-        interviewer VARCHAR(100) DEFAULT NULL,
-        round INT DEFAULT 1,
-        round_name VARCHAR(100) DEFAULT NULL,
-        rating DECIMAL(3,1) DEFAULT NULL,
-        score_technical DECIMAL(3,1) DEFAULT NULL,
-        score_communication DECIMAL(3,1) DEFAULT NULL,
-        score_problem_solving DECIMAL(3,1) DEFAULT NULL,
-        score_attitude DECIMAL(3,1) DEFAULT NULL,
-        reject_reason VARCHAR(100) DEFAULT NULL,
+        status VARCHAR(50) DEFAULT 'Waiting for Feedback',
+        score_technical DECIMAL(3,1),
+        score_communication DECIMAL(3,1),
+        score_problem_solving DECIMAL(3,1),
+        score_attitude DECIMAL(3,1),
+        rating DECIMAL(3,1),
+        decision VARCHAR(20),
+        reject_reason TEXT,
+        feedback TEXT,
         is_final_round TINYINT(1) DEFAULT 0,
-        feedback TEXT DEFAULT NULL,
-        decision VARCHAR(30) DEFAULT NULL,
-        status VARCHAR(30) DEFAULT 'Scheduled',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================

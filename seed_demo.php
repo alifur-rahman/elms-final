@@ -15,7 +15,7 @@ echo "=== Clearing pipeline data ===\n";
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
 $pdo->exec("TRUNCATE TABLE offer_approvals");
 $pdo->exec("TRUNCATE TABLE offers");
-$pdo->exec("TRUNCATE TABLE interviews");
+$pdo->exec("TRUNCATE TABLE interview_log");
 $pdo->exec("TRUNCATE TABLE screenings");
 $pdo->exec("TRUNCATE TABLE candidate_logs");
 $pdo->exec("DELETE FROM candidates");

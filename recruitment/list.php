@@ -51,6 +51,7 @@ function getFilteredData() {
 }
 
 function renderPaginationBar(total, totalPages) {
+    if (totalPages <= 1) { document.getElementById("paginationBar").innerHTML = ""; return; }
     var html = "";
     html += "<div class=\"page-info\">Showing page " + currentPage + " of " + totalPages + " (" + total + " total)</div>";
     html += "<div class=\"page-btns\">";

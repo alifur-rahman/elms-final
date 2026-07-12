@@ -147,24 +147,21 @@ function renderTable() {
         } else if (st === "feedback") {
             actionsHtml =
                 "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openFeedback(" + c.interview_id + ")\" style=\"margin-right:4px\">Feedback</button>" +
-                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.editInterview(" + c.interview_id + ")\">Edit</button>";
+                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.editInterview(" + c.interview_id + ")\" style=\"margin-right:4px\">Edit</button>" +
+                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
         } else if (st === "next_round") {
             actionsHtml =
                 "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Next Round Interview\',false)\" style=\"margin-right:4px\">Next Round</button>" +
-                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openFeedbackView(" + c.interview_id + ")\">View</button>";
+                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
         } else {
             if (c.decision === "Fail" || c.decision === "Hold") {
                 actionsHtml =
                     "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Reschedule Interview\',true)\" style=\"margin-right:4px\">Reschedule</button>" +
-                    "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openFeedbackView(" + c.interview_id + ")\">View</button>";
+                    "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
             } else {
-                actionsHtml = "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openFeedbackView(" + c.interview_id + ")\">View</button>";
+                actionsHtml = "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
             }
         }
-
-        var historyBtn = c.interview_id
-            ? " <button class=\"btn btn-sm btn-outline\" onclick=\"window.openInterviewHistory(" + c.candidate_id + ")\" title=\"History\">\u{1F4CB}</button>"
-            : "";
 
         var tr = document.createElement("tr");
         tr.innerHTML =
@@ -176,7 +173,7 @@ function renderTable() {
             "<td>" + dt + "</td>" +
             "<td><span class=\"badge " + statusBadgeClass + "\">" + statusLabel + "</span></td>" +
             "<td>" + decisionHtml + "</td>" +
-            "<td style=\"white-space:nowrap\">" + actionsHtml + historyBtn + "</td>";
+            "<td style=\"white-space:nowrap\">" + actionsHtml + "</td>";
         tbody.appendChild(tr);
     });
 
@@ -257,7 +254,7 @@ window.openScheduleForCandidate = function(candidateId, title, disableSelect) {
     document.getElementById("siCandidateId").value = candidateId;
     document.getElementById("siCandidateId").disabled = disableSelect !== false;
     document.getElementById("siIsFinalRound").checked = false;
-    document.getElementById("siRoundWrapper").style.display = "block";
+    document.getElementById("siRoundWrapper").style.display = (title && title.indexOf("Reschedule") !== -1) ? "none" : "block";
     document.getElementById("scheduleModalTitle").textContent = title || "Schedule Interview";
     document.getElementById("siSubmitBtn").textContent = "\u2728 " + (title || "Schedule Interview");
     onCandidateSelect();
@@ -302,7 +299,8 @@ window.ajaxScheduleInterview = function() {
         showAlert("Please fill in all required fields", "error");
         return;
     }
-    if (!rescheduleId && !round) {
+    var roundWrapper = document.getElementById("siRoundWrapper");
+    if (!rescheduleId && !round && roundWrapper.style.display !== "none") {
         showAlert("Round is required", "error");
         return;
     }
@@ -349,66 +347,6 @@ window.ajaxScheduleInterview = function() {
     }
 };
 
-window.openInterviewHistory = function(candidateId) {
-    var historyBody = document.getElementById("historyBody");
-    historyBody.innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--gray-400)\">Loading...</div>";
-    openModal("historyModal");
-
-    var cName = "";
-    for (var i = 0; i < candidatesData.length; i++) {
-        if (candidatesData[i].candidate_id === candidateId) { cName = candidatesData[i].first_name + " " + candidatesData[i].last_name; break; }
-    }
-    document.getElementById("historyModalTitle").textContent = "Interview History - " + cName;
-
-    apiGet("ajax/all_interviews.php?candidate_id=" + candidateId, null, function(res) {
-        if (!res.success || !res.data) {
-            historyBody.innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--gray-400)\">Failed to load history.</div>";
-            return;
-        }
-        var candidateInterviews = res.data;
-        if (candidateInterviews.length === 0) {
-            historyBody.innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--gray-400)\">No interview records yet.</div>";
-            return;
-        }
-
-        var html = "<div class=\"timeline\">";
-        for (var i = 0; i < candidateInterviews.length; i++) {
-            var iv = candidateInterviews[i];
-            var isCompleted = iv.status === "Completed";
-            var statusIcon = isCompleted ? "\u2705" : "\u23F3";
-            var statusClass = isCompleted ? "timeline-completed" : "timeline-pending";
-            var scores = iv.score_technical ? "T:" + iv.score_technical + " C:" + iv.score_communication + " PS:" + iv.score_problem_solving + " A:" + iv.score_attitude : "-";
-            var decisionBadge = iv.decision ? "<span class=\"badge " + getBadgeClass(iv.decision) + "\" style=\"margin-left:8px\">" + iv.decision + "</span>" : "";
-            html +=
-                "<div class=\"timeline-item " + statusClass + "\">" +
-                    "<div class=\"timeline-marker\">" + statusIcon + "</div>" +
-                    "<div class=\"timeline-content\">" +
-                        "<div style=\"display:flex;justify-content:space-between;align-items:center\">" +
-                            "<strong>" + (iv.round_name || "Round " + iv.round) + "</strong>" +
-                            "<span style=\"font-size:12px;color:var(--gray-400)\">" + formatDateTime(iv.date) + "</span>" +
-                        "</div>" +
-                        "<div style=\"font-size:12px;margin-top:4px\">" +
-                            iv.type + " | " + iv.interviewer +
-                        "</div>" +
-                        "<div style=\"font-size:12px;margin-top:4px\">" +
-                            "Scores: " + scores +
-                        "</div>" +
-                        "<div style=\"font-size:12px;margin-top:4px\">" +
-                            "Overall: " + (iv.rating != null ? iv.rating : "-") +
-                            decisionBadge +
-                            (iv.is_final_round ? " <span class=\"final-badge\">FINAL</span>" : "") +
-                        "</div>" +
-                        (iv.feedback ? "<div style=\"font-size:12px;margin-top:4px;color:var(--gray-600);border-top:1px solid var(--gray-100);padding-top:4px\">" + iv.feedback + "</div>" : "") +
-                    "</div>" +
-                "</div>";
-        }
-        html += "</div>";
-        historyBody.innerHTML = html;
-    }, function() {
-        historyBody.innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--gray-400)\">Failed to load history.</div>";
-    });
-};
-
 function calcOverall() {
     var tech = parseFloat(document.getElementById("fbTechnical").value) || 0;
     var comm = parseFloat(document.getElementById("fbCommunication").value) || 0;
@@ -449,24 +387,93 @@ window.openFeedback = function(interviewId) {
     openModal("feedbackModal");
 };
 
-window.openFeedbackView = function(interviewId) {
+window.openCombinedView = function(candidateId) {
     var iv = null;
-    for (var i = 0; i < candidatesData.length; i++) { if (candidatesData[i].interview_id === interviewId) { iv = candidatesData[i]; break; } }
+    var cName = "";
+    for (var i = 0; i < candidatesData.length; i++) {
+        if (candidatesData[i].candidate_id === candidateId) {
+            iv = candidatesData[i];
+            cName = iv.first_name + " " + iv.last_name;
+            break;
+        }
+    }
     if (!iv) return;
 
-    var html = "<div class=\"score-grid\">";
-    html += "<div class=\"form-group\"><label>Technical Skill</label><div><strong>" + (iv.score_technical || "-") + "</strong> / 5</div></div>";
-    html += "<div class=\"form-group\"><label>Communication</label><div><strong>" + (iv.score_communication || "-") + "</strong> / 5</div></div>";
-    html += "<div class=\"form-group\"><label>Problem Solving</label><div><strong>" + (iv.score_problem_solving || "-") + "</strong> / 5</div></div>";
-    html += "<div class=\"form-group\"><label>Attitude</label><div><strong>" + (iv.score_attitude || "-") + "</strong> / 5</div></div>";
-    html += "</div>";
-    html += "<div class=\"overall-rating\"><div class=\"or-value\">" + (iv.rating || "-") + "</div><div class=\"or-label\">Overall Rating</div></div>";
-    html += "<div class=\"form-group\"><label>Decision</label><div><span class=\"badge " + getBadgeClass(iv.decision) + "\">" + (iv.decision || "-") + "</span></div></div>";
-    if (iv.reject_reason) html += "<div class=\"form-group\"><label>Reject Reason</label><div>" + iv.reject_reason + "</div></div>";
-    if (iv.feedback) html += "<div class=\"form-group\" style=\"margin-top:12px\"><label>Feedback</label><div style=\"font-size:13px;color:var(--gray-700);line-height:1.5\">" + iv.feedback + "</div></div>";
+    document.getElementById("combinedViewTitle").textContent = "Interview Logs of - " + cName;
 
-    document.getElementById("feedbackViewBody").innerHTML = html;
-    openModal("feedbackViewModal");
+    document.getElementById("combinedViewBody").innerHTML = "<div id=\"combinedHistoryBody\"><div style=\"text-align:center;padding:24px;color:var(--gray-400)\">Loading...</div></div>";
+    openModal("combinedViewModal");
+
+    apiGet("ajax/all_interviews.php?candidate_id=" + candidateId, null, function(res) {
+        if (!res.success || !res.data) {
+            document.getElementById("combinedHistoryBody").innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--gray-400)\">Failed to load history.</div>";
+            return;
+        }
+        var data = res.data;
+        if (data.length === 0) {
+            document.getElementById("combinedHistoryBody").innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--gray-400)\">No interview records yet.</div>";
+            return;
+        }
+        var h = "<div class=\"iv-logs\">";
+        for (var i = 0; i < data.length; i++) {
+            var iv2 = data[i];
+            var isCompleted = iv2.status === "Completed";
+            var isRescheduled = iv2.status === "Rescheduled";
+            var isPending = !isCompleted && !isRescheduled;
+
+            var statusBadge = "";
+            if (isPending) statusBadge = "<span class=\"badge badge-pending\">Waiting for Feedback</span>";
+            else if (isRescheduled) statusBadge = "<span class=\"badge\" style=\"background:var(--gray-200);color:var(--gray-600)\">Rescheduled</span>";
+            else statusBadge = "<span class=\"badge badge-completed\">Completed</span>";
+
+            var headerColor = isCompleted ? "#059669" : (isRescheduled ? "#9ca3af" : "#d97706");
+
+            h +=
+                "<div class=\"iv-card\">" +
+                    "<div class=\"iv-card-header\" style=\"border-left:4px solid " + headerColor + "\">" +
+                        "<div class=\"iv-card-header-left\">" +
+                            "<span class=\"iv-round\">Round " + (iv2.round || (i + 1)) + "</span>" +
+                            "<span class=\"iv-round-name\">" + (iv2.round_name || iv2.type || "Interview") + "</span>" +
+                            (iv2.is_final_round ? "<span class=\"final-badge\">FINAL</span>" : "") +
+                        "</div>" +
+                        "<div class=\"iv-card-header-right\">" +
+                            statusBadge +
+                            "<span class=\"iv-date\">" + formatDateTime(iv2.date) + "</span>" +
+                        "</div>" +
+                    "</div>" +
+                    "<div class=\"iv-card-body\">" +
+                        "<div class=\"iv-meta\">" +
+                            "<span><strong>Type:</strong> " + iv2.type + "</span>" +
+                            "<span><strong>Interviewer:</strong> " + iv2.interviewer + "</span>" +
+                        "</div>";
+            if (isCompleted) {
+                h +=
+                        "<div class=\"iv-scores\">" +
+                            "<div class=\"iv-score-item\"><label>Technical</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_technical || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_technical || "-") + "/5</span></div>" +
+                            "<div class=\"iv-score-item\"><label>Communication</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_communication || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_communication || "-") + "/5</span></div>" +
+                            "<div class=\"iv-score-item\"><label>Problem Solving</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_problem_solving || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_problem_solving || "-") + "/5</span></div>" +
+                            "<div class=\"iv-score-item\"><label>Attitude</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_attitude || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_attitude || "-") + "/5</span></div>" +
+                        "</div>" +
+                        "<div class=\"iv-footer\">" +
+                            "<div class=\"iv-overall\"><span class=\"iv-overall-value\">" + (iv2.rating != null ? iv2.rating : "-") + "</span><span class=\"iv-overall-label\">Overall</span></div>" +
+                            "<div class=\"iv-decision\"><span class=\"badge " + getBadgeClass(iv2.decision) + "\">" + (iv2.decision || "-") + "</span></div>" +
+                        "</div>";
+                if (iv2.reject_reason) h += "<div class=\"iv-reject-reason\"><strong>Reason:</strong> " + iv2.reject_reason + "</div>";
+                if (iv2.feedback) h += "<div class=\"iv-feedback\">" + iv2.feedback + "</div>";
+            } else if (isRescheduled) {
+                h += "<div class=\"iv-empty-state\">This round was rescheduled</div>";
+            } else {
+                h += "<div class=\"iv-empty-state\">Waiting for Feedback</div>";
+            }
+            h +=
+                    "</div>" +
+                "</div>";
+        }
+        h += "</div>";
+        document.getElementById("combinedHistoryBody").innerHTML = h;
+    }, function() {
+        document.getElementById("combinedHistoryBody").innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--gray-400)\">Failed to load history.</div>";
+    });
 };
 
 function onDecisionChange() {
@@ -740,42 +747,45 @@ ob_start();
     </div>
 </div>
 
-<!-- View Feedback Modal (read-only) -->
-<div class="modal-overlay" id="feedbackViewModal" onclick="if(event.target===this)closeModal('feedbackViewModal')">
+<!-- Combined View Modal (feedback + history) -->
+<div class="modal-overlay" id="combinedViewModal" onclick="if(event.target===this)closeModal('combinedViewModal')">
     <div class="modal">
         <div class="modal-header">
-            <h3>Feedback Details</h3>
-            <button class="modal-close" onclick="closeModal('feedbackViewModal')">&times;</button>
+            <h3 id="combinedViewTitle">View</h3>
+            <button class="modal-close" onclick="closeModal('combinedViewModal')">&times;</button>
         </div>
-        <div class="modal-body" id="feedbackViewBody"></div>
+        <div class="modal-body" id="combinedViewBody"></div>
         <div class="modal-footer">
-            <button class="btn btn-outline btn-sm" onclick="closeModal('feedbackViewModal')">Close</button>
-        </div>
-    </div>
-</div>
-
-<!-- Interview History Modal -->
-<div class="modal-overlay" id="historyModal" onclick="if(event.target===this)closeModal('historyModal')">
-    <div class="modal">
-        <div class="modal-header">
-            <h3 id="historyModalTitle">Interview History</h3>
-            <button class="modal-close" onclick="closeModal('historyModal')">&times;</button>
-        </div>
-        <div class="modal-body" id="historyBody"></div>
-        <div class="modal-footer">
-            <button class="btn btn-outline btn-sm" onclick="closeModal('historyModal')">Close</button>
+            <button class="btn btn-outline btn-sm" onclick="closeModal('combinedViewModal')">Close</button>
         </div>
     </div>
 </div>
 
 <style>
-.timeline { position:relative; padding-left:40px; }
-.timeline::before { content:""; position:absolute; left:18px; top:0; bottom:0; width:2px; background:var(--gray-200); }
-.timeline-item { position:relative; margin-bottom:20px; }
-.timeline-marker { position:absolute; left:-40px; top:0; width:36px; height:36px; border-radius:50%; background:#fff; border:2px solid var(--gray-200); display:flex; align-items:center; justify-content:center; font-size:16px; }
-.timeline-completed .timeline-marker { border-color:var(--success); }
-.timeline-pending .timeline-marker { border-color:var(--warning); }
-.timeline-content { background:#f8f9fa; border-radius:8px; padding:12px 16px; border:1px solid var(--gray-100); }
+.iv-logs { display:flex; flex-direction:column; gap:16px; }
+.iv-card { background:#fff; border:1px solid var(--gray-100); border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+.iv-card-header { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#f9fafb; border-bottom:1px solid var(--gray-100); }
+.iv-card-header-left { display:flex; align-items:center; gap:8px; }
+.iv-round { font-size:13px; font-weight:700; color:var(--gray-800); background:var(--gray-100); padding:2px 10px; border-radius:20px; }
+.iv-round-name { font-size:14px; font-weight:600; color:var(--gray-700); }
+.iv-card-header-right { display:flex; align-items:center; gap:10px; }
+.iv-date { font-size:12px; color:var(--gray-400); white-space:nowrap; }
+.iv-card-body { padding:14px 16px; }
+.iv-meta { display:flex; gap:24px; font-size:13px; color:var(--gray-600); margin-bottom:12px; }
+.iv-scores { display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; margin-bottom:12px; }
+.iv-score-item { display:flex; align-items:center; gap:8px; }
+.iv-score-item label { font-size:12px; color:var(--gray-500); width:85px; flex-shrink:0; }
+.iv-score-item span { font-size:12px; font-weight:600; color:var(--gray-700); width:30px; text-align:right; flex-shrink:0; }
+.iv-score-bar { flex:1; height:6px; background:var(--gray-100); border-radius:3px; overflow:hidden; }
+.iv-score-fill { height:100%; background:linear-gradient(90deg,#3b82f6,#6366f1); border-radius:3px; transition:width 0.3s; }
+.iv-footer { display:flex; align-items:center; gap:16px; margin-bottom:8px; }
+.iv-overall { display:flex; align-items:baseline; gap:4px; background:var(--gray-50); padding:6px 14px; border-radius:8px; }
+.iv-overall-value { font-size:18px; font-weight:700; color:var(--gray-800); }
+.iv-overall-label { font-size:11px; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.3px; }
+.iv-decision { }
+.iv-reject-reason { font-size:13px; color:#dc2626; margin-bottom:6px; padding:6px 10px; background:#fef2f2; border-radius:6px; }
+.iv-feedback { font-size:13px; color:var(--gray-700); line-height:1.5; padding:8px 10px; background:#f8f9fa; border-radius:6px; border:1px solid var(--gray-100); margin-top:4px; }
+.iv-empty-state { text-align:center; padding:16px; color:var(--gray-400); font-size:13px; }
 </style>
 <?php
 $content = ob_get_clean();

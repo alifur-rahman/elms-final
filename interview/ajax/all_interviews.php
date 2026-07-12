@@ -18,7 +18,7 @@ try {
         $sql .= " WHERE i.candidate_id = :cid";
         $params[':cid'] = $candidateId;
     }
-    $sql .= " ORDER BY i.round ASC, i.id ASC";
+    $sql .= " ORDER BY i.id DESC";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);

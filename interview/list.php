@@ -30,6 +30,8 @@ $pageStyles  = '
 .pagination-bar .page-btn:disabled { opacity:.4; cursor:default; }
 .pagination-bar .per-page { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-500); }
 .pagination-bar .per-page select { padding:4px 8px; border:1px solid var(--gray-200); border-radius:4px; font-size:13px; font-family:inherit; }
+@media (max-width:768px){ .score-grid { grid-template-columns: 1fr; gap: 8px; } }
+@media (max-width:480px){ .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } .stat-card { padding: 12px; gap: 8px; } .stat-card .stat-icon { width: 34px; height: 34px; font-size: 15px; } .stat-card .stat-info h3 { font-size: 17px; } }
 ';
 
 $pageScripts = '
@@ -642,8 +644,8 @@ ob_start();
 
 <!-- Schedule Interview Modal -->
 <div class="modal-overlay" id="scheduleModal" onclick="if(event.target===this)closeModal('scheduleModal')">
-    <div class="modal">
-        <div class="modal-header">
+    <div class="modal modal-sticky">
+        <div class="modal-header modal-header-navy">
             <h3 id="scheduleModalTitle">Schedule Interview</h3>
             <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
         </div>
@@ -691,7 +693,7 @@ ob_start();
                 </div>
             </form>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer modal-footer-light">
             <button class="btn btn-outline" onclick="closeModal('scheduleModal')">Cancel</button>
             <button class="btn btn-primary" id="siSubmitBtn" onclick="window.ajaxScheduleInterview()">&#x2728; Schedule Interview</button>
         </div>
@@ -700,8 +702,8 @@ ob_start();
 
 <!-- Record Feedback Modal -->
 <div class="modal-overlay" id="feedbackModal" onclick="if(event.target===this)closeModal('feedbackModal')">
-    <div class="modal">
-        <div class="modal-header">
+    <div class="modal modal-sticky">
+        <div class="modal-header modal-header-navy">
             <h3 id="feedbackModalTitle">&#x270F; Record Feedback</h3>
             <button class="modal-close" onclick="closeModal('feedbackModal')">&times;</button>
         </div>
@@ -771,7 +773,7 @@ ob_start();
                 </div>
             </form>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer modal-footer-light">
             <button class="btn btn-outline" onclick="closeModal('feedbackModal')">Cancel</button>
             <button class="btn btn-primary" id="fbSubmitBtn" onclick="window.ajaxSaveFeedback()">&#x2728; Save Feedback</button>
         </div>
@@ -780,13 +782,13 @@ ob_start();
 
 <!-- Combined View Modal (feedback + history) -->
 <div class="modal-overlay" id="combinedViewModal" onclick="if(event.target===this)closeModal('combinedViewModal')">
-    <div class="modal">
-        <div class="modal-header">
+    <div class="modal modal-sticky">
+        <div class="modal-header modal-header-navy">
             <h3 id="combinedViewTitle">View</h3>
             <button class="modal-close" onclick="closeModal('combinedViewModal')">&times;</button>
         </div>
         <div class="modal-body" id="combinedViewBody"></div>
-        <div class="modal-footer">
+        <div class="modal-footer modal-footer-light">
             <button class="btn btn-outline btn-sm" onclick="closeModal('combinedViewModal')">Close</button>
         </div>
     </div>
@@ -818,6 +820,7 @@ ob_start();
 .iv-reject-reason { font-size:13px; color:#dc2626; margin-bottom:6px; padding:6px 10px; background:#fef2f2; border-radius:6px; }
 .iv-feedback { font-size:13px; color:var(--gray-700); line-height:1.5; padding:8px 10px; background:#f8f9fa; border-radius:6px; border:1px solid var(--gray-100); margin-top:4px; }
 .iv-empty-state { text-align:center; padding:16px; color:var(--gray-400); font-size:13px; }
+@media (max-width:768px){ .iv-scores { grid-template-columns:1fr; gap:6px 12px; } .iv-meta { flex-direction:column; gap:6px; } .iv-score-item label { width:auto; flex-shrink:1; } .iv-score-item span { width:auto; flex-shrink:1; } .iv-card-header { flex-direction:column; align-items:flex-start; gap:4px; } .iv-card-header-right { width:100%; justify-content:space-between; } .iv-date { white-space:normal; } .iv-footer { flex-direction:column; align-items:flex-start; gap:8px; } }
 </style>
 <?php
 $content = ob_get_clean();

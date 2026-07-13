@@ -1,4 +1,5 @@
 <header class="top-header">
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">&#x2630;</button>
     <div class="page-title-area">
         <h1><?= $pageTitle ?? 'Dashboard' ?></h1>
         <div class="breadcrumb"><?= $breadcrumb ?? 'Home / ' . ($pageTitle ?? 'Dashboard') ?></div>

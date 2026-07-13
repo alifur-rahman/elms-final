@@ -10,8 +10,8 @@ $pageStyles  = '
 .dashboard-sidebar-section h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--gray-200); }
 .upcoming-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
 .upcoming-item:last-child { border-bottom: none; }
-.upcoming-item .ui-avatar { width: 36px; height: 36px; border-radius: 50%; background: #e8f0fe; color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
-.upcoming-item .ui-info { flex: 1; }
+.upcoming-item .ui-avatar { width: 36px; height: 36px; border-radius: 50%; background: #e8f0fe; color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+.upcoming-item .ui-info { flex: 1; min-width: 0; }
 .upcoming-item .ui-info .ui-name { font-size: 13px; font-weight: 500; }
 .upcoming-item .ui-info .ui-detail { font-size: 11px; color: var(--gray-500); }
 .upcoming-item .ui-date { font-size: 11px; color: var(--primary); font-weight: 600; white-space: nowrap; }
@@ -27,6 +27,9 @@ $pageStyles  = '
 .reminder-card .rc-days { font-size: 24px; font-weight: 700; color: var(--primary); }
 .reminder-card .rc-label { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
 .reminder-card .rc-action { font-size: 11px; color: var(--gray-600); margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--gray-100); }
+@media (max-width:1024px){ .dashboard-layout { grid-template-columns: 1fr; } .dashboard-sidebar { order: -1; } }
+@media (max-width:768px){ .lifecycle-cards { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; } .lifecycle-card { padding: 12px 8px; } .lifecycle-card .lc-count { font-size: 18px; } .lifecycle-card .lc-icon { font-size: 20px; } .lifecycle-card .lc-label { font-size: 11px; } .reminder-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; } .reminder-card { padding: 12px; } .reminder-card .rc-days { font-size: 20px; } .dashboard-sidebar-section { padding: 16px; } .timeline { padding-left: 16px; } }
+@media (max-width:480px){ .lifecycle-cards { grid-template-columns: repeat(2, 1fr); } .reminder-grid { grid-template-columns: repeat(2, 1fr); } }
 ';
 $pageScripts = '
 function renderDashboard() {

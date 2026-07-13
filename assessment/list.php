@@ -15,6 +15,7 @@ $pageStyles  = '
 .form-section { margin-bottom: 20px; }
 .form-section-title { font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--gray-200); }
 .interview-card { background: var(--gray-50); border-radius: 6px; padding: 16px; margin-bottom: 12px; }
+@media (max-width:480px){ .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } .stat-card { padding: 12px; gap: 8px; } .stat-card .stat-icon { width: 36px; height: 36px; font-size: 16px; } .stat-card .stat-info h3 { font-size: 18px; } }
 ';
 $pageScripts = '
 var assessmentData = [];
@@ -169,8 +170,8 @@ ob_start();
 
 <!-- Assessment Detail Modal -->
 <div class="modal-overlay" id="assessmentDetailModal" onclick="if(event.target===this)closeModal('assessmentDetailModal')">
-    <div class="modal modal-lg">
-        <div class="modal-header">
+    <div class="modal modal-lg modal-sticky">
+        <div class="modal-header modal-header-navy">
             <h3>Assessment Detail</h3>
             <button class="modal-close" onclick="closeModal('assessmentDetailModal')">&times;</button>
         </div>

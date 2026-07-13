@@ -29,6 +29,8 @@ $pageStyles  = '
 .pagination-bar .page-btn:disabled { opacity:.4; cursor:default; }
 .pagination-bar .per-page { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-500); }
 .pagination-bar .per-page select { padding:4px 8px; border:1px solid var(--gray-200); border-radius:4px; font-size:13px; font-family:inherit; }
+@media (max-width:768px){ .tab-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; flex-wrap: nowrap; } .tab-btn { padding: 10px 16px; font-size: 13px; } }
+@media (max-width:480px){ .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } .stat-card { padding: 12px; gap: 8px; } .stat-card .stat-icon { width: 36px; height: 36px; font-size: 16px; } .stat-card .stat-info h3 { font-size: 18px; } }
 ';
 $pageScripts = '
 var upcomingData = [];
@@ -375,8 +377,8 @@ ob_start();
 
 <!-- Screening Form Modal -->
 <div class="modal-overlay" id="screeningModal" onclick="if(event.target===this)closeModal('screeningModal')">
-    <div class="modal">
-        <div class="modal-header">
+    <div class="modal modal-sticky">
+        <div class="modal-header modal-header-navy">
             <h3 id="screeningModalTitle">&#x1F50D; Screen Candidate</h3>
             <button class="modal-close" onclick="closeModal('screeningModal')">&times;</button>
         </div>
@@ -441,7 +443,7 @@ ob_start();
                 </div>
             </form>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer modal-footer-light">
             <button class="btn btn-outline" onclick="closeModal('screeningModal')">Cancel</button>
             <button class="btn btn-primary" id="scSubmitBtn" onclick="window.ajaxSaveScreening()">&#x2728; Save Screening</button>
         </div>

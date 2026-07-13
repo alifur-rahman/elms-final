@@ -4,7 +4,7 @@ $pageTitle   = 'Recruitment Pipeline';
 $activePage  = 'recruitment';
 $breadcrumb  = 'Home / Recruitment / Pipeline';
 $pageStyles  = '
-.pipeline-flow { display: flex; align-items: center; gap: 0; margin-bottom: 24px; overflow-x: auto; padding: 16px 20px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.pipeline-flow { display: flex; align-items: center; gap: 0; margin-bottom: 24px; overflow-x: auto; padding: 16px 20px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); -webkit-overflow-scrolling: touch; }
 .pf-step { display: flex; flex-direction: column; align-items: center; min-width: 80px; padding: 8px 12px; text-align: center; }
 .pf-step .pf-count { font-size: 22px; font-weight: 700; color: var(--primary); }
 .pf-step .pf-icon { font-size: 18px; margin: 4px 0; }
@@ -34,6 +34,51 @@ $pageStyles  = '
 .pagination-bar .page-btn:disabled { opacity:.4; cursor:default; }
 .pagination-bar .per-page { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-500); }
 .pagination-bar .per-page select { padding:4px 8px; border:1px solid var(--gray-200); border-radius:4px; font-size:13px; font-family:inherit; }
+@media (max-width:768px){
+ html, body { overflow-x: hidden; width: 100%; }
+ .page-content { overflow-x: hidden; }
+ .quick-stats { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+ .qs-card { padding: 14px 16px; gap: 10px; }
+ .qs-card .qs-icon { width: 36px; height: 36px; font-size: 16px; }
+ .qs-card .qs-info h4 { font-size: 18px; }
+ .pipeline-flow { padding: 12px 14px; }
+ .pf-step { min-width: 64px; padding: 6px 8px; }
+ .pf-step .pf-count { font-size: 18px; }
+ .pf-step .pf-icon { font-size: 15px; }
+ .pf-connector { width: 24px; }
+ .view-job-details { grid-template-columns: 1fr; gap: 8px 16px; }
+}
+@media (max-width:480px){
+ html, body { overflow-x: hidden; width: 100%; }
+ .page-content { overflow-x: hidden; }
+ .quick-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+ .qs-card { padding: 12px; gap: 8px; flex-direction: column; text-align: center; }
+ .qs-card .qs-icon { width: 32px; height: 32px; font-size: 14px; }
+ .qs-card .qs-info h4 { font-size: 16px; }
+ .qs-card .qs-info p { font-size: 11px; }
+ .pipeline-flow { padding: 10px 12px; }
+ .pf-step { min-width: 52px; padding: 4px 6px; }
+ .pf-step .pf-count { font-size: 16px; }
+ .pf-step .pf-icon { font-size: 13px; }
+ .pf-step .pf-label { font-size: 10px; }
+ .pf-connector { width: 16px; }
+ .card-header { flex-direction: column; align-items: stretch; gap: 10px; }
+ .card-header .btn-group { width: 100%; }
+ .card-header .btn-group .search-box { width: 100%; }
+ .card-header .btn-group .search-box input { width: 100% !important; }
+ .card-header .btn-group .btn { width: 100%; justify-content: center; }
+ .card-header[style*="border-radius"] { border-radius: 8px 8px 0 0 !important; }
+ .card[style*="border-radius"] { border-radius: 0 0 8px 8px !important; }
+ .view-job-details { gap: 6px 12px; }
+ .view-job-details .vj-item span { font-size: 13px; word-break: break-word; }
+ .view-job-desc p { font-size: 12px; }
+ .modal-body { padding: 16px; }
+ .modal-footer .btn { flex: 1; text-align: center; justify-content: center; }
+ .requisition-section { margin-bottom: 20px; }
+ .requisition-section .section-title { font-size: 14px; margin-bottom: 14px; padding-bottom: 8px; }
+ .form-row-2 { gap: 10px; }
+ .textarea-full, .textarea-full-lg { min-height: 80px; }
+}
 ';
 $pageScripts = '
 var reqSkills = [];
@@ -381,7 +426,7 @@ ob_start();
     <div class="btn-group">
         <div class="search-box">
             <span class="search-icon">&#x1F50D;</span>
-            <input type="text" id="searchJobs" placeholder="Search positions..." onkeyup="applyFilters()" style="border:none;padding:7px 8px;font-size:13px;outline:none;width:200px;font-family:inherit">
+            <input type="text" id="searchJobs" placeholder="Search positions..." onkeyup="applyFilters()" style="border:none;padding:7px 8px;font-size:13px;outline:none;width:200px;max-width:100%;font-family:inherit">
         </div>
         <button class="btn btn-primary btn-sm" onclick="resetRequisitionForm();openModal('createRequisitionModal')">+ Create Requisition</button>
     </div>
@@ -427,8 +472,8 @@ ob_start();
 </div>
 
 <div class="modal-overlay" id="viewJobModal" onclick="if(event.target===this)closeModal('viewJobModal')">
-    <div class="modal">
-        <div class="modal-header">
+    <div class="modal modal-sticky">
+        <div class="modal-header modal-header-navy">
             <h3 id="viewJobTitle">Job Details</h3>
             <button class="modal-close" onclick="closeModal('viewJobModal')">&times;</button>
         </div>
@@ -436,15 +481,15 @@ ob_start();
             <div class="view-job-details" id="viewJobDetails"></div>
             <div class="view-job-desc" id="viewJobDesc"></div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer modal-footer-light">
             <button class="btn btn-outline btn-sm" onclick="closeModal('viewJobModal')">Close</button>
         </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="createRequisitionModal" onclick="if(event.target===this)closeModal('createRequisitionModal')">
-    <div class="modal modal-requisition">
-        <div class="modal-header">
+    <div class="modal modal-requisition modal-sticky modal-xl">
+        <div class="modal-header modal-header-navy">
             <h3 id="reqModalTitle">&#x1F4CB; Create New Requisition</h3>
             <button class="modal-close" onclick="closeModal('createRequisitionModal')">&times;</button>
         </div>
@@ -568,7 +613,7 @@ ob_start();
                 </div>
             </form>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer modal-footer-light">
             <button class="btn btn-outline" onclick="closeModal('createRequisitionModal');resetRequisitionForm()">Cancel</button>
             <button class="btn btn-primary" id="reqSubmitBtn" onclick="window.ajaxSubmitRequisition()">&#x2728; Create Requisition</button>
         </div>

@@ -30,6 +30,24 @@ $pageStyles  = '
 .pagination-bar .page-btn:disabled { opacity:.4; cursor:default; }
 .pagination-bar .per-page { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-500); }
 .pagination-bar .per-page select { padding:4px 8px; border:1px solid var(--gray-200); border-radius:4px; font-size:13px; font-family:inherit; }
+@media (max-width:768px){ html, body { overflow-x: hidden; width: 100%; } .page-content { overflow-x: hidden; } .view-candidate-grid { grid-template-columns: 1fr; gap: 8px 16px; } .filter-bar .form-control { min-width: 0; width: 100%; } }
+@media (max-width:480px){
+ html, body { overflow-x: hidden; width: 100%; }
+ .page-content { overflow-x: hidden; }
+ .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+ .stat-card { padding: 12px; gap: 8px; }
+ .stat-card .stat-icon { width: 36px; height: 36px; font-size: 16px; }
+ .stat-card .stat-info h3 { font-size: 18px; }
+ .filter-bar { flex-direction: column; align-items: stretch; }
+ .filter-bar .form-control, .filter-bar .search-box { width: 100%; min-width: 0; }
+ .filter-bar .btn { width: 100%; justify-content: center; }
+ .view-candidate-grid { gap: 6px 12px; }
+ .view-candidate-grid .form-group label { font-size: 11px; }
+ .view-candidate-grid .form-group div { font-size: 13px; word-break: break-word; }
+ .modal-body { padding: 16px; }
+ .modal-footer .btn { flex: 1; text-align: center; justify-content: center; }
+ .form-row-2 { gap: 10px; }
+}
 ';
 $pageScripts = '
 var candidatesData = [];
@@ -365,8 +383,8 @@ ob_start();
 
 <!-- View Candidate Modal -->
 <div class="modal-overlay" id="viewCandidateModal" onclick="if(event.target===this)closeModal('viewCandidateModal')">
-    <div class="modal modal-lg">
-        <div class="modal-header">
+    <div class="modal modal-lg modal-sticky">
+        <div class="modal-header modal-header-navy">
             <h3>Candidate Details</h3>
             <button class="modal-close" onclick="closeModal('viewCandidateModal')">&times;</button>
         </div>
@@ -376,8 +394,8 @@ ob_start();
 
 <!-- Add / Edit Candidate Modal -->
 <div class="modal-overlay" id="addCandidateModal" onclick="if(event.target===this)closeModal('addCandidateModal')">
-    <div class="modal">
-        <div class="modal-header">
+    <div class="modal modal-sticky">
+        <div class="modal-header modal-header-navy">
             <h3 id="candModalTitle">&#x2795; Add Candidate</h3>
             <button class="modal-close" onclick="closeModal('addCandidateModal')">&times;</button>
         </div>
@@ -464,7 +482,7 @@ ob_start();
                 </div>
             </form>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer modal-footer-light">
             <button class="btn btn-outline" onclick="closeModal('addCandidateModal');resetCandidateForm()">Cancel</button>
             <button class="btn btn-primary" id="candSubmitBtn" onclick="window.ajaxSaveCandidate()">&#x2728; Save Candidate</button>
         </div>

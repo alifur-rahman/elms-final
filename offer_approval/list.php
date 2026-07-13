@@ -21,6 +21,8 @@ $pageStyles  = '
 .approval-level .level-dot.rejected { background: var(--danger); }
 .approval-level .level-label { font-size: 11px; color: var(--gray-500); }
 .text-muted { color: var(--gray-500); font-size: 12px; }
+@media (max-width:768px){ .tab-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; flex-wrap: nowrap; } .tab-btn { padding: 10px 14px; font-size: 12px; } }
+@media (max-width:480px){ .approval-level { flex-wrap: wrap; gap: 4px; } }
 ';
 $pageScripts = '
 var selectedCandidates = [];
@@ -290,8 +292,8 @@ ob_start();
 
 <!-- Create Offer Modal -->
 <div class="modal-overlay" id="createOfferModal" onclick="if(event.target===this)closeModal('createOfferModal')">
-    <div class="modal">
-        <div class="modal-header">
+    <div class="modal modal-sticky">
+        <div class="modal-header modal-header-navy">
             <h3>Create Offer</h3>
             <button class="modal-close" onclick="closeModal('createOfferModal')">&times;</button>
         </div>
@@ -328,19 +330,19 @@ ob_start();
                     <label>Notes</label>
                     <textarea class="form-control" id="offerNotes" name="notes" rows="3" placeholder="Any additional notes..."></textarea>
                 </div>
-                <div class="form-group" style="margin-bottom:0">
-                    <button type="button" class="btn btn-primary" onclick="submitCreateOffer()">Create Offer</button>
-                    <button type="button" class="btn btn-outline" onclick="closeModal('createOfferModal')" style="margin-left:8px">Cancel</button>
-                </div>
             </form>
+        </div>
+        <div class="modal-footer modal-footer-light">
+            <button type="button" class="btn btn-outline" onclick="closeModal('createOfferModal')">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="submitCreateOffer()">Create Offer</button>
         </div>
     </div>
 </div>
 
 <!-- Approval Action Modal -->
 <div class="modal-overlay" id="approvalActionModal" onclick="if(event.target===this)closeModal('approvalActionModal')">
-    <div class="modal">
-        <div class="modal-header">
+    <div class="modal modal-sticky">
+        <div class="modal-header modal-header-navy">
             <h3>Approval Action</h3>
             <button class="modal-close" onclick="closeModal('approvalActionModal')">&times;</button>
         </div>
@@ -367,11 +369,11 @@ ob_start();
                     <label>Comment</label>
                     <textarea class="form-control" id="approvalComment" name="comment" rows="3" placeholder="Add a comment..."></textarea>
                 </div>
-                <div class="form-group" style="margin-bottom:0">
-                    <button type="button" class="btn btn-primary" onclick="submitApprovalAction()">Submit</button>
-                    <button type="button" class="btn btn-outline" onclick="closeModal('approvalActionModal')" style="margin-left:8px">Cancel</button>
-                </div>
             </form>
+        </div>
+        <div class="modal-footer modal-footer-light">
+            <button type="button" class="btn btn-outline" onclick="closeModal('approvalActionModal')">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="submitApprovalAction()">Submit</button>
         </div>
     </div>
 </div>

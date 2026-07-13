@@ -29,6 +29,8 @@ $pageStyles  = '
 .quick-link-card .ql-label { font-size: 13px; font-weight: 500; color: var(--gray-800); }
 .quick-link-card .ql-count { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
 .quick-link-card .ql-badge { display: inline-block; margin-top: 6px; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; background: var(--danger); color: #fff; }
+@media (max-width:768px){ .welcome-card { padding: 32px 20px; } .welcome-card h1 { font-size: 22px; } .lifecycle-flow { padding: 16px; gap: 0; } .flow-step { min-width: 60px; padding: 8px 10px; } .flow-step .flow-icon { width: 40px; height: 40px; font-size: 16px; } .flow-connector { width: 20px; } .quick-links-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; } }
+@media (max-width:480px){ .welcome-card { padding: 24px 16px; } .welcome-card h1 { font-size: 18px; } .welcome-card p { font-size: 13px; } .flow-step { min-width: 48px; padding: 6px 8px; } .flow-step .flow-icon { width: 32px; height: 32px; font-size: 14px; } .flow-connector { width: 12px; } .flow-step .flow-label { font-size: 10px; } .quick-links-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } .quick-link-card { padding: 14px 10px; } }
 ';
 
 ob_start();

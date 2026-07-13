@@ -8,6 +8,8 @@
     --sidebar-bg: #ffffff;
     --sidebar-hover: #f1f3f4;
     --sidebar-active: #e8f0fe;
+    --sidebar-width: 260px;
+    --sidebar-collapsed: 60px;
     --primary: #1a73e8;
     --primary-dark: #1557b0;
     --success: #1e8e3e;
@@ -41,7 +43,7 @@ body {
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-    width: 260px;
+    width: var(--sidebar-width);
     background: var(--sidebar-bg);
     color: var(--gray-900);
     position: fixed;
@@ -51,8 +53,8 @@ body {
     z-index: 1000;
     display: flex;
     flex-direction: column;
-    transition: var(--transition);
     border-right: 1px solid var(--gray-200);
+    transition: transform 0.3s ease;
 }
 
 .sidebar-brand {
@@ -153,7 +155,7 @@ body {
 
 /* ===== MAIN CONTENT ===== */
 .main-content {
-    margin-left: 260px;
+    margin-left: var(--sidebar-width);
     flex: 1;
     min-height: 100vh;
 }
@@ -976,12 +978,59 @@ textarea.form-control {
 
 .modal {
     background: #fff;
-    border-radius: var(--radius);
+    border-radius: 16px;
     width: 90%;
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: var(--shadow-lg);
+}
+
+/* Modal sticky header/footer pattern */
+.modal-sticky {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.modal-sticky .modal-header {
+    flex-shrink: 0;
+}
+.modal-sticky .modal-body {
+    overflow-y: auto;
+    flex: 1;
+}
+.modal-sticky .modal-footer {
+    flex-shrink: 0;
+}
+
+/* Navy header style */
+.modal-header-navy {
+    background: #1E3A8A;
+    border-bottom: none;
+    padding: 20px 28px;
+}
+.modal-header-navy h3 {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+}
+.modal-header-navy .modal-close {
+    color: rgba(255,255,255,.7);
+    font-size: 24px;
+}
+.modal-header-navy .modal-close:hover {
+    color: #fff;
+}
+
+/* Footer light style */
+.modal-footer-light {
+    background: var(--gray-50);
+    padding: 16px 28px;
+}
+
+/* Extra large modal */
+.modal-xl {
+    max-width: 920px;
 }
 
 .modal-lg {
@@ -1012,7 +1061,7 @@ textarea.form-control {
 }
 
 .modal-body {
-    padding: 24px;
+    padding: 28px;
 }
 
 .modal-footer {
@@ -1229,37 +1278,92 @@ textarea.form-control {
     border-bottom: none;
 }
 
+/* ===== SIDEBAR TOGGLE ===== */
+.sidebar-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px 8px;
+    color: var(--gray-700);
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+.sidebar-toggle:hover {
+    color: var(--gray-900);
+}
+
+/* ===== SIDEBAR OVERLAY ===== */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,.4);
+    z-index: 999;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
     .form-row-3, .form-row-4 {
         grid-template-columns: repeat(2, 1fr);
     }
+    .modal-xl, .modal-requisition, .modal-lg {
+        max-width: 95%;
+    }
+    .view-job-details,
+    .view-candidate-grid {
+        grid-template-columns: 1fr;
+    }
+    .score-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 768px) {
-    .sidebar {
-        width: 60px;
+    .sidebar-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
-    .sidebar-brand span,
+    .sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-width);
+    }
+    body.sidebar-open .sidebar {
+        transform: translateX(0);
+    }
+    body.sidebar-open .sidebar-overlay {
+        display: block;
+    }
+    .sidebar-nav a {
+        justify-content: flex-start;
+        padding: 10px 24px;
+    }
     .sidebar-nav a span,
     .sidebar-nav .nav-label,
     .sidebar-footer span {
-        display: none;
-    }
-    .sidebar-nav a {
-        justify-content: center;
-        padding: 12px;
+        display: inline;
     }
     .sidebar-nav a .badge {
-        display: none;
+        display: inline-flex;
+    }
+    .sidebar-brand span {
+        display: inline;
     }
     .main-content {
-        margin-left: 60px;
+        margin-left: 0;
     }
     .page-content {
         padding: 16px;
     }
     .form-row-3, .form-row-4 {
+        grid-template-columns: 1fr;
+    }
+    .form-row-2 {
         grid-template-columns: 1fr;
     }
     .profile-card {
@@ -1273,6 +1377,139 @@ textarea.form-control {
     .letter-preview {
         padding: 24px;
     }
+    .top-header {
+        padding: 10px 16px;
+    }
+    .top-header .page-title-area h1 {
+        font-size: 16px;
+    }
+    .top-header .breadcrumb {
+        font-size: 11px;
+    }
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-bar .form-control,
+    .filter-bar .search-box {
+        width: 100%;
+        min-width: 0;
+    }
+    .filter-bar .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .table-container table {
+        min-width: 700px;
+    }
+    .modal-xl, .modal-requisition {
+        max-width: 95%;
+    }
+    .modal-lg {
+        max-width: 95%;
+    }
+    .modal-header-navy {
+        padding: 16px 20px;
+    }
+    .modal-header-navy h3 {
+        font-size: 15px;
+    }
+    .modal-body {
+        padding: 20px;
+    }
+    .modal-footer-light {
+        padding: 12px 20px;
+    }
+    .welcome-card {
+        padding: 32px 24px;
+    }
+    .welcome-card h1 {
+        font-size: 22px;
+    }
+    .lifecycle-flow {
+        padding: 16px 12px;
+        gap: 0;
+    }
+    .flow-step {
+        min-width: 60px;
+        padding: 8px 10px;
+    }
+    .flow-step .flow-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+    .flow-step .flow-label {
+        font-size: 10px;
+    }
+    .quick-links-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+    }
+    .pipeline-flow {
+        gap: 0;
+    }
+    .pf-step {
+        min-width: 60px;
+        padding: 6px 8px;
+    }
+    .pf-step .pf-count {
+        font-size: 18px;
+    }
+    .pf-step .pf-label {
+        font-size: 10px;
+    }
+    .pf-connector {
+        width: 24px;
+    }
+    .quick-stats {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    .tab-bar {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    .tab-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    .iv-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    .iv-card-header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .iv-scores {
+        grid-template-columns: 1fr;
+    }
+    .iv-meta {
+        flex-direction: column;
+        gap: 4px;
+    }
+    .header-right .user-info div:last-child {
+        display: none;
+    }
+    .pagination-bar {
+        flex-direction: column;
+        align-items: center;
+    }
+    .approval-level {
+        flex-wrap: wrap;
+    }
+    .btn-group {
+        flex-wrap: wrap;
+    }
+    .btn {
+        white-space: normal;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1280,9 +1517,73 @@ textarea.form-control {
         grid-template-columns: 1fr;
     }
     .top-header {
-        padding: 8px 16px;
-        flex-direction: column;
-        gap: 8px;
+        padding: 8px 12px;
+    }
+    .page-content {
+        padding: 12px;
+    }
+    .stat-card {
+        padding: 14px 16px;
+    }
+    .qs-card {
+        padding: 14px 16px;
+    }
+    .modal {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+        max-height: 100vh;
+        height: 100vh;
+    }
+    .modal-overlay {
+        align-items: flex-end;
+    }
+    .modal-header-navy {
+        padding: 14px 16px;
+    }
+    .modal-header-navy h3 {
+        font-size: 14px;
+    }
+    .modal-body {
+        padding: 16px;
+    }
+    .modal-footer-light {
+        padding: 12px 16px;
+    }
+    .modal-sticky {
+        border-radius: 16px 16px 0 0;
+        max-height: 90vh;
+        height: auto;
+    }
+    .header-right .notification-btn {
+        font-size: 18px;
+    }
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 11px;
+    }
+    .welcome-card {
+        padding: 24px 16px;
+    }
+    .welcome-card h1 {
+        font-size: 18px;
+    }
+    .quick-links-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+    .quick-link-card {
+        padding: 14px 12px;
+    }
+    .quick-link-card .ql-icon {
+        font-size: 22px;
+    }
+    .flow-connector {
+        width: 16px;
+    }
+    .quick-stats {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1326,50 +1627,6 @@ textarea.form-control {
 /* ===== REQUISITION MODAL ===== */
 .modal-requisition {
     max-width: 920px;
-    border-radius: 16px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    max-height: 90vh;
-}
-
-.modal-requisition .modal-header {
-    background: #1E3A8A;
-    padding: 20px 28px;
-    border-bottom: none;
-    flex-shrink: 0;
-}
-
-.modal-requisition .modal-header h3 {
-    color: #fff;
-    font-size: 17px;
-    font-weight: 600;
-}
-
-.modal-requisition .modal-header .modal-close {
-    color: rgba(255,255,255,.7);
-    font-size: 24px;
-}
-
-.modal-requisition .modal-header .modal-close:hover {
-    color: #fff;
-}
-
-.modal-requisition .modal-body {
-    padding: 28px;
-    background: #fff;
-    overflow-y: auto;
-    flex: 1;
-}
-
-.modal-requisition .modal-footer {
-    padding: 16px 28px;
-    background: var(--gray-50);
-    border-top: 1px solid var(--gray-200);
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    flex-shrink: 0;
 }
 
 /* Section styling */

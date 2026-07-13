@@ -5,7 +5,7 @@ $activePage  = 'lifecycle';
 $breadcrumb  = 'Home / Lifecycle / Timeline';
 $pageStyles  = '
 .selector-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-.selector-bar label { font-weight: 500; font-size: 13px; color: var(--gray-700); }
+.selector-bar label { font-weight: 500; font-size: 13px; color: var(--gray-700); flex-shrink: 0; }
 .selector-bar select { min-width: 360px; }
 .lifecycle-timeline { position: relative; padding-left: 40px; margin: 32px 0; }
 .lifecycle-timeline::before { content: ""; position: absolute; left: 20px; top: 0; bottom: 0; width: 3px; background: var(--gray-200); border-radius: 2px; }
@@ -19,7 +19,7 @@ $pageStyles  = '
 .lt-event .lt-desc { font-size: 12px; color: var(--gray-600); margin-top: 4px; }
 .lt-event .lt-status { margin-top: 8px; }
 .summary-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 24px; display: grid; grid-template-columns: auto 1fr; gap: 20px 32px; align-items: start; }
-.summary-card .sc-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; grid-row: span 2; }
+.summary-card .sc-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; grid-row: span 2; flex-shrink: 0; }
 .summary-card .sc-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
 .summary-card .sc-item label { display: block; font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
 .summary-card .sc-item span { font-size: 14px; font-weight: 500; color: var(--gray-900); }
@@ -27,6 +27,8 @@ $pageStyles  = '
 .no-data .nd-icon { font-size: 48px; margin-bottom: 12px; }
 .no-data h3 { font-size: 16px; color: var(--gray-700); margin-bottom: 4px; }
 .action-icon { margin-right: 6px; font-size: 14px; }
+@media (max-width:768px){ .selector-bar select { min-width: 0; width: 100%; } .lifecycle-timeline { padding-left: 32px; } .lt-event .lt-icon { width: 34px; height: 34px; left: -28px; font-size: 13px; } .lt-event .lt-card { padding: 12px 14px; margin-left: 12px; } .lt-event .lt-label { font-size: 13px; } .summary-card { grid-template-columns: 1fr; text-align: center; } .summary-card .sc-avatar { margin: 0 auto; } .summary-card .sc-details { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); } }
+@media (max-width:480px){ .lt-event { padding-bottom: 24px; } .lt-event .lt-card { padding: 10px 12px; } .summary-card { padding: 16px; } .summary-card .sc-details { grid-template-columns: 1fr 1fr; gap: 8px; } .no-data { padding: 32px 16px; } .no-data .nd-icon { font-size: 36px; } }
 ';
 $pageScripts = '
 var candidatesData = [];

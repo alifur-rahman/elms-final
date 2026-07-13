@@ -35,7 +35,13 @@ function showAlert(message, type) {
     }, 3000);
 }
 
-// Sidebar nav items config
+// Sidebar toggle (responsive)
+function toggleSidebar() {
+    document.body.classList.toggle('sidebar-open');
+}
+function closeSidebar() {
+    document.body.classList.remove('sidebar-open');
+}
 var SIDEBAR_ITEMS = [
     { label: 'Lifecycle', header: true },
     { id: 'dashboard',       text: 'Dashboard',          href: 'dashboard.html' },

@@ -72,7 +72,7 @@ ob_start();
             <div class="flow-connector"></div>
             <a href="interview/list.html" class="flow-step"><div class="flow-icon">&#x1F91D;</div><div class="flow-label">Interview</div></a>
             <div class="flow-connector"></div>
-            <a href="offer_approval/list.html" class="flow-step"><div class="flow-icon">&#x2705;</div><div class="flow-label">Offer</div></a>
+            <a href="offer_management/list.php" class="flow-step"><div class="flow-icon">&#x2705;</div><div class="flow-label">Offer</div></a>
             <div class="flow-connector"></div>
             <a href="pre_onboarding/list.html" class="flow-step"><div class="flow-icon">&#x1F4CB;</div><div class="flow-label">Pre-Onboarding</div></a>
             <div class="flow-connector"></div>
@@ -94,7 +94,7 @@ ob_start();
             <a href="candidates/list.html" class="quick-link-card"><div class="ql-icon">&#x1F465;</div><div class="ql-label">Candidates</div><div class="ql-count">Active Pipeline</div><div class="ql-badge">5</div></a>
             <a href="screening/list.html" class="quick-link-card"><div class="ql-icon">&#x1F50D;</div><div class="ql-label">Screening</div><div class="ql-count">Pending Review</div></a>
             <a href="interview/list.html" class="quick-link-card"><div class="ql-icon">&#x1F91D;</div><div class="ql-label">Interview</div><div class="ql-count">Scheduled</div></a>
-            <a href="offer_approval/list.html" class="quick-link-card"><div class="ql-icon">&#x2705;</div><div class="ql-label">Offer Approval</div><div class="ql-count">Pending</div></a>
+            <a href="offer_management/list.php" class="quick-link-card"><div class="ql-icon">&#x2705;</div><div class="ql-label">Offer Approval</div><div class="ql-count">Pending</div></a>
             <a href="pre_onboarding/list.html" class="quick-link-card"><div class="ql-icon">&#x1F4CB;</div><div class="ql-label">Pre-Onboarding</div><div class="ql-count">Tasks</div></a>
             <a href="joining/list.html" class="quick-link-card"><div class="ql-icon">&#x1F6AA;</div><div class="ql-label">Joining</div><div class="ql-count">Upcoming</div></a>
             <a href="probation/list.html" class="quick-link-card"><div class="ql-icon">&#x1F4DD;</div><div class="ql-label">Probation</div><div class="ql-count">Appraisals</div></a>

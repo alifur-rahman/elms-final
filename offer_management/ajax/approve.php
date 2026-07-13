@@ -51,16 +51,20 @@ try {
 
     $pdo->beginTransaction();
 
+    // Get candidate_id for lifecycle logging
+    $oInfo = $pdo->prepare("SELECT candidate_id FROM offers WHERE id = :id");
+    $oInfo->execute([':id' => $offerId]);
+    $candidateId = (int)$oInfo->fetchColumn();
+
     // Update approval record
     $uStmt = $pdo->prepare("UPDATE offer_approvals SET status = :status, comment = :comment WHERE id = :id");
     $uStmt->execute([':status' => $action, ':comment' => $comment, ':id' => $approvalId]);
 
     if ($action === 'Rejected') {
-        // Reject the entire offer
         $oStmt = $pdo->prepare("UPDATE offers SET status = 'Rejected' WHERE id = :id");
         $oStmt->execute([':id' => $offerId]);
+        if ($candidateId) addCandidateLog($pdo, $candidateId, 'offer_rejected', null, null, 'Offer rejected at approval: ' . $comment);
     } else {
-        // Approved: check if all levels for this offer are now approved
         $pendingCount = $pdo->prepare("SELECT COUNT(*) FROM offer_approvals WHERE offer_id = :oid AND status = 'Pending'");
         $pendingCount->execute([':oid' => $offerId]);
         $remaining = $pendingCount->fetchColumn();
@@ -68,6 +72,7 @@ try {
         if ($remaining == 0) {
             $oStmt = $pdo->prepare("UPDATE offers SET status = 'Approved' WHERE id = :id");
             $oStmt->execute([':id' => $offerId]);
+            if ($candidateId) addCandidateLog($pdo, $candidateId, 'offer_approved', null, null, 'Offer approved after all levels.');
         }
     }
 

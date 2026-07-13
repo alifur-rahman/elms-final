@@ -10,7 +10,7 @@ try {
     // ========================================================================
     $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
 
-    $tables = ['offer_approvals', 'offers', 'interview_log', 'screenings', 'candidate_logs', 'candidates', 'designations', 'candidate_statuses'];
+    $tables = ['offer_email_log', 'offer_letters', 'salary_proposals', 'offer_approvals', 'offers', 'interview_log', 'screenings', 'candidate_logs', 'candidates', 'designations', 'candidate_statuses'];
     foreach ($tables as $t) {
         $pdo->exec("DROP TABLE IF EXISTS $t");
     }
@@ -159,6 +159,9 @@ try {
         probation_months INT DEFAULT 6,
         notes TEXT DEFAULT NULL,
         status VARCHAR(20) NOT NULL DEFAULT 'Pending',
+        response_status VARCHAR(20) DEFAULT 'Pending',
+        responded_at DATETIME DEFAULT NULL,
+        response_notes TEXT DEFAULT NULL,
         sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         accepted_at DATETIME DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -183,7 +186,57 @@ try {
         FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    echo json_encode(['success' => true, 'message' => 'All tables recreated from scratch with status_id FK.']);
+    // ========================================================================
+    // salary_proposals (FK → candidates)
+    // ========================================================================
+    $pdo->exec("CREATE TABLE salary_proposals (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        candidate_id INT NOT NULL,
+        proposed_salary DECIMAL(12,2) NOT NULL,
+        offered_salary DECIMAL(12,2) DEFAULT NULL,
+        negotiation_notes TEXT DEFAULT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'Draft',
+        version INT NOT NULL DEFAULT 1,
+        created_by VARCHAR(100) DEFAULT 'Admin User',
+        finalized_at DATETIME DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    // ========================================================================
+    // offer_letters (FK → offers)
+    // ========================================================================
+    $pdo->exec("CREATE TABLE offer_letters (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        offer_id INT NOT NULL,
+        letter_content LONGTEXT DEFAULT NULL,
+        letter_format VARCHAR(10) DEFAULT 'html',
+        generated_at DATETIME DEFAULT NULL,
+        sent_at DATETIME DEFAULT NULL,
+        sent_to_email VARCHAR(100) DEFAULT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'Draft',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    // ========================================================================
+    // offer_email_log (FK → offers)
+    // ========================================================================
+    $pdo->exec("CREATE TABLE offer_email_log (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        offer_id INT NOT NULL,
+        recipient VARCHAR(100) NOT NULL,
+        subject VARCHAR(255) NOT NULL,
+        body LONGTEXT DEFAULT NULL,
+        sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        status VARCHAR(20) NOT NULL DEFAULT 'Sent',
+        error_message TEXT DEFAULT NULL,
+        FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    echo json_encode(['success' => true, 'message' => 'All tables recreated from scratch with Offer Management schema.']);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);

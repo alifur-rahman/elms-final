@@ -204,7 +204,7 @@ ob_start();
                     <a href="candidates/list.html" class="lifecycle-card"><div class="lc-count" id="lcCandidates">0</div><div class="lc-icon">&#x1F465;</div><div class="lc-label">Candidates</div></a>
                     <a href="screening/list.html" class="lifecycle-card"><div class="lc-count" id="lcScreening">0</div><div class="lc-icon">&#x1F50D;</div><div class="lc-label">Screening</div></a>
                     <a href="interview/list.html" class="lifecycle-card"><div class="lc-count" id="lcInterview">0</div><div class="lc-icon">&#x1F91D;</div><div class="lc-label">Interview</div></a>
-                    <a href="offer_approval/list.html" class="lifecycle-card"><div class="lc-count" id="lcOffer">0</div><div class="lc-icon">&#x2705;</div><div class="lc-label">Offer</div></a>
+                    <a href="offer_management/list.php" class="lifecycle-card"><div class="lc-count" id="lcOffer">0</div><div class="lc-icon">&#x2705;</div><div class="lc-label">Offer</div></a>
                     <a href="pre_onboarding/list.html" class="lifecycle-card"><div class="lc-count" id="lcPreOnboard">0</div><div class="lc-icon">&#x1F4CB;</div><div class="lc-label">Pre-Onboard</div></a>
                     <a href="probation/list.html" class="lifecycle-card"><div class="lc-count" id="lcProbation">0</div><div class="lc-icon">&#x1F4DD;</div><div class="lc-label">Probation</div></a>
                     <a href="confirmation/list.html" class="lifecycle-card"><div class="lc-count" id="lcConfirm">0</div><div class="lc-icon">&#x1F389;</div><div class="lc-label">Confirmation</div></a>

@@ -56,7 +56,10 @@ window.renderTimeline = function(candId) {
             screening_shortlist: "\uD83D\uDD0D", screening_reject: "\u2715", screening_hold: "\u23F3",
             screening_shortlist_update: "\uD83D\uDD0D", screening_reject_update: "\u2715", screening_hold_update: "\u23F3",
             interview_scheduled: "\uD83E\uDD1D", interview_pass: "\u2705", interview_fail: "\u274C",
-            assessment_completed: "\uD83D\uDCDD", offer_created: "\uD83D\uDCC4"
+            salary_proposed: "\uD83D\uDCB0", salary_finalized: "\u2705",
+            offer_created: "\uD83D\uDCC4", offer_approved: "\u2705", offer_rejected: "\u274C",
+            offer_letter_generated: "\uD83D\uDCDD", offer_sent: "\u2709\uFE0F",
+            offer_accepted: "\uD83C\uDF89", offer_rejected_candidate: "\u274C"
         };
         var labels = {
             candidate_created: "Applied", candidate_updated: "Profile Updated", candidate_deleted: "Deleted",
@@ -65,7 +68,10 @@ window.renderTimeline = function(candId) {
             screening_reject_update: "Screening Updated (Rejected)",
             screening_hold_update: "Screening Updated (Hold)",
             interview_scheduled: "Interview Scheduled", interview_pass: "Interview Passed", interview_fail: "Interview Failed",
-            assessment_completed: "Assessment Completed", offer_created: "Offer Created"
+            salary_proposed: "Salary Proposed", salary_finalized: "Salary Finalized",
+            offer_created: "Offer Created", offer_approved: "Offer Approved", offer_rejected: "Offer Rejected",
+            offer_letter_generated: "Letter Generated", offer_sent: "Offer Sent",
+            offer_accepted: "Offer Accepted", offer_rejected_candidate: "Offer Rejected"
         };
 
         var html = "<div class=\"lifecycle-timeline\">";

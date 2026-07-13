@@ -350,6 +350,64 @@ function renderLetters() {
     });
 }
 
+var letterTemplates = [];
+
+function loadTemplateSelector(offerData) {
+    apiGet("../templates/ajax/templates_list.php?type=Offer", null, function(res) {
+        letterTemplates = res.success && res.data ? res.data : [];
+        var sel = document.getElementById("letterTemplateSelect");
+        var currentVal = sel.value;
+        sel.innerHTML = "<option value=\"\">-- Select Template --</option>";
+        for (var i = 0; i < letterTemplates.length; i++) {
+            sel.innerHTML += "<option value=\"" + letterTemplates[i].id + "\">" + letterTemplates[i].name + "</option>";
+        }
+        if (currentVal) {
+            sel.value = currentVal;
+        } else if (letterTemplates.length > 0) {
+            sel.value = letterTemplates[0].id;
+        }
+        if (sel.value) { applyTemplate(offerData); }
+    });
+}
+
+function applyTemplate(offerData) {
+    if (!offerData) return;
+    var sel = document.getElementById("letterTemplateSelect");
+    var templateId = parseInt(sel.value);
+    if (!templateId) { document.getElementById("letterContent").value = ""; return; }
+    var tpl = null;
+    for (var i = 0; i < letterTemplates.length; i++) {
+        if (letterTemplates[i].id === templateId) { tpl = letterTemplates[i]; break; }
+    }
+    if (!tpl) return;
+    var content = tpl.content;
+    var now = new Date();
+    var dateStr = now.toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"});
+    var respDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+    var respDateStr = respDate.toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"});
+    var salary = formatCurrency(offerData.salary, "৳");
+    var joinDate = offerData.joining_date ? new Date(offerData.joining_date).toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"}) : "";
+    content = content.replace(/\{\{CANDIDATE_NAME\}\}/g, offerData.candidate_name || "");
+    content = content.replace(/\{\{DESIGNATION\}\}/g, offerData.designation_name || offerData.job_title || "");
+    content = content.replace(/\{\{JOB_TITLE\}\}/g, offerData.job_title || "");
+    content = content.replace(/\{\{DEPARTMENT\}\}/g, offerData.dept_name || "");
+    content = content.replace(/\{\{SALARY\}\}/g, salary);
+    content = content.replace(/\{\{JOINING_DATE\}\}/g, joinDate);
+    content = content.replace(/\{\{PROBATION_MONTHS\}\}/g, offerData.probation_months || 6);
+    content = content.replace(/\{\{COMPANY_NAME\}\}/g, "TechCorp International");
+    content = content.replace(/\{\{HR_NAME\}\}/g, "Admin User");
+    content = content.replace(/\{\{DATE\}\}/g, dateStr);
+    content = content.replace(/\{\{RESPONSE_DATE\}\}/g, respDateStr);
+    document.getElementById("letterContent").value = content;
+}
+
+function getSelectedOffer() {
+    var offerId = parseInt(document.getElementById("letterOfferId").value);
+    var allOffers = approvedOffers.concat(letterOffers);
+    for (var i = 0; i < allOffers.length; i++) { if (allOffers[i].id === offerId) return allOffers[i]; }
+    return null;
+}
+
 function openGenerateLetter(offerId) {
     var o = null;
     var allOffers = approvedOffers.concat(letterOffers);
@@ -361,6 +419,7 @@ function openGenerateLetter(offerId) {
     document.getElementById("letterJoiningDate").value = o.joining_date ? new Date(o.joining_date).toISOString().slice(0,10) : "";
     document.getElementById("letterProbationMonths").value = o.probation_months || 6;
     document.getElementById("letterDesignation").value = o.designation_name || o.job_title || "";
+    loadTemplateSelector(o);
     openModal("generateLetterModal");
 }
 
@@ -879,8 +938,18 @@ ob_start();
                     </div>
                 </div>
                 <div class="form-group">
+                    <label>Template</label>
+                    <select class="form-control" id="letterTemplateSelect" onchange="applyTemplate(getSelectedOffer())">
+                        <option value="">-- Select Template --</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Letter Content <span class="required">*</span></label>
-                    <textarea class="form-control" id="letterContent" rows="14" style="font-family:monospace;font-size:13px" placeholder="Offer letter content will be auto-generated. You can edit as needed."></textarea>
+                    <textarea class="form-control" id="letterContent" rows="14" style="font-family:monospace;font-size:13px" placeholder="Select a template above or type your letter content here..."></textarea>
+                </div>
+                <div style="font-size:12px;color:#888;margin-bottom:8px;padding:8px 12px;background:#f8f9fa;border-radius:6px">
+                    <strong>Merge Tags:</strong>
+                    {{CANDIDATE_NAME}}, {{DESIGNATION}}, {{DEPARTMENT}}, {{SALARY}}, {{JOINING_DATE}}, {{PROBATION_MONTHS}}, {{COMPANY_NAME}}, {{HR_NAME}}, {{DATE}}, {{RESPONSE_DATE}}
                 </div>
             </form>
         </div>

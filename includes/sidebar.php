@@ -29,7 +29,7 @@ $sidebarItems = [
         ['id' => 'employee_master', 'text' => 'Employee Master', 'href' => 'employee_master/list.html'],
     ],
     'Settings' => [
-        ['id' => 'templates', 'text' => 'Letter Templates', 'href' => 'templates/list.html'],
+        ['id' => 'templates', 'text' => 'Letter Templates', 'href' => 'templates/list.php'],
         ['id' => 'reports',   'text' => 'Reports',          'href' => 'reports/probation_summary.html'],
     ],
 ];

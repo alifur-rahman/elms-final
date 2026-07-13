@@ -64,7 +64,7 @@ var SIDEBAR_ITEMS = [
     { label: 'Employee', header: true },
     { id: 'employee_master', text: 'Employee Master', href: 'employee_master/list.html' },
     { label: 'Settings', header: true },
-    { id: 'templates', text: 'Letter Templates', href: 'templates/list.html' },
+    { id: 'templates', text: 'Letter Templates', href: 'templates/list.php' },
     { id: 'reports',   text: 'Reports',          href: 'reports/probation_summary.html' }
 ];
 

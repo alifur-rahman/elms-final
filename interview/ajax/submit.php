@@ -19,7 +19,7 @@ try {
     $date          = trim($body['date'] ?? '');
     $type          = trim($body['type'] ?? '');
     $interviewer   = trim($body['interviewer'] ?? '');
-    $round         = (int) ($body['round'] ?? 1);
+    $reschedule_id = (int) ($body['reschedule_id'] ?? 0);
     $round_name    = trim($body['round_name'] ?? '');
     $status        = trim($body['status'] ?? 'Waiting for Feedback');
     $is_final_round = !empty($body['is_final_round']) ? 1 : 0;
@@ -36,14 +36,12 @@ try {
         exit;
     }
 
-    // Auto-calculate round if not set or zero
-    if ($round <= 0) {
-        $maxStmt = $pdo->prepare("SELECT COALESCE(MAX(`round`), 0) FROM interview_log WHERE candidate_id = :cid AND status != 'Rescheduled'");
-        $maxStmt->execute([':cid' => $candidate_id]);
-        $round = (int) $maxStmt->fetchColumn() + 1;
-    }
-
     $pdo->beginTransaction();
+
+    // Calculate next round based on ALL existing entries for this candidate
+    $maxStmt = $pdo->prepare("SELECT COALESCE(MAX(`round`), 0) FROM interview_log WHERE candidate_id = :cid");
+    $maxStmt->execute([':cid' => $candidate_id]);
+    $round = (int) $maxStmt->fetchColumn() + 1;
 
     $stmt = $pdo->prepare("
         INSERT INTO interview_log
@@ -66,6 +64,12 @@ try {
     ]);
 
     $insertId = $pdo->lastInsertId();
+
+    // If rescheduling, mark the old entry as Rescheduled
+    if ($reschedule_id > 0) {
+        $updResched = $pdo->prepare("UPDATE interview_log SET status = 'Rescheduled' WHERE id = :id AND candidate_id = :cid");
+        $updResched->execute([':id' => $reschedule_id, ':cid' => $candidate_id]);
+    }
 
     // Update candidate status to Interview (status_id = 3)
     $upd = $pdo->prepare("UPDATE candidates SET status_id = 3 WHERE id = :id");

@@ -157,7 +157,7 @@ function renderTable() {
         } else {
             if (c.decision === "Fail" || c.decision === "Hold") {
                 actionsHtml =
-                    "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Reschedule Interview\',true)\" style=\"margin-right:4px\">Reschedule</button>" +
+                    "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Reschedule Interview\',true," + (c.interview_id || 0) + ")\" style=\"margin-right:4px\">Reschedule</button>" +
                     "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
             } else {
                 actionsHtml = "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
@@ -194,7 +194,6 @@ function renderTable() {
 window.editInterview = function(interviewId) {
     document.getElementById("scheduleForm").reset();
     document.getElementById("siRescheduleId").value = interviewId;
-    document.getElementById("siRoundWrapper").style.display = "none";
     document.getElementById("scheduleModalTitle").textContent = "Edit Interview";
     document.getElementById("siSubmitBtn").innerHTML = "&#x270F; Update";
     loadCandidateSelect();
@@ -220,16 +219,16 @@ window.openScheduleModal = function() {
     document.getElementById("siRescheduleId").value = "";
     document.getElementById("siCandidateId").disabled = false;
     document.getElementById("siIsFinalRound").checked = false;
-    document.getElementById("siRoundWrapper").style.display = "block";
     document.getElementById("scheduleModalTitle").textContent = "Schedule Interview";
     document.getElementById("siSubmitBtn").textContent = "\u2728 Schedule Interview";
     loadCandidateSelect();
     openModal("scheduleModal");
 };
 
-window.openScheduleForCandidate = function(candidateId, title, disableSelect) {
+window.openScheduleForCandidate = function(candidateId, title, disableSelect, interviewId) {
     document.getElementById("scheduleForm").reset();
     document.getElementById("siRescheduleId").value = "";
+    document.getElementById("siOldInterviewId").value = interviewId || "";
     loadCandidateSelect();
 
     // Ensure candidate exists in select (may not be in eligibleCandidates for Fail/Hold)
@@ -255,7 +254,6 @@ window.openScheduleForCandidate = function(candidateId, title, disableSelect) {
     document.getElementById("siCandidateId").value = candidateId;
     document.getElementById("siCandidateId").disabled = disableSelect !== false;
     document.getElementById("siIsFinalRound").checked = false;
-    document.getElementById("siRoundWrapper").style.display = (title && title.indexOf("Reschedule") !== -1) ? "none" : "block";
     document.getElementById("scheduleModalTitle").textContent = title || "Schedule Interview";
     document.getElementById("siSubmitBtn").textContent = "\u2728 " + (title || "Schedule Interview");
     onCandidateSelect();
@@ -268,7 +266,6 @@ function onCandidateSelect() {
     for (var i = 0; i < eligibleCandidates.length; i++) {
         var c = eligibleCandidates[i];
         if (c.id === cid) {
-            document.getElementById("siRound").value = c.next_round || 1;
             document.getElementById("siRoundName").value = "";
             break;
         }
@@ -288,21 +285,16 @@ function loadCandidateSelect() {
 
 window.ajaxScheduleInterview = function() {
     var rescheduleId = document.getElementById("siRescheduleId").value;
+    var oldInterviewId = document.getElementById("siOldInterviewId").value;
     var candidateId = parseInt(document.getElementById("siCandidateId").value);
     var date = document.getElementById("siDate").value;
     var type = document.getElementById("siType").value;
     var interviewer = document.getElementById("siInterviewer").value.trim();
-    var round = rescheduleId ? 0 : parseInt(document.getElementById("siRound").value);
     var roundName = document.getElementById("siRoundName").value.trim();
     var isFinal = document.getElementById("siIsFinalRound").checked ? 1 : 0;
 
     if (!candidateId || !date || !type || !interviewer) {
         showAlert("Please fill in all required fields", "error");
-        return;
-    }
-    var roundWrapper = document.getElementById("siRoundWrapper");
-    if (!rescheduleId && !round && roundWrapper.style.display !== "none") {
-        showAlert("Round is required", "error");
         return;
     }
 
@@ -332,8 +324,9 @@ window.ajaxScheduleInterview = function() {
     } else {
         apiPost("ajax/submit.php", {
             candidate_id: candidateId, date: date, type: type,
-            interviewer: interviewer, round: round, round_name: roundName,
-            is_final_round: isFinal
+            interviewer: interviewer, round_name: roundName,
+            is_final_round: isFinal,
+            reschedule_id: parseInt(oldInterviewId) || 0
         }, function(res) {
             btn.disabled = false;
             btn.innerHTML = origText;
@@ -411,64 +404,104 @@ window.openCombinedView = function(candidateId) {
             return;
         }
         var data = res.data;
-        if (data.length === 0) {
-            document.getElementById("combinedHistoryBody").innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--gray-400)\">No interview records yet.</div>";
-            return;
-        }
+        var screening = res.screening;
         var h = "<div class=\"iv-logs\">";
-        for (var i = 0; i < data.length; i++) {
-            var iv2 = data[i];
-            var isCompleted = iv2.status === "Completed";
-            var isRescheduled = iv2.status === "Rescheduled";
-            var isPending = !isCompleted && !isRescheduled;
 
-            var statusBadge = "";
-            if (isPending) statusBadge = "<span class=\"badge badge-pending\">Waiting for Feedback</span>";
-            else if (isRescheduled) statusBadge = "<span class=\"badge\" style=\"background:var(--gray-200);color:var(--gray-600)\">Rescheduled</span>";
-            else statusBadge = "<span class=\"badge badge-completed\">Completed</span>";
-
-            var headerColor = isCompleted ? "#059669" : (isRescheduled ? "#9ca3af" : "#d97706");
+        // Screening card (if exists)
+        if (screening) {
+            var scrResult = screening.result || "";
+            var scrResultBadge = "";
+            if (scrResult === "Shortlist") scrResultBadge = "<span class=\"badge badge-completed\">Shortlisted</span>";
+            else if (scrResult === "Hold") scrResultBadge = "<span class=\"badge badge-pending\">Hold</span>";
+            else if (scrResult === "Reject") scrResultBadge = "<span class=\"badge\" style=\"background:#fce8e6;color:#d93025\">Rejected</span>";
 
             h +=
                 "<div class=\"iv-card\">" +
-                    "<div class=\"iv-card-header\" style=\"border-left:4px solid " + headerColor + "\">" +
+                    "<div class=\"iv-card-header\" style=\"border-left:4px solid #3b82f6\">" +
                         "<div class=\"iv-card-header-left\">" +
-                            "<span class=\"iv-round\">Round " + (iv2.round || (i + 1)) + "</span>" +
-                            "<span class=\"iv-round-name\">" + (iv2.round_name || iv2.type || "Interview") + "</span>" +
-                            (iv2.is_final_round ? "<span class=\"final-badge\">FINAL</span>" : "") +
+                            "<span class=\"iv-round\">Screening</span>" +
+                            "<span class=\"iv-round-name\">Feedback</span>" +
                         "</div>" +
                         "<div class=\"iv-card-header-right\">" +
-                            statusBadge +
-                            "<span class=\"iv-date\">" + formatDateTime(iv2.date) + "</span>" +
+                            scrResultBadge +
+                            "<span class=\"iv-date\">" + (screening.date || "") + "</span>" +
                         "</div>" +
                     "</div>" +
                     "<div class=\"iv-card-body\">" +
                         "<div class=\"iv-meta\">" +
-                            "<span><strong>Type:</strong> " + iv2.type + "</span>" +
-                            "<span><strong>Interviewer:</strong> " + iv2.interviewer + "</span>" +
-                        "</div>";
-            if (isCompleted) {
-                h +=
-                        "<div class=\"iv-scores\">" +
-                            "<div class=\"iv-score-item\"><label>Technical</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_technical || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_technical || "-") + "/5</span></div>" +
-                            "<div class=\"iv-score-item\"><label>Communication</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_communication || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_communication || "-") + "/5</span></div>" +
-                            "<div class=\"iv-score-item\"><label>Problem Solving</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_problem_solving || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_problem_solving || "-") + "/5</span></div>" +
-                            "<div class=\"iv-score-item\"><label>Attitude</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_attitude || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_attitude || "-") + "/5</span></div>" +
+                            "<span><strong>Screened by:</strong> " + (screening.screened_by || "-") + "</span>" +
                         "</div>" +
-                        "<div class=\"iv-footer\">" +
-                            "<div class=\"iv-overall\"><span class=\"iv-overall-value\">" + (iv2.rating != null ? iv2.rating : "-") + "</span><span class=\"iv-overall-label\">Overall</span></div>" +
-                            "<div class=\"iv-decision\"><span class=\"badge " + getBadgeClass(iv2.decision) + "\">" + (iv2.decision || "-") + "</span></div>" +
-                        "</div>";
-                if (iv2.reject_reason) h += "<div class=\"iv-reject-reason\"><strong>Reason:</strong> " + iv2.reject_reason + "</div>";
-                if (iv2.feedback) h += "<div class=\"iv-feedback\">" + iv2.feedback + "</div>";
-            } else if (isRescheduled) {
-                h += "<div class=\"iv-empty-state\">This round was rescheduled</div>";
-            } else {
-                h += "<div class=\"iv-empty-state\">Waiting for Feedback</div>";
-            }
-            h +=
+                        "<div class=\"iv-scores\">" +
+                            "<div class=\"iv-score-item\"><label>Rating</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill iv-score-fill-blue\" style=\"width:" + ((screening.rating || 0) / 5 * 100) + "%\"></div></div><span>" + (screening.rating != null ? screening.rating : "-") + "/5</span></div>" +
+                            "<div class=\"iv-score-item\"><label>Communication</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill iv-score-fill-blue\" style=\"width:" + ((screening.communication_score || 0) / 5 * 100) + "%\"></div></div><span>" + (screening.communication_score != null ? screening.communication_score : "-") + "/5</span></div>" +
+                        "</div>" +
+                        "<div class=\"iv-scores\" style=\"margin-top:4px\">" +
+                            "<div class=\"iv-score-item\"><label>Experience</label><span style=\"font-size:12px;font-weight:600;color:var(--gray-700)\">" + (screening.experience_match || "-") + "</span></div>" +
+                            "<div class=\"iv-score-item\"><label>Skill Match</label><span style=\"font-size:12px;font-weight:600;color:var(--gray-700)\">" + (screening.skill_match || "-") + "</span></div>" +
+                            "<div class=\"iv-score-item\"><label>Education</label><span style=\"font-size:12px;font-weight:600;color:var(--gray-700)\">" + (screening.education_match || "-") + "</span></div>" +
+                        "</div>" +
+                        (screening.remarks ? "<div class=\"iv-feedback\" style=\"margin-top:8px\">" + screening.remarks + "</div>" : "") +
                     "</div>" +
                 "</div>";
+        }
+
+        // Interview logs
+        if (data.length === 0) {
+            h += "<div style=\"text-align:center;padding:24px;color:var(--gray-400)\">No interview records yet.</div>";
+        } else {
+            for (var i = 0; i < data.length; i++) {
+                var iv2 = data[i];
+                var isCompleted = iv2.status === "Completed";
+                var isRescheduled = iv2.status === "Rescheduled";
+                var isPending = !isCompleted && !isRescheduled;
+
+                var statusBadge = "";
+                if (isPending) statusBadge = "<span class=\"badge badge-pending\">Waiting for Feedback</span>";
+                else if (isRescheduled) statusBadge = "<span class=\"badge\" style=\"background:var(--gray-200);color:var(--gray-600)\">Rescheduled</span>";
+                else statusBadge = "<span class=\"badge badge-completed\">Completed</span>";
+
+                var headerColor = isCompleted ? "#059669" : (isRescheduled ? "#9ca3af" : "#d97706");
+
+                h +=
+                    "<div class=\"iv-card\">" +
+                        "<div class=\"iv-card-header\" style=\"border-left:4px solid " + headerColor + "\">" +
+                            "<div class=\"iv-card-header-left\">" +
+                                "<span class=\"iv-round-name\">" + (iv2.round_name || iv2.type || "Interview") + "</span>" +
+                                (iv2.is_final_round ? "<span class=\"final-badge\">FINAL</span>" : "") +
+                            "</div>" +
+                            "<div class=\"iv-card-header-right\">" +
+                                statusBadge +
+                                "<span class=\"iv-date\">" + formatDateTime(iv2.date) + "</span>" +
+                            "</div>" +
+                        "</div>" +
+                        "<div class=\"iv-card-body\">" +
+                            "<div class=\"iv-meta\">" +
+                                "<span><strong>Type:</strong> " + iv2.type + "</span>" +
+                                "<span><strong>Interviewer:</strong> " + iv2.interviewer + "</span>" +
+                            "</div>";
+                if (isCompleted) {
+                    h +=
+                            "<div class=\"iv-scores\">" +
+                                "<div class=\"iv-score-item\"><label>Technical</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_technical || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_technical || "-") + "/5</span></div>" +
+                                "<div class=\"iv-score-item\"><label>Communication</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_communication || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_communication || "-") + "/5</span></div>" +
+                                "<div class=\"iv-score-item\"><label>Problem Solving</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_problem_solving || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_problem_solving || "-") + "/5</span></div>" +
+                                "<div class=\"iv-score-item\"><label>Attitude</label><div class=\"iv-score-bar\"><div class=\"iv-score-fill\" style=\"width:" + ((iv2.score_attitude || 0) / 5 * 100) + "%\"></div></div><span>" + (iv2.score_attitude || "-") + "/5</span></div>" +
+                            "</div>" +
+                            "<div class=\"iv-footer\">" +
+                                "<div class=\"iv-overall\"><span class=\"iv-overall-value\">" + (iv2.rating != null ? iv2.rating : "-") + "</span><span class=\"iv-overall-label\">Overall</span></div>" +
+                                "<div class=\"iv-decision\"><span class=\"badge " + getBadgeClass(iv2.decision) + "\">" + (iv2.decision || "-") + "</span></div>" +
+                            "</div>";
+                    if (iv2.reject_reason) h += "<div class=\"iv-reject-reason\"><strong>Reason:</strong> " + iv2.reject_reason + "</div>";
+                    if (iv2.feedback) h += "<div class=\"iv-feedback\">" + iv2.feedback + "</div>";
+                } else if (isRescheduled) {
+                    h += "<div class=\"iv-empty-state\">This round was rescheduled</div>";
+                } else {
+                    h += "<div class=\"iv-empty-state\">Waiting for Feedback</div>";
+                }
+                h +=
+                        "</div>" +
+                    "</div>";
+            }
         }
         h += "</div>";
         document.getElementById("combinedHistoryBody").innerHTML = h;
@@ -617,6 +650,7 @@ ob_start();
         <div class="modal-body">
             <form id="scheduleForm" onsubmit="event.preventDefault();window.ajaxScheduleInterview()">
                 <input type="hidden" id="siRescheduleId" value="">
+                <input type="hidden" id="siOldInterviewId" value="">
                 <div class="form-group">
                     <label>Candidate <span class="required">*</span></label>
                     <select class="form-control" id="siCandidateId" required onchange="onCandidateSelect()"></select>
@@ -643,11 +677,7 @@ ob_start();
                         <label>Interviewer Name <span class="required">*</span></label>
                         <input type="text" class="form-control" id="siInterviewer" required>
                     </div>
-                    <div class="form-group" id="siRoundWrapper">
-                        <label>Round <span class="required">*</span></label>
-                        <input type="number" class="form-control" id="siRound" min="1" readonly style="background:#f0f0f0;cursor:not-allowed" required>
-                        <small style="color:var(--gray-400);font-size:11px">Auto-calculated from existing interviews</small>
-                    </div>
+
                 </div>
                 <div class="form-group">
                     <label>Round Name</label>
@@ -779,6 +809,7 @@ ob_start();
 .iv-score-item span { font-size:12px; font-weight:600; color:var(--gray-700); width:30px; text-align:right; flex-shrink:0; }
 .iv-score-bar { flex:1; height:6px; background:var(--gray-100); border-radius:3px; overflow:hidden; }
 .iv-score-fill { height:100%; background:linear-gradient(90deg,#3b82f6,#6366f1); border-radius:3px; transition:width 0.3s; }
+.iv-score-fill-blue { background:linear-gradient(90deg,#60a5fa,#3b82f6); }
 .iv-footer { display:flex; align-items:center; gap:16px; margin-bottom:8px; }
 .iv-overall { display:flex; align-items:baseline; gap:4px; background:var(--gray-50); padding:6px 14px; border-radius:8px; }
 .iv-overall-value { font-size:18px; font-weight:700; color:var(--gray-800); }

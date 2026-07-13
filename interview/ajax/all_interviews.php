@@ -50,7 +50,36 @@ try {
         ];
     }
 
-    echo json_encode(['success' => true, 'data' => $interviews]);
+    // Fetch latest screening for this candidate
+    $screening = null;
+    if ($candidateId > 0) {
+        $sStmt = $pdo->prepare("
+            SELECT s.*, c.first_name, c.last_name, r.title AS job_title
+            FROM screenings s
+            LEFT JOIN candidates c ON c.id = s.candidate_id
+            LEFT JOIN requisitions r ON r.id = c.job_id
+            WHERE s.candidate_id = :cid
+            ORDER BY s.id DESC LIMIT 1
+        ");
+        $sStmt->execute([':cid' => $candidateId]);
+        $sRow = $sStmt->fetch();
+        if ($sRow) {
+            $screening = [
+                'id'                  => (int) $sRow['id'],
+                'rating'              => $sRow['rating'] ? (float) $sRow['rating'] : null,
+                'communication_score' => $sRow['communication_score'] ? (float) $sRow['communication_score'] : null,
+                'experience_match'    => $sRow['experience_match'] ?? '',
+                'skill_match'         => $sRow['skill_match'] ?? '',
+                'education_match'     => $sRow['education_match'] ?? '',
+                'result'              => $sRow['result'] ?? '',
+                'remarks'             => $sRow['remarks'] ?? '',
+                'screened_by'         => $sRow['screened_by'] ?? '',
+                'date'                => $sRow['date'] ?? '',
+            ];
+        }
+    }
+
+    echo json_encode(['success' => true, 'data' => $interviews, 'screening' => $screening]);
 
 } catch (Exception $e) {
     http_response_code(500);

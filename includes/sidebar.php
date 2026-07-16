@@ -13,13 +13,9 @@ $sidebarItems = [
         ['id' => 'interview',      'text' => 'Interview',        'href' => 'interview/list.php',            'badge' => 2],
         ['id' => 'offer_management', 'text' => 'Offer Management', 'href' => 'offer_management/list.php', 'badge' => 1],
     ],
-    'Onboarding' => [
-        ['id' => 'pre_onboarding', 'text' => 'Pre-Onboarding',   'href' => 'pre_onboarding/list.html',      'badge' => 1],
-        ['id' => 'joining',        'text' => 'Joining',          'href' => 'joining/list.html',             'badge' => 0],
-    ],
     'Probation' => [
-        ['id' => 'probation',         'text' => 'Probation Appraisal', 'href' => 'probation/list.html',     'badge' => 1],
-        ['id' => 'probation_approve', 'text' => 'Pending Approval',    'href' => 'probation/approve.html',  'badge' => 1],
+        ['id' => 'probation',         'text' => 'Probation Appraisal', 'href' => 'probation/list.php',     'badge' => 1],
+        ['id' => 'probation_approve', 'text' => 'Pending Approval',    'href' => 'probation/approve.php',  'badge' => 1],
     ],
     'Confirmation' => [
         ['id' => 'confirmation',          'text' => 'Confirmation',    'href' => 'confirmation/list.html'],
@@ -27,6 +23,10 @@ $sidebarItems = [
     ],
     'Employee' => [
         ['id' => 'employee_master', 'text' => 'Employee Master', 'href' => 'employee_master/list.html'],
+    ],
+    'WaterAid' => [
+        ['id' => 'exp_cert',    'text' => 'Experience Certificate', 'href' => 'wateraid/exp_cert_request.php'],
+        ['id' => 'salary_cert', 'text' => 'Salary Certificate',    'href' => 'wateraid/salary_cert_request.php'],
     ],
     'Settings' => [
         ['id' => 'templates', 'text' => 'Letter Templates', 'href' => 'templates/list.php'],

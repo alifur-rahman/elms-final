@@ -5,6 +5,16 @@ $activePage  = 'offer_management';
 $breadcrumb  = 'Home / Recruitment / Offer Management';
 $pageStyles  = '
 .tab-bar { display: flex; gap: 0; border-bottom: 2px solid var(--gray-200); margin-bottom: 24px; }
+#letterEditorContainer .ql-container { min-height:320px; font-size:14px; font-family:inherit; }
+#letterEditorContainer .ql-editor { min-height:320px; line-height:1.8; padding:16px 20px; }
+#letterEditorContainer .ql-editor p { margin:0 0 8px; }
+.merge-tags-bar { display:flex; flex-wrap:wrap; gap:4px; padding:8px 12px; background:#f8f9fa; border:1px solid var(--gray-200); border-bottom:none; border-radius:6px 6px 0 0; }
+.merge-tags-bar .mt-label { font-size:11px; color:var(--gray-500); margin-right:8px; font-weight:600; text-transform:uppercase; letter-spacing:.3px; align-self:center; }
+.merge-tag-btn { font-size:11px; padding:3px 10px; border:1px solid var(--gray-200); border-radius:4px; background:#fff; cursor:pointer; color:var(--primary); font-family:monospace; transition:all .15s; }
+.merge-tag-btn:hover { border-color:var(--primary); background:#e8f0fe; }
+#letterEditorContainer .ql-editor .merge-tag { display:inline-block; background:#e8f0fe; color:var(--primary); border-radius:3px; padding:0 4px; font-family:monospace; font-size:13px; font-weight:600; }
+#letterEditorContainer .ql-toolbar { border-color:var(--gray-200); border-radius:6px 6px 0 0; background:#f9fafb; }
+#letterEditorContainer .ql-container { border-color:var(--gray-200); }
 .tab-btn { padding: 10px 24px; font-size: 13px; font-weight: 500; background: none; border: none; cursor: pointer; color: var(--gray-500); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: var(--transition); font-family: inherit; }
 .tab-btn:hover { color: var(--gray-700); }
 .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
@@ -28,6 +38,31 @@ $pageStyles  = '
 ';
 $pageScripts = <<<'EOSCRIPT'
 var selectedCandidates = [], pendingOffers = [], approvedOffers = [];
+var letterQuill = null;
+
+function initLetterEditor() {
+    if (letterQuill) return;
+    letterQuill = new Quill("#letterEditor", {
+        theme: "snow",
+        placeholder: "Select a template above or compose the letter here...",
+        modules: { toolbar: [
+            [{ header: [1, 2, 3, false] }],
+            ["bold", "italic", "underline", "strike"],
+            [{ color: [] }, { background: [] }],
+            [{ list: "ordered" }, { list: "bullet" }],
+            [{ align: [] }],
+            ["blockquote", "code-block"],
+            ["clean"]
+        ]}
+    });
+}
+
+function letterInsertMergeTag(tag) {
+    initLetterEditor();
+    var range = letterQuill.getSelection(true);
+    letterQuill.clipboard.dangerouslyPasteHTML(range.index, "<span class=\"merge-tag\">{{" + tag + "}}</span>");
+    letterQuill.setSelection(range.index + 1);
+}
 
 function switchTab(tabId, btn) {
     document.querySelectorAll(".tab-content").forEach(function(t) { t.classList.remove("active"); });
@@ -374,31 +409,54 @@ function applyTemplate(offerData) {
     if (!offerData) return;
     var sel = document.getElementById("letterTemplateSelect");
     var templateId = parseInt(sel.value);
-    if (!templateId) { document.getElementById("letterContent").value = ""; return; }
+    if (!templateId) { initLetterEditor(); letterQuill.root.innerHTML = ""; return; }
     var tpl = null;
     for (var i = 0; i < letterTemplates.length; i++) {
         if (letterTemplates[i].id === templateId) { tpl = letterTemplates[i]; break; }
     }
     if (!tpl) return;
-    var content = tpl.content;
-    var now = new Date();
-    var dateStr = now.toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"});
-    var respDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-    var respDateStr = respDate.toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"});
-    var salary = formatCurrency(offerData.salary, "৳");
-    var joinDate = offerData.joining_date ? new Date(offerData.joining_date).toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"}) : "";
-    content = content.replace(/\{\{CANDIDATE_NAME\}\}/g, offerData.candidate_name || "");
-    content = content.replace(/\{\{DESIGNATION\}\}/g, offerData.designation_name || offerData.job_title || "");
-    content = content.replace(/\{\{JOB_TITLE\}\}/g, offerData.job_title || "");
-    content = content.replace(/\{\{DEPARTMENT\}\}/g, offerData.dept_name || "");
-    content = content.replace(/\{\{SALARY\}\}/g, salary);
-    content = content.replace(/\{\{JOINING_DATE\}\}/g, joinDate);
-    content = content.replace(/\{\{PROBATION_MONTHS\}\}/g, offerData.probation_months || 6);
-    content = content.replace(/\{\{COMPANY_NAME\}\}/g, "TechCorp International");
-    content = content.replace(/\{\{HR_NAME\}\}/g, "Admin User");
-    content = content.replace(/\{\{DATE\}\}/g, dateStr);
-    content = content.replace(/\{\{RESPONSE_DATE\}\}/g, respDateStr);
-    document.getElementById("letterContent").value = content;
+    apiPost("../templates/ajax/render.php", {
+        module: "Offer",
+        record_id: offerData.id,
+        content: tpl.content
+    }, function(res) {
+        if (res.success && res.data) {
+            initLetterEditor();
+            letterQuill.root.innerHTML = res.data.rendered_content;
+        } else {
+            initLetterEditor();
+            letterQuill.root.innerHTML = tpl.content;
+        }
+    }, function() {
+        initLetterEditor();
+        letterQuill.root.innerHTML = tpl.content;
+    });
+}
+
+var offerMergeTags = [];
+
+function loadOfferMergeTags(callback) {
+    apiGet("../templates/ajax/merge_tags_list.php?type=Offer", null, function(res) {
+        offerMergeTags = res.success && res.data ? res.data : [];
+        if (callback) callback(offerMergeTags);
+    });
+}
+
+function renderLetterMergeTagButtons() {
+    var bar = document.getElementById("letterMergeTagsBar");
+    var list = document.getElementById("letterMergeTagsList");
+    if (!list) return;
+    list.innerHTML = "";
+    for (var i = 0; i < offerMergeTags.length; i++) {
+        var t = offerMergeTags[i];
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "merge-tag-btn";
+        btn.title = t.description || t.label;
+        btn.textContent = "{{" + t.tag + "}}";
+        btn.setAttribute("onclick", "letterInsertMergeTag('" + t.tag + "')");
+        list.appendChild(btn);
+    }
 }
 
 function getSelectedOffer() {
@@ -414,6 +472,7 @@ function openGenerateLetter(offerId) {
     for (var i = 0; i < allOffers.length; i++) { if (allOffers[i].id === offerId) { o = allOffers[i]; break; } }
     if (!o) return;
     document.getElementById("letterOfferId").value = offerId;
+    loadOfferMergeTags(function() { renderLetterMergeTagButtons(); });
     document.getElementById("letterCandidateName").value = o.candidate_name || "";
     document.getElementById("letterSalary").value = o.salary || "";
     document.getElementById("letterJoiningDate").value = o.joining_date ? new Date(o.joining_date).toISOString().slice(0,10) : "";
@@ -425,8 +484,9 @@ function openGenerateLetter(offerId) {
 
 function submitGenerateLetter() {
     var offerId = document.getElementById("letterOfferId").value;
-    var content = document.getElementById("letterContent").value;
-    if (!content) { showAlert("Please review the letter content", "error"); return; }
+    initLetterEditor();
+    var content = letterQuill.root.innerHTML;
+    if (!content || content === "<p><br></p>" || content === "<br>") { showAlert("Please review the letter content", "error"); return; }
     apiPost("ajax/letter_generate.php", {
         offer_id: offerId, letter_content: content
     }, function(res) {
@@ -459,7 +519,8 @@ function sendOfferEmail(offerId) {
     document.getElementById("emailSubject").value = "Offer of Employment - " + (o.candidate_name || "");
     apiGet("ajax/letter_view.php?offer_id=" + offerId, null, function(res) {
         if (res.success && res.data && res.data.letter_content) {
-            document.getElementById("emailBody").value = res.data.letter_content;
+            initLetterEditor();
+            document.getElementById("emailBody").value = letterQuill.root.innerHTML || res.data.letter_content;
         } else {
             document.getElementById("emailBody").value = "Dear " + (o.candidate_name || "Candidate") + ",\n\nWe are pleased to offer you the position of " + (o.job_title || "") + ".\n\nPlease find attached the formal offer letter.";
         }
@@ -473,14 +534,33 @@ function submitSendEmail() {
     var subject = document.getElementById("emailSubject").value;
     var body = document.getElementById("emailBody").value;
     if (!recipient || !subject) { showAlert("Please fill recipient and subject", "error"); return; }
-    apiPost("ajax/letter_send.php", {
-        offer_id: offerId, recipient: recipient, subject: subject, body: body
+    // Render any merge tags in the email body before sending
+    apiPost("../templates/ajax/render.php", {
+        module: "Offer",
+        record_id: offerId,
+        content: body
     }, function(res) {
-        showAlert(res.message || "Email sent!", "success");
-        closeModal("sendEmailModal");
-        renderLetters();
-    }, function(err) {
-        showAlert((typeof err === "object" && err.message) ? err.message : "Failed to send email", "error");
+        var renderedBody = res.success && res.data ? res.data.rendered_content : body;
+        apiPost("ajax/letter_send.php", {
+            offer_id: offerId, recipient: recipient, subject: subject, body: renderedBody
+        }, function(res2) {
+            showAlert(res2.message || "Email sent!", "success");
+            closeModal("sendEmailModal");
+            renderLetters();
+        }, function(err) {
+            showAlert((typeof err === "object" && err.message) ? err.message : "Failed to send email", "error");
+        });
+    }, function() {
+        // Fallback: send raw body if render fails
+        apiPost("ajax/letter_send.php", {
+            offer_id: offerId, recipient: recipient, subject: subject, body: body
+        }, function(res2) {
+            showAlert(res2.message || "Email sent!", "success");
+            closeModal("sendEmailModal");
+            renderLetters();
+        }, function(err) {
+            showAlert((typeof err === "object" && err.message) ? err.message : "Failed to send email", "error");
+        });
     });
 }
 
@@ -945,11 +1025,13 @@ ob_start();
                 </div>
                 <div class="form-group">
                     <label>Letter Content <span class="required">*</span></label>
-                    <textarea class="form-control" id="letterContent" rows="14" style="font-family:monospace;font-size:13px" placeholder="Select a template above or type your letter content here..."></textarea>
-                </div>
-                <div style="font-size:12px;color:#888;margin-bottom:8px;padding:8px 12px;background:#f8f9fa;border-radius:6px">
-                    <strong>Merge Tags:</strong>
-                    {{CANDIDATE_NAME}}, {{DESIGNATION}}, {{DEPARTMENT}}, {{SALARY}}, {{JOINING_DATE}}, {{PROBATION_MONTHS}}, {{COMPANY_NAME}}, {{HR_NAME}}, {{DATE}}, {{RESPONSE_DATE}}
+                    <div class="merge-tags-bar" id="letterMergeTagsBar">
+                        <span class="mt-label">Merge Tags:</span>
+                        <span id="letterMergeTagsList"></span>
+                    </div>
+                    <div id="letterEditorContainer" style="border:1px solid var(--gray-200);border-radius:6px;overflow:hidden">
+                        <div id="letterEditor"></div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -1053,6 +1135,7 @@ ob_start();
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 <?php
 $content = ob_get_clean();
 require_once __DIR__ . '/../includes/layout.php';

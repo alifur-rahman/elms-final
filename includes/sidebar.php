@@ -28,8 +28,11 @@ $sidebarItems = [
         ['id' => 'exp_cert',    'text' => 'Experience Certificate', 'href' => 'wateraid/exp_cert_request.php'],
         ['id' => 'salary_cert', 'text' => 'Salary Certificate',    'href' => 'wateraid/salary_cert_request.php'],
     ],
+    'Template Management' => [
+        ['id' => 'templates',      'text' => 'Templates',       'href' => 'templates/list.php'],
+        ['id' => 'template_tags',  'text' => 'Registered Tags', 'href' => 'templates/tags.php'],
+    ],
     'Settings' => [
-        ['id' => 'templates', 'text' => 'Letter Templates', 'href' => 'templates/list.php'],
         ['id' => 'reports',   'text' => 'Reports',          'href' => 'reports/probation_summary.html'],
     ],
 ];

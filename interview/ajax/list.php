@@ -30,12 +30,12 @@ try {
         LEFT JOIN departments d ON d.id = r.dept_id
         LEFT JOIN interview_log i ON i.id = (
             SELECT i2.id FROM interview_log i2
-            WHERE i2.candidate_id = c.id AND i2.status != 'Rescheduled'
+            WHERE i2.candidate_id = c.id
             ORDER BY i2.id DESC LIMIT 1
         )
         WHERE (c.status_id IN (2, 3)
            OR (c.status_id IN (4, 7, 8)
-               AND EXISTS (SELECT 1 FROM interview_log il WHERE il.candidate_id = c.id AND il.status != 'Rescheduled')))
+               AND EXISTS (SELECT 1 FROM interview_log il WHERE il.candidate_id = c.id)))
         ORDER BY
             CASE c.status_id WHEN 2 THEN 0 WHEN 3 THEN 1 ELSE 2 END,
             c.first_name ASC

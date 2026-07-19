@@ -116,10 +116,6 @@ try {
             $targetStatusId = 7; // Rejected
             $targetStatusName = 'Rejected';
             $logAction = 'interview_fail';
-        } elseif ($decision === 'Hold') {
-            $targetStatusId = 8; // Hold
-            $targetStatusName = 'Hold';
-            $logAction = 'interview_hold';
         }
 
         if ($targetStatusId !== null) {

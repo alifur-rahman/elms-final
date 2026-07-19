@@ -22,7 +22,7 @@ try {
         $cid = (int) $r['id'];
 
         // Count existing interviews & get max round
-        $cntStmt = $pdo->prepare("SELECT COUNT(*) AS cnt, COALESCE(MAX(`round`),0) AS mx FROM interview_log WHERE candidate_id = :id AND status != 'Rescheduled'");
+        $cntStmt = $pdo->prepare("SELECT COUNT(*) AS cnt, COALESCE(MAX(`round`),0) AS mx FROM interview_log WHERE candidate_id = :id");
         $cntStmt->execute([':id' => $cid]);
         $cntRow = $cntStmt->fetch();
         $interviewCount = (int) ($cntRow['cnt'] ?? 0);

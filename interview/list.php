@@ -146,11 +146,13 @@ function renderTable() {
 
         var actionsHtml = "";
         if (st === "schedule") {
-            actionsHtml = "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Schedule Interview\',false)\">Schedule</button>";
+            actionsHtml =
+                "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Schedule Interview\',false)\" style=\"margin-right:4px\">Schedule</button>" +
+                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
         } else if (st === "feedback") {
             actionsHtml =
                 "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openFeedback(" + c.interview_id + ")\" style=\"margin-right:4px\">Feedback</button>" +
-                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.editInterview(" + c.interview_id + ")\" style=\"margin-right:4px\">Edit</button>" +
+                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.editInterview(" + c.interview_id + ")\" style=\"margin-right:4px\">Edit Schedule</button>" +
                 "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
         } else if (st === "next_round") {
             actionsHtml =
@@ -230,7 +232,6 @@ window.openScheduleModal = function() {
 window.openScheduleForCandidate = function(candidateId, title, disableSelect, interviewId) {
     document.getElementById("scheduleForm").reset();
     document.getElementById("siRescheduleId").value = "";
-    document.getElementById("siOldInterviewId").value = interviewId || "";
     loadCandidateSelect();
 
     // Ensure candidate exists in select (may not be in eligibleCandidates for Fail/Hold)
@@ -287,7 +288,6 @@ function loadCandidateSelect() {
 
 window.ajaxScheduleInterview = function() {
     var rescheduleId = document.getElementById("siRescheduleId").value;
-    var oldInterviewId = document.getElementById("siOldInterviewId").value;
     var candidateId = parseInt(document.getElementById("siCandidateId").value);
     var date = document.getElementById("siDate").value;
     var type = document.getElementById("siType").value;
@@ -327,8 +327,7 @@ window.ajaxScheduleInterview = function() {
         apiPost("ajax/submit.php", {
             candidate_id: candidateId, date: date, type: type,
             interviewer: interviewer, round_name: roundName,
-            is_final_round: isFinal,
-            reschedule_id: parseInt(oldInterviewId) || 0
+            is_final_round: isFinal
         }, function(res) {
             btn.disabled = false;
             btn.innerHTML = origText;
@@ -454,15 +453,11 @@ window.openCombinedView = function(candidateId) {
             for (var i = 0; i < data.length; i++) {
                 var iv2 = data[i];
                 var isCompleted = iv2.status === "Completed";
-                var isRescheduled = iv2.status === "Rescheduled";
-                var isPending = !isCompleted && !isRescheduled;
+                var isPending = iv2.status === "Waiting for Feedback";
 
-                var statusBadge = "";
-                if (isPending) statusBadge = "<span class=\"badge badge-pending\">Waiting for Feedback</span>";
-                else if (isRescheduled) statusBadge = "<span class=\"badge\" style=\"background:var(--gray-200);color:var(--gray-600)\">Rescheduled</span>";
-                else statusBadge = "<span class=\"badge badge-completed\">Completed</span>";
+                var statusBadge = isCompleted ? "<span class=\"badge badge-completed\">Completed</span>" : "<span class=\"badge badge-pending\">Waiting for Feedback</span>";
 
-                var headerColor = isCompleted ? "#059669" : (isRescheduled ? "#9ca3af" : "#d97706");
+                var headerColor = isCompleted ? "#059669" : "#d97706";
 
                 h +=
                     "<div class=\"iv-card\">" +
@@ -495,8 +490,6 @@ window.openCombinedView = function(candidateId) {
                             "</div>";
                     if (iv2.reject_reason) h += "<div class=\"iv-reject-reason\"><strong>Reason:</strong> " + iv2.reject_reason + "</div>";
                     if (iv2.feedback) h += "<div class=\"iv-feedback\">" + iv2.feedback + "</div>";
-                } else if (isRescheduled) {
-                    h += "<div class=\"iv-empty-state\">This round was rescheduled</div>";
                 } else {
                     h += "<div class=\"iv-empty-state\">Waiting for Feedback</div>";
                 }
@@ -652,7 +645,6 @@ ob_start();
         <div class="modal-body">
             <form id="scheduleForm" onsubmit="event.preventDefault();window.ajaxScheduleInterview()">
                 <input type="hidden" id="siRescheduleId" value="">
-                <input type="hidden" id="siOldInterviewId" value="">
                 <div class="form-group">
                     <label>Candidate <span class="required">*</span></label>
                     <select class="form-control" id="siCandidateId" required onchange="onCandidateSelect()"></select>
@@ -742,7 +734,6 @@ ob_start();
                         <option value="">Select</option>
                         <option value="Pass">Pass</option>
                         <option value="Fail">Fail</option>
-                        <option value="Hold">Hold</option>
                     </select>
                 </div>
 

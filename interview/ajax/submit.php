@@ -19,7 +19,6 @@ try {
     $date          = trim($body['date'] ?? '');
     $type          = trim($body['type'] ?? '');
     $interviewer   = trim($body['interviewer'] ?? '');
-    $reschedule_id = (int) ($body['reschedule_id'] ?? 0);
     $round_name    = trim($body['round_name'] ?? '');
     $status        = trim($body['status'] ?? 'Waiting for Feedback');
     $is_final_round = !empty($body['is_final_round']) ? 1 : 0;
@@ -64,12 +63,6 @@ try {
     ]);
 
     $insertId = $pdo->lastInsertId();
-
-    // If rescheduling, mark the old entry as Rescheduled
-    if ($reschedule_id > 0) {
-        $updResched = $pdo->prepare("UPDATE interview_log SET status = 'Rescheduled' WHERE id = :id AND candidate_id = :cid");
-        $updResched->execute([':id' => $reschedule_id, ':cid' => $candidate_id]);
-    }
 
     // Update candidate status to Interview (status_id = 3)
     $upd = $pdo->prepare("UPDATE candidates SET status_id = 3 WHERE id = :id");

@@ -24,8 +24,8 @@ $sidebarItems = [
         ['id' => 'probation_approve', 'text' => 'Pending Approval',    'href' => 'probation/approve.php',  'badge' => 1],
     ],
     'Confirmation' => [
-        ['id' => 'confirmation',          'text' => 'Confirmation',    'href' => 'confirmation/list.html'],
-        ['id' => 'confirmation_generate', 'text' => 'Generate Letter', 'href' => 'confirmation/generate.html'],
+        ['id' => 'confirmation',          'text' => 'Confirmation',    'href' => 'confirmation/list.php',          'badge' => 1],
+        ['id' => 'confirmation_approve',  'text' => 'Pending Approval','href' => 'confirmation/approve.php',  'badge' => 1],
     ],
     'Employee' => [
         ['id' => 'employee_master', 'text' => 'Employee Master', 'href' => 'employee_master/list.html'],

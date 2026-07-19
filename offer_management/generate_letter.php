@@ -1,0 +1,232 @@
+<?php
+$basePath    = '..';
+$pageTitle   = 'Generate Offer Letter';
+$activePage  = 'offer_letter';
+$breadcrumb  = 'Home / Recruitment / Offer Management / Offer Letter / Generate';
+
+require_once __DIR__ . '/../includes/config.php';
+
+$pdo = getDB();
+$offerId = (int)($_GET['offer_id'] ?? 0);
+
+$offer = null;
+$existingContent = '';
+
+if ($offerId > 0) {
+    $stmt = $pdo->prepare("
+        SELECT o.*,
+               c.first_name, c.last_name, c.email,
+               r.title AS job_title,
+               d.name AS dept_name,
+               des.name AS designation_name
+        FROM offers o
+        LEFT JOIN candidates c ON c.id = o.candidate_id
+        LEFT JOIN requisitions r ON r.id = c.job_id
+        LEFT JOIN departments d ON d.id = o.dept_id
+        LEFT JOIN designations des ON des.id = o.designation_id
+        WHERE o.id = :id
+    ");
+    $stmt->execute([':id' => $offerId]);
+    $offer = $stmt->fetch();
+
+    if ($offer) {
+        $lStmt = $pdo->prepare("SELECT letter_content FROM offer_letters WHERE offer_id = :oid ORDER BY id DESC LIMIT 1");
+        $lStmt->execute([':oid' => $offerId]);
+        $existing = $lStmt->fetch();
+        if ($existing) $existingContent = $existing['letter_content'];
+    }
+}
+
+$candidateName = $offer ? trim(($offer['first_name'] ?? '') . ' ' . ($offer['last_name'] ?? '')) : '';
+$existingContentJson = json_encode($existingContent);
+$pageStyles  = '
+@import url("https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css");
+.form-section { margin-bottom:24px }
+.form-section-title { font-size:15px; font-weight:600; border-bottom:1px solid var(--gray-200); padding-bottom:8px; margin-bottom:16px; display:flex; align-items:center; gap:8px }
+#quillEditor { height:400px }
+.vc-item { margin-bottom:10px }
+.vc-item label { display:block; font-size:11px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:.4px; margin-bottom:2px }
+.vc-item span { font-size:14px; color:var(--gray-800); font-weight:500 }
+';
+
+$pageScripts = <<<EOSCRIPT
+var quill = null;
+var existingContent = $existingContentJson;
+
+function initQuillInstance() {
+    var editorEl = document.getElementById("quillEditor");
+    if (!editorEl) return;
+    quill = new Quill("#quillEditor", {
+        theme: "snow",
+        placeholder: "Compose offer letter...",
+        modules: {
+            toolbar: [
+                ["bold","italic","underline","strike"],
+                [{list:"ordered"},{list:"bullet"}],
+                ["clean"]
+            ]
+        }
+    });
+    if (existingContent) {
+        quill.clipboard.dangerouslyPasteHTML(0, existingContent);
+    }
+}
+
+function waitForQuill() {
+    if (typeof Quill === "undefined") {
+        setTimeout(waitForQuill, 100);
+        return;
+    }
+    initQuillInstance();
+}
+
+function loadTemplates() {
+    apiGet("../templates/ajax/templates_list.php?type=Offer", null, function(res) {
+        var sel = document.getElementById("templateSelect");
+        sel.innerHTML = "<option value=\"\">-- Select Template --</option>";
+        if (res.success && res.data) {
+            for (var i = 0; i < res.data.length; i++) {
+                var t = res.data[i];
+                var opt = document.createElement("option");
+                opt.value = t.id;
+                opt.textContent = t.name;
+                opt.dataset.content = t.content;
+                sel.appendChild(opt);
+            }
+        }
+    });
+}
+
+function applyTemplate() {
+    var sel = document.getElementById("templateSelect");
+    var option = sel.options[sel.selectedIndex];
+    if (!option || !option.value || !quill) return;
+    var content = option.dataset.content;
+    if (!content) return;
+    var offerId = $offerId;
+    if (!offerId) {
+        quill.setText("");
+        quill.clipboard.dangerouslyPasteHTML(0, content);
+        return;
+    }
+    apiPost("ajax/render_template.php", {
+        offer_id: offerId,
+        content: content
+    }, function(res) {
+        if (res.success && res.data && res.data.rendered_content) {
+            quill.setText("");
+            quill.clipboard.dangerouslyPasteHTML(0, res.data.rendered_content);
+            showAlert("Template loaded: " + option.textContent, "success");
+        } else {
+            quill.setText("");
+            quill.clipboard.dangerouslyPasteHTML(0, content);
+            showAlert("Template loaded (tags unresolved)", "info");
+        }
+    }, function() {
+        quill.setText("");
+        quill.clipboard.dangerouslyPasteHTML(0, content);
+        showAlert("Template loaded (tags unresolved)", "info");
+    });
+}
+
+function saveLetter() {
+    var offerId = $offerId;
+    var letterContent = quill ? quill.root.innerHTML : "";
+    if (!letterContent || letterContent === "<p><br></p>") { showAlert("Please write letter content", "error"); return; }
+    apiPost("ajax/letter_generate.php", {
+        offer_id: offerId,
+        letter_content: letterContent
+    }, function(res) {
+        showAlert(res.message || "Letter generated!", "success");
+        setTimeout(function() { window.location.href = "letter.php"; }, 600);
+    }, function(err) {
+        showAlert((typeof err === "object" && err.message) ? err.message : "Failed to generate letter", "error");
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    waitForQuill();
+    loadTemplates();
+});
+EOSCRIPT;
+
+ob_start();
+?>
+<div class="card">
+    <div class="card-header">
+        <h2>Generate Offer Letter</h2>
+        <a href="letter.php" class="btn btn-sm btn-outline">&larr; Back to List</a>
+    </div>
+    <div class="card-body">
+        <?php if (!$offer): ?>
+            <div class="empty-state">
+                <div class="empty-icon">&#128196;</div>
+                <p>Offer not found. <a href="letter.php">Go back to offer list</a>.</p>
+            </div>
+        <?php else: ?>
+        <form autocomplete="off">
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span class="section-icon">&#128100;</span> Offer Details
+                </div>
+                <div class="form-row-3">
+                    <div class="vc-item">
+                        <label>Candidate</label>
+                        <span><?= htmlspecialchars($candidateName) ?></span>
+                    </div>
+                    <div class="vc-item">
+                        <label>Position</label>
+                        <span><?= htmlspecialchars($offer['job_title'] ?? 'N/A') ?></span>
+                    </div>
+                    <div class="vc-item">
+                        <label>Offered Salary</label>
+                        <span><?= htmlspecialchars(number_format((float)($offer['salary'] ?? 0), 2)) ?> BDT</span>
+                    </div>
+                    <div class="vc-item">
+                        <label>Department</label>
+                        <span><?= htmlspecialchars($offer['dept_name'] ?? 'N/A') ?></span>
+                    </div>
+                    <div class="vc-item">
+                        <label>Designation</label>
+                        <span><?= htmlspecialchars($offer['designation_name'] ?? 'N/A') ?></span>
+                    </div>
+                    <div class="vc-item">
+                        <label>Joining Date</label>
+                        <span><?= $offer['joining_date'] ? htmlspecialchars((new DateTime($offer['joining_date']))->format('F j, Y')) : 'N/A' ?></span>
+                    </div>
+                    <div class="vc-item">
+                        <label>Email</label>
+                        <span><?= htmlspecialchars($offer['email'] ?? '-') ?></span>
+                    </div>
+                    <div class="vc-item">
+                        <label>Probation</label>
+                        <span><?= (int)($offer['probation_months'] ?? 0) ?> months</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span class="section-icon">&#128203;</span> Template
+                </div>
+                <div style="display:flex;gap:8px;margin-bottom:14px">
+                    <select class="form-control" id="templateSelect" onchange="applyTemplate()" style="flex:1"></select>
+                   
+                </div>
+               
+                <div id="quillEditor"></div>
+            </div>
+
+            <div class="btn-group" style="padding-top:20px;border-top:1px solid var(--gray-200)">
+                <a href="letter.php" class="btn btn-outline">Cancel</a>
+                <button type="button" class="btn btn-primary" onclick="saveLetter()">Generate Letter</button>
+            </div>
+        </form>
+        <?php endif; ?>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<?php
+$content = ob_get_clean();
+require_once __DIR__ . '/../includes/layout.php';

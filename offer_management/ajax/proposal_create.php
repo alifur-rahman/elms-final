@@ -24,17 +24,30 @@ try {
         exit;
     }
 
+    // Salary breakdown (optional JSON)
+    $breakdown = isset($body['salary_breakdown']) ? $body['salary_breakdown'] : null;
+    $breakdownJson = null;
+    if ($breakdown && is_array($breakdown)) {
+        // Ensure numeric fields
+        $numericFields = ['gross_salary','basic','house_rent','medical_allowance','conveyance_allowance','food_allowance','special_allowance','mobile_allowance','personal_pf','company_pf','pf_deductible','monthly_income_tax','cash_paid','bank_paid','total_salary','total_payable'];
+        foreach ($numericFields as $f) {
+            if (isset($breakdown[$f])) $breakdown[$f] = (float)$breakdown[$f];
+        }
+        $breakdownJson = json_encode($breakdown);
+    }
+
     // Get current latest version
     $vStmt = $pdo->prepare("SELECT COALESCE(MAX(version), 0) + 1 AS next_ver FROM salary_proposals WHERE candidate_id = :cid");
     $vStmt->execute([':cid' => $candidateId]);
     $nextVer = (int)$vStmt->fetchColumn();
 
-    $stmt = $pdo->prepare("INSERT INTO salary_proposals (candidate_id, proposed_salary, negotiation_notes, status, version, created_by) VALUES (:cid, :sal, :notes, 'Proposed', :ver, 'Admin User')");
+    $stmt = $pdo->prepare("INSERT INTO salary_proposals (candidate_id, proposed_salary, negotiation_notes, salary_breakdown, status, version, created_by) VALUES (:cid, :sal, :notes, :breakdown, 'Proposed', :ver, 'Admin User')");
     $stmt->execute([
-        ':cid'   => $candidateId,
-        ':sal'   => $proposedSalary,
-        ':notes' => $notes,
-        ':ver'   => $nextVer,
+        ':cid'       => $candidateId,
+        ':sal'       => $proposedSalary,
+        ':notes'     => $notes,
+        ':breakdown' => $breakdownJson,
+        ':ver'       => $nextVer,
     ]);
 
     $propId = $pdo->lastInsertId();

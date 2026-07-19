@@ -5,12 +5,20 @@ require_once __DIR__ . '/../../includes/config.php';
 try {
     $pdo = getDB();
 
+    // Check if salary_breakdown column exists (graceful for pre-migration DB)
+    $hasBreakdown = false;
+    $cols = $pdo->query("SHOW COLUMNS FROM salary_proposals LIKE 'salary_breakdown'")->fetchAll();
+    if (!empty($cols)) $hasBreakdown = true;
+
+    $breakdownSelect = $hasBreakdown ? 'sp.salary_breakdown' : 'NULL AS salary_breakdown';
+
     $stmt = $pdo->query("
         SELECT c.id, c.first_name, c.last_name, c.job_id, c.status_id,
                cs.name AS status_name, c.expected_salary, c.applied_at,
                r.title AS job_title, r.dept_id,
                sp.id AS proposal_id, sp.proposed_salary, sp.offered_salary,
-               sp.status AS proposal_status, sp.version, sp.negotiation_notes
+               sp.status AS proposal_status, sp.version, sp.negotiation_notes,
+               $breakdownSelect
         FROM candidates c
         LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
         LEFT JOIN requisitions r ON r.id = c.job_id
@@ -25,6 +33,11 @@ try {
     $rows = $stmt->fetchAll();
     $candidates = [];
     foreach ($rows as $r) {
+        $breakdown = null;
+        if ($r['salary_breakdown']) {
+            $bd = json_decode($r['salary_breakdown'], true);
+            if (is_array($bd)) $breakdown = $bd;
+        }
         $candidates[] = [
             'id'                => (int)$r['id'],
             'first_name'        => $r['first_name'],
@@ -39,6 +52,7 @@ try {
             'proposal_status'   => $r['proposal_status'] ?? 'None',
             'version'           => (int)$r['version'],
             'negotiation_notes' => $r['negotiation_notes'] ?? '',
+            'salary_breakdown'  => $breakdown,
         ];
     }
 

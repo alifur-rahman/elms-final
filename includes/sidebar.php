@@ -11,7 +11,13 @@ $sidebarItems = [
         ['id' => 'candidates',     'text' => 'Candidates',       'href' => 'candidates/list.php',           'badge' => 2],
         ['id' => 'screening',      'text' => 'Screening',        'href' => 'screening/list.php',            'badge' => 1],
         ['id' => 'interview',      'text' => 'Interview',        'href' => 'interview/list.php',            'badge' => 2],
-        ['id' => 'offer_management', 'text' => 'Offer Management', 'href' => 'offer_management/list.php', 'badge' => 1],
+    ],
+    'Offer Management' => [
+        ['id' => 'offer_overview',              'text' => 'Overview',             'href' => 'offer_management/index.php'],
+        ['id' => 'offer_proposal',              'text' => 'Salary Proposal',      'href' => 'offer_management/proposal.php'],
+        ['id' => 'offer_proposal_approval',     'text' => 'Proposal Approval',    'href' => 'offer_management/proposal_approval.php'],
+        ['id' => 'offer_letter',                'text' => 'Offer Letter',         'href' => 'offer_management/letter.php'],
+        ['id' => 'offer_response',              'text' => 'Response',             'href' => 'offer_management/response.php'],
     ],
     'Probation' => [
         ['id' => 'probation',         'text' => 'Probation Appraisal', 'href' => 'probation/list.php',     'badge' => 1],
@@ -23,10 +29,6 @@ $sidebarItems = [
     ],
     'Employee' => [
         ['id' => 'employee_master', 'text' => 'Employee Master', 'href' => 'employee_master/list.html'],
-    ],
-    'WaterAid' => [
-        ['id' => 'exp_cert',    'text' => 'Experience Certificate', 'href' => 'wateraid/exp_cert_request.php'],
-        ['id' => 'salary_cert', 'text' => 'Salary Certificate',    'href' => 'wateraid/salary_cert_request.php'],
     ],
     'Template Management' => [
         ['id' => 'templates',      'text' => 'Templates',       'href' => 'templates/list.php'],

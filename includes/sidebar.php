@@ -7,10 +7,10 @@ $sidebarItems = [
         ['id' => 'lifecycle', 'text' => 'Lifecycle Timeline', 'href' => 'lifecycle/view.php'],
     ],
     'Recruitment' => [
-        ['id' => 'recruitment',    'text' => 'Pipeline',         'href' => 'recruitment/list.php',          'badge' => 3],
-        ['id' => 'candidates',     'text' => 'Candidates',       'href' => 'candidates/list.php',           'badge' => 2],
-        ['id' => 'screening',      'text' => 'Screening',        'href' => 'screening/list.php',            'badge' => 1],
-        ['id' => 'interview',      'text' => 'Interview',        'href' => 'interview/list.php',            'badge' => 2],
+        ['id' => 'recruitment',    'text' => 'Pipeline',         'href' => 'recruitment/list.php' ],
+        ['id' => 'candidates',     'text' => 'Candidates',       'href' => 'candidates/list.php' ],
+        ['id' => 'screening',      'text' => 'Screening',        'href' => 'screening/list.php'],
+        ['id' => 'interview',      'text' => 'Interview',        'href' => 'interview/list.php'],
     ],
     'Offer Management' => [
         ['id' => 'offer_overview',              'text' => 'Overview',             'href' => 'offer_management/index.php'],
@@ -20,15 +20,13 @@ $sidebarItems = [
         ['id' => 'offer_response',              'text' => 'Response',             'href' => 'offer_management/response.php'],
     ],
     'Probation' => [
-        ['id' => 'probation',         'text' => 'Probation Appraisal', 'href' => 'probation/list.php',     'badge' => 1],
-        ['id' => 'probation_approve', 'text' => 'Pending Approval',    'href' => 'probation/approve.php',  'badge' => 1],
+        ['id' => 'create_employee',   'text' => 'Create Employee',    'href' => 'probation/create_employee.php'],
+        ['id' => 'probation',         'text' => 'Probation Appraisal', 'href' => 'probation/list.php'],
+        ['id' => 'probation_approve', 'text' => 'Pending Approval',    'href' => 'probation/approve.php'],
     ],
     'Confirmation' => [
-        ['id' => 'confirmation',          'text' => 'Confirmation',    'href' => 'confirmation/list.php',          'badge' => 1],
-        ['id' => 'confirmation_approve',  'text' => 'Pending Approval','href' => 'confirmation/approve.php',  'badge' => 1],
-    ],
-    'Employee' => [
-        ['id' => 'employee_master', 'text' => 'Employee Master', 'href' => 'employee_master/list.html'],
+        ['id' => 'confirmation_approve',  'text' => 'Pending Approval','href' => 'confirmation/employee_approve.php'],
+        ['id' => 'confirmation_letter',          'text' => 'Confirmation Letters',    'href' => 'confirmation/confirmation_letters.php'],
     ],
     'Template Management' => [
         ['id' => 'templates',      'text' => 'Templates',       'href' => 'templates/list.php'],

@@ -300,42 +300,6 @@ ob_start();
 
             <div class="form-section">
                 <div class="form-section-title">
-                    <span class="section-icon">&#127974;</span> Bank &amp; Payment Details
-                </div>
-                <div class="form-row-3">
-                    <div class="form-group">
-                        <label>Bank Name</label>
-                        <input type="text" class="form-control" id="bank_name" placeholder="Bank name" value="<?= htmlspecialchars($breakdown['bank_name'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>Account No</label>
-                        <input type="text" class="form-control" id="account_no" placeholder="Account number" value="<?= htmlspecialchars($breakdown['account_no'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>Receiving Bank Code</label>
-                        <input type="text" class="form-control" id="bank_code" placeholder="Routing / sort code" value="<?= htmlspecialchars($breakdown['receiving_bank_code'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>Receiving Bank Name</label>
-                        <input type="text" class="form-control" id="receiving_bank" placeholder="Receiving bank name" value="<?= htmlspecialchars($breakdown['receiving_bank_name'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>Salary Given By</label>
-                        <input type="text" class="form-control" id="salary_given_by" placeholder="e.g. Cash / Bank" value="<?= htmlspecialchars($breakdown['salary_given_by'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>Cash Paid</label>
-                        <input type="number" class="form-control" id="cash_paid" placeholder="0" value="<?= htmlspecialchars($breakdown['cash_paid'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>Bank Paid</label>
-                        <input type="number" class="form-control" id="bank_paid" placeholder="0" value="<?= htmlspecialchars($breakdown['bank_paid'] ?? '') ?>">
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <div class="form-section-title">
                     <span class="section-icon">&#9989;</span> Summary
                 </div>
                 <div class="form-row-2">

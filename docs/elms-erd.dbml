@@ -1,0 +1,289 @@
+// ELMS Database ERD for dbdiagram.io
+// https://dbdiagram.io/d — paste this code to generate the visual ERD
+
+// ========================================
+// MODULE 1: RECRUITMENT / HR
+// ========================================
+
+Table departments {
+  id int [pk, increment]
+  name varchar(255) [not null]
+  code varchar(50) [null]
+}
+
+Table designations {
+  id int [pk, increment]
+  name varchar(100) [not null]
+  code varchar(20) [null]
+  dept_id int [not null, ref: > departments.id]
+}
+
+Table candidate_statuses {
+  id int [pk, increment]
+  code varchar(30) [not null, unique]
+  name varchar(50) [not null]
+  sort_order int [not null, default: 0]
+  description text [null]
+}
+
+Table requisitions {
+  id int [pk, increment]
+  title varchar(255) [not null]
+  dept_id int [not null, ref: > departments.id]
+  location varchar(255) [null]
+  type varchar(100) [not null, default: 'Full Time']
+  vacancies int [not null, default: 1]
+  deadline date [null]
+  education varchar(100) [null]
+  experience decimal(4,1) [null, default: 0.0]
+  salary_min decimal(12,2) [null, default: 0.00]
+  salary_max decimal(12,2) [null, default: 0.00]
+  skills text [null]
+  description text [null]
+  responsibilities text [null]
+  benefits text [null]
+  priority varchar(20) [not null, default: 'Medium']
+  status varchar(20) [not null, default: 'Active']
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table candidates {
+  id int [pk, increment]
+  job_id int [not null, ref: > requisitions.id]
+  code varchar(30) [not null]
+  first_name varchar(100) [not null]
+  last_name varchar(100) [not null]
+  email varchar(100) [not null]
+  phone varchar(30) [null]
+  nid varchar(50) [null]
+  blood_group varchar(10) [null]
+  dob date [null]
+  gender varchar(10) [null]
+  present_address text [null]
+  permanent_address text [null]
+  current_salary decimal(12,2) [null, default: 0.00]
+  expected_salary decimal(12,2) [null, default: 0.00]
+  status_id int [not null, default: 1, ref: > candidate_statuses.id]
+  applied_at datetime [null, default: `current_timestamp()`]
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table candidate_logs {
+  id int [pk, increment]
+  candidate_id int [not null, ref: > candidates.id]
+  action varchar(50) [not null]
+  from_status varchar(30) [null]
+  to_status varchar(30) [null]
+  notes text [null]
+  created_by varchar(100) [null, default: 'Admin User']
+  created_at timestamp [not null, default: `current_timestamp()`]
+}
+
+// ========================================
+// MODULE 2: SCREENING & INTERVIEW
+// ========================================
+
+Table screenings {
+  id int [pk, increment]
+  candidate_id int [not null, ref: > candidates.id]
+  screened_by varchar(100) [null, default: 'Admin User']
+  date date [null]
+  rating decimal(3,1) [null]
+  communication_score decimal(3,1) [null]
+  experience_match varchar(20) [null]
+  skill_match varchar(20) [null]
+  education_match varchar(20) [null]
+  remarks text [null]
+  result varchar(30) [not null]
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table interview_log {
+  id int [pk, increment]
+  candidate_id int [not null, ref: > candidates.id]
+  round int [not null]
+  round_name varchar(100) [null]
+  type varchar(50) [not null]
+  interviewer varchar(100) [not null]
+  date datetime [not null]
+  status varchar(50) [null, default: 'Waiting for Feedback']
+  score_technical decimal(3,1) [null]
+  score_communication decimal(3,1) [null]
+  score_problem_solving decimal(3,1) [null]
+  score_attitude decimal(3,1) [null]
+  rating decimal(3,1) [null]
+  decision varchar(20) [null]
+  reject_reason text [null]
+  feedback text [null]
+  is_final_round tinyint(1) [null, default: 0]
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+// ========================================
+// MODULE 3: OFFER MANAGEMENT
+// ========================================
+
+Table salary_proposals {
+  id int [pk, increment]
+  candidate_id int [not null, ref: > candidates.id]
+  proposed_salary decimal(12,2) [not null]
+  offered_salary decimal(12,2) [null]
+  negotiation_notes text [null]
+  salary_breakdown text [null]
+  status varchar(20) [not null, default: 'Draft']
+  version int [not null, default: 1]
+  created_by varchar(100) [null, default: 'Admin User']
+  finalized_at datetime [null]
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table offers {
+  id int [pk, increment]
+  candidate_id int [not null, ref: > candidates.id]
+  salary decimal(12,2) [not null]
+  joining_date date [not null]
+  designation_id int [null, ref: > designations.id]
+  dept_id int [null, ref: > departments.id]
+  probation_months int [null, default: 6]
+  notes text [null]
+  status varchar(20) [not null, default: 'Pending']
+  response_status varchar(20) [null, default: 'Pending']
+  responded_at datetime [null]
+  response_notes text [null]
+  sent_at datetime [null, default: `current_timestamp()`]
+  accepted_at datetime [null]
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table offer_letters {
+  id int [pk, increment]
+  offer_id int [not null, ref: > offers.id]
+  letter_content longtext [null]
+  letter_format varchar(10) [null, default: 'html']
+  generated_at datetime [null]
+  sent_at datetime [null]
+  sent_to_email varchar(100) [null]
+  status varchar(20) [not null, default: 'Draft']
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table offer_approvals {
+  id int [pk, increment]
+  offer_id int [not null, ref: > offers.id]
+  level int [not null, default: 1]
+  approver varchar(100) [null, default: 'Admin User']
+  status varchar(20) [not null, default: 'Pending']
+  comment text [null]
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table offer_email_log {
+  id int [pk, increment]
+  offer_id int [not null, ref: > offers.id]
+  recipient varchar(100) [not null]
+  subject varchar(255) [not null]
+  body longtext [null]
+  sent_at datetime [null, default: `current_timestamp()`]
+  status varchar(20) [not null, default: 'Sent']
+  error_message text [null]
+}
+
+// ========================================
+// MODULE 4: TEMPLATE SYSTEM
+// ========================================
+
+Table template_modules {
+  id int [pk, increment]
+  module_name varchar(50) [not null, unique]
+  label varchar(100) [not null]
+  render_file varchar(255) [not null, default: '']
+  description text [null]
+  is_active tinyint(1) [null, default: 1]
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table merge_tags {
+  id int [pk, increment]
+  type varchar(50) [not null, default: 'Offer']
+  tag varchar(100) [not null]
+  label varchar(255) [not null]
+  description text [null]
+  sort_order int [not null, default: 0]
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+
+  indexes {
+    (tag, type) [unique]
+  }
+}
+
+Table letter_templates {
+  id int [pk, increment]
+  name varchar(255) [not null]
+  type varchar(50) [not null, default: 'Offer']
+  content longtext [not null]
+  status varchar(20) [not null, default: 'Active']
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+// ========================================
+// MODULE 5: PROBATION
+// ========================================
+
+Table probation_appraisals {
+  id int [pk, increment]
+  employee_id int [not null]
+  joining_date date [null]
+  probation_months int [not null, default: 6]
+  end_date date [null]
+  review_date date [null]
+  status varchar(20) [not null, default: 'Draft']
+  overall_score decimal(5,2) [null]
+  recommendation varchar(30) [null]
+  remarks text [null]
+  supervisor_comments text [null]
+  dept_head_comments text [null]
+  hr_review text [null]
+  created_by varchar(100) [null, default: 'Admin User']
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table probation_categories {
+  id int [pk, increment]
+  name varchar(100) [not null]
+  weight decimal(5,2) [not null, default: 0.00]
+  sort_order int [not null, default: 0]
+  status varchar(20) [not null, default: 'Active']
+  created_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table probation_scores {
+  id int [pk, increment]
+  appraisal_id int [not null, ref: > probation_appraisals.id]
+  category_id int [not null, ref: > probation_categories.id]
+  score decimal(5,2) [not null, default: 0.00]
+  comments text [null]
+  created_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table probation_workflow {
+  id int [pk, increment]
+  appraisal_id int [not null, ref: > probation_appraisals.id]
+  level varchar(50) [not null]
+  status varchar(20) [not null, default: 'Pending']
+  approved_by varchar(100) [null]
+  comments text [null]
+  action_at datetime [null]
+  created_at timestamp [not null, default: `current_timestamp()`]
+}

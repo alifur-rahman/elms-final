@@ -19,8 +19,10 @@ $sidebarItems = [
         ['id' => 'offer_letter',                'text' => 'Offer Letter',         'href' => 'offer_management/letter.php'],
         ['id' => 'offer_response',              'text' => 'Response',             'href' => 'offer_management/response.php'],
     ],
+    'Employee' => [
+        ['id' => 'create_employee',   'text' => 'Create Employee',    'href' => 'employee/list.php'],
+    ],
     'Probation' => [
-        ['id' => 'create_employee',   'text' => 'Create Employee',    'href' => 'probation/create_employee.php'],
         ['id' => 'probation',         'text' => 'Probation Appraisal', 'href' => 'probation/list.php'],
         ['id' => 'probation_approve', 'text' => 'Pending Approval',    'href' => 'probation/approve.php'],
     ],

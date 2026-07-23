@@ -4,29 +4,28 @@ require_once __DIR__ . '/../../includes/config.php';
 
 try {
     $pdo = getDB();
-    // Get candidates who have accepted offers (joined employees)
     $stmt = $pdo->query("
-        SELECT c.id, c.first_name, c.last_name, c.code AS employee_code, c.job_id,
-               r.title AS job_title, o.dept_id,
+        SELECT pbi.PBI_ID AS id, pbi.PBI_NAME, pbi.last_name, pbi.PBI_CODE AS employee_code,
+               pbi.job_title, pbi.dept_id, pbi.candidate_id,
                d.name AS dept_name,
                des.name AS designation_name,
                o.joining_date, o.probation_months,
-               (SELECT COUNT(*) FROM probation_appraisals pa2 WHERE pa2.employee_id = c.id) AS existing_count
-        FROM candidates c
-        INNER JOIN offers o ON o.candidate_id = c.id AND o.response_status = 'Accepted'
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN departments d ON d.id = o.dept_id
+               (SELECT COUNT(*) FROM probation_appraisals pa2 WHERE pa2.employee_id = pbi.PBI_ID) AS existing_count
+        FROM personnel_basic_info pbi
+        INNER JOIN offers o ON o.id = pbi.offer_id AND o.response_status = 'Accepted'
+        LEFT JOIN departments d ON d.id = pbi.dept_id
         LEFT JOIN designations des ON des.id = o.designation_id
-        WHERE c.status_id >= 4
-        ORDER BY c.first_name ASC
+        WHERE pbi.candidate_id IS NOT NULL
+          AND pbi.EMPLOYMENT_TYPE = 'Probationer'
+        ORDER BY pbi.PBI_NAME ASC
     ");
     $rows = $stmt->fetchAll();
     $employees = [];
     foreach ($rows as $r) {
         $employees[] = [
             'id'               => (int)$r['id'],
-            'name'             => $r['first_name'] . ' ' . $r['last_name'],
-            'first_name'       => $r['first_name'],
+            'name'             => $r['PBI_NAME'] . ' ' . $r['last_name'],
+            'first_name'       => $r['PBI_NAME'],
             'last_name'        => $r['last_name'],
             'employee_code'    => $r['employee_code'] ?? 'N/A',
             'job_title'        => $r['job_title'] ?? 'N/A',

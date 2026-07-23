@@ -6,6 +6,7 @@ try {
     $pdo = getDB();
     $status = trim($_GET['status'] ?? 'all');
     $responseStatus = trim($_GET['response_status'] ?? '');
+    $letterStatus = trim($_GET['letter_status'] ?? '');
     $withLetter = (int)($_GET['with_letter'] ?? 0);
 
     $where = [];
@@ -20,10 +21,26 @@ try {
         $where[] = "(o.response_status = 'Pending' OR o.response_status IS NULL)";
     } elseif ($responseStatus === 'all') {
         // include all response statuses
+    } elseif ($responseStatus !== '') {
+        $statuses = array_filter(array_map('trim', explode(',', $responseStatus)));
+        if (!empty($statuses)) {
+            $ph = [];
+            foreach ($statuses as $i => $sv) {
+                $key = ':rs' . $i;
+                $ph[] = $key;
+                $params[$key] = $sv;
+            }
+            $where[] = "o.response_status IN (" . implode(',', $ph) . ")";
+        }
     }
 
     if ($withLetter) {
         $where[] = "o.status = 'Approved'";
+    }
+
+    if ($letterStatus !== '') {
+        $where[] = "ol.status = :letter_status";
+        $params[':letter_status'] = $letterStatus;
     }
 
     $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';

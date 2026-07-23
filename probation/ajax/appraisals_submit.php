@@ -42,9 +42,14 @@ try {
     $wfStmt = $pdo->prepare("UPDATE probation_workflow SET status = 'Approved', approved_by = 'Admin User', action_at = NOW() WHERE appraisal_id = :aid AND level = 'Self Assessment'");
     $wfStmt->execute([':aid' => $id]);
 
-    // Log lifecycle
-    require_once __DIR__ . '/../../includes/functions.php';
-    addCandidateLog($pdo, (int)$app['employee_id'], 'probation_submitted', null, null, 'Probation appraisal #' . $id . ' submitted for approval.');
+    // Log lifecycle (resolve candidate_id from personnel_basic_info)
+    $candStmt = $pdo->prepare("SELECT candidate_id FROM personnel_basic_info WHERE PBI_ID = :eid");
+    $candStmt->execute([':eid' => $app['employee_id']]);
+    $candId = (int)$candStmt->fetchColumn();
+    if ($candId > 0) {
+        require_once __DIR__ . '/../../includes/functions.php';
+        addCandidateLog($pdo, $candId, 'probation_submitted', null, null, 'Probation appraisal #' . $id . ' submitted for approval.');
+    }
 
     $pdo->commit();
 

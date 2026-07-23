@@ -45,6 +45,11 @@ try {
     $appStmt->execute([':id' => $appraisalId]);
     $empId = (int)$appStmt->fetchColumn();
 
+    // Resolve candidate_id from personnel_basic_info
+    $candStmt = $pdo->prepare("SELECT candidate_id FROM personnel_basic_info WHERE PBI_ID = :eid");
+    $candStmt->execute([':eid' => $empId]);
+    $candId = (int)$candStmt->fetchColumn();
+
     require_once __DIR__ . '/../../includes/functions.php';
 
     if ($action === 'approve') {
@@ -59,11 +64,11 @@ try {
         if ($currentLevel === $lastLevel) {
             // All levels approved → mark as Completed
             $pdo->prepare("UPDATE probation_appraisals SET status = 'Completed' WHERE id = :id")->execute([':id' => $appraisalId]);
-            addCandidateLog($pdo, $empId, 'probation_completed', null, null, 'Probation appraisal #' . $appraisalId . ' fully approved.');
+            if ($candId > 0) addCandidateLog($pdo, $candId, 'probation_completed', null, null, 'Probation appraisal #' . $appraisalId . ' fully approved.');
         } else {
             // Move to In Progress
             $pdo->prepare("UPDATE probation_appraisals SET status = 'In Progress' WHERE id = :id")->execute([':id' => $appraisalId]);
-            addCandidateLog($pdo, $empId, 'probation_approved', null, null, 'Probation appraisal #' . $appraisalId . ' approved at ' . $currentLevel . ' level.');
+            if ($candId > 0) addCandidateLog($pdo, $candId, 'probation_approved', null, null, 'Probation appraisal #' . $appraisalId . ' approved at ' . $currentLevel . ' level.');
         }
 
         echo json_encode(['success' => true, 'message' => 'Approved at ' . $currentLevel . ' level.']);
@@ -73,7 +78,7 @@ try {
         $updStmt->execute([':comments' => $comments ?: null, ':id' => $wfId]);
 
         $pdo->prepare("UPDATE probation_appraisals SET status = 'Draft' WHERE id = :id")->execute([':id' => $appraisalId]);
-        addCandidateLog($pdo, $empId, 'probation_sentback', null, null, 'Probation appraisal #' . $appraisalId . ' sent back at ' . $currentLevel . ' level.');
+        if ($candId > 0) addCandidateLog($pdo, $candId, 'probation_sentback', null, null, 'Probation appraisal #' . $appraisalId . ' sent back at ' . $currentLevel . ' level.');
 
         echo json_encode(['success' => true, 'message' => 'Sent back to previous level.']);
     } elseif ($action === 'reject') {
@@ -82,7 +87,7 @@ try {
         $updStmt->execute([':comments' => $comments ?: null, ':id' => $wfId]);
 
         $pdo->prepare("UPDATE probation_appraisals SET status = 'Rejected' WHERE id = :id")->execute([':id' => $appraisalId]);
-        addCandidateLog($pdo, $empId, 'probation_rejected', null, null, 'Probation appraisal #' . $appraisalId . ' rejected at ' . $currentLevel . ' level.');
+        if ($candId > 0) addCandidateLog($pdo, $candId, 'probation_rejected', null, null, 'Probation appraisal #' . $appraisalId . ' rejected at ' . $currentLevel . ' level.');
 
         echo json_encode(['success' => true, 'message' => 'Rejected.']);
     }

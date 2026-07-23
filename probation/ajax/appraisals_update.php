@@ -61,13 +61,18 @@ try {
         }
     }
 
-    // Log lifecycle event
+    // Log lifecycle event (resolve candidate_id from personnel_basic_info)
     $appStmt = $pdo->prepare("SELECT employee_id FROM probation_appraisals WHERE id = :id");
     $appStmt->execute([':id' => $id]);
     $empId = (int)$appStmt->fetchColumn();
     if ($empId) {
-        require_once __DIR__ . '/../../includes/functions.php';
-        addCandidateLog($pdo, $empId, 'probation_updated', null, null, 'Probation appraisal #' . $id . ' updated.');
+        $candStmt = $pdo->prepare("SELECT candidate_id FROM personnel_basic_info WHERE PBI_ID = :eid");
+        $candStmt->execute([':eid' => $empId]);
+        $candId = (int)$candStmt->fetchColumn();
+        if ($candId > 0) {
+            require_once __DIR__ . '/../../includes/functions.php';
+            addCandidateLog($pdo, $candId, 'probation_updated', null, null, 'Probation appraisal #' . $id . ' updated.');
+        }
     }
 
     $pdo->commit();

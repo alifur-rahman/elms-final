@@ -233,7 +233,7 @@ function openApproval(id) {
             ["Blood Group", a.blood_group || "—", "half"], ["NID", a.nid || "—", "half"],
             ["Present Address", a.present_address || "—", "full"],
             ["Permanent Address", a.permanent_address || "—", "full"],
-            ["Applied At", a.applied_at || "—", "half"], ["Current Salary", a.current_salary !== null ? "$" + a.current_salary.toFixed(2) : "—", "half"],
+            ["Applied At", a.applied_at || "—", "half"], ["Current Salary", a.current_salary != null ? "৳" + Number(a.current_salary).toFixed(2) : "—", "half"],
         ];
         document.getElementById("actPersonalInfo").innerHTML = infoFields.map(function(f) {
             var valClass = f[1] === "—" || f[1] === "" ? "info-value empty" : "info-value";

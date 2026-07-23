@@ -15,7 +15,7 @@ try {
         $params[':status'] = $status;
     }
     if ($deptId > 0) {
-        $where[] = "c.dept_id = :dept_id";
+        $where[] = "pbi.dept_id = :dept_id";
         $params[':dept_id'] = $deptId;
     }
 
@@ -23,16 +23,13 @@ try {
 
     $stmt = $pdo->prepare("
         SELECT pa.*,
-               c.first_name, c.last_name, c.job_id,
-               r.title AS job_title, o.dept_id,
+               pbi.PBI_NAME, pbi.last_name, pbi.job_title, pbi.dept_id,
                d.name AS dept_name,
                des.name AS designation_name
         FROM probation_appraisals pa
-        LEFT JOIN candidates c ON c.id = pa.employee_id
-        LEFT JOIN offers o ON o.candidate_id = c.id AND o.response_status = 'Accepted'
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN departments d ON d.id = o.dept_id
-        LEFT JOIN designations des ON des.id = o.designation_id
+        LEFT JOIN personnel_basic_info pbi ON pbi.PBI_ID = pa.employee_id
+        LEFT JOIN departments d ON d.id = pbi.dept_id
+        LEFT JOIN designations des ON des.id = (SELECT o.designation_id FROM offers o WHERE o.id = pbi.offer_id LIMIT 1)
         $whereClause
         ORDER BY pa.created_at DESC
     ");
@@ -51,7 +48,7 @@ try {
         $appraisals[] = [
             'id'               => (int)$r['id'],
             'employee_id'      => (int)$r['employee_id'],
-            'employee_name'    => ($r['first_name'] ?? '') . ' ' . ($r['last_name'] ?? ''),
+            'employee_name'    => ($r['PBI_NAME'] ?? '') . ' ' . ($r['last_name'] ?? ''),
             'job_title'        => $r['job_title'] ?? 'N/A',
             'dept_id'          => (int)$r['dept_id'],
             'dept_name'        => $r['dept_name'] ?? 'N/A',

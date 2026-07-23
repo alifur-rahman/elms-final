@@ -109,31 +109,74 @@ function autofillForm() {
     setVal("DESG_ID", o.designation_id);
     setVal("PBI_DESIGNATION", o.designation_name);
     setVal("job_title", o.job_title);
+    var salName = document.getElementById("sal_candidate_name");
+    if (salName) salName.value = (o.first_name || "") + (o.last_name ? " " + o.last_name : "");
+    var salTitle = document.getElementById("sal_job_title");
+    if (salTitle) salTitle.value = o.job_title || "";
+    var salOffered = document.getElementById("sal_offered_salary");
+    if (salOffered) salOffered.value = o.salary ? parseFloat(o.salary).toLocaleString() : "";
+    if (o.gender) {
+        var gs = document.getElementById("gender");
+        if (gs) gs.value = o.gender.toLowerCase();
+    }
     if (autoFilledFields.length > 0) {
         showAlert("Auto-filled " + autoFilledFields.length + " fields from candidate data", "info");
     }
 }
 
-function autoCalcSalary() {
-    if (!offerData) return;
-    var gross = parseFloat(offerData.salary) || 0;
-    if (gross <= 0) return;
-    var basic = Math.round(gross * 0.571425);
-    var hr = Math.round(basic * 0.5);
-    var med = Math.round(basic * 0.1);
-    var conv = Math.round(basic * 0.15);
-    setSalaryVal("gross_salary", Math.round(gross));
-    setSalaryVal("basic_salary", basic);
-    setSalaryVal("house_rent", hr);
-    setSalaryVal("medical_allowance", med);
-    setSalaryVal("convenience", conv);
-    setSalaryVal("total_salary", Math.round(gross));
+function safeParseFloat(v) { var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+
+function calculateSalary() {
+    var gross = safeParseFloat(document.getElementById('gross_salary').value);
+    var basic = Math.round(gross * 0.571425 * 100) / 100;
+    var house = Math.round(basic * 0.5 * 100) / 100;
+    var medical = Math.round(basic * 0.1 * 100) / 100;
+    var conveyance = Math.round(basic * 0.15 * 100) / 100;
+
+    document.getElementById('basic_salary').value = basic;
+    document.getElementById('house_rent').value = house;
+    document.getElementById('medical_allowance').value = medical;
+    document.getElementById('convenience').value = conveyance;
+    document.getElementById('total_salary').value = gross;
+
+    calculateSalaryTax(gross, basic);
+    calculateTotalPayable();
 }
 
-function setSalaryVal(id, val) {
-    var el = document.getElementById(id);
-    if (!el || el.value) return;
-    el.value = val;
+function calculateSalaryTax(gross, basic) {
+    if (!gross) gross = safeParseFloat(document.getElementById('gross_salary').value);
+    if (!basic) basic = safeParseFloat(document.getElementById('basic_salary').value);
+    if (gross <= 0) { document.getElementById('m_income_tex').value = ''; return; }
+
+    var genderSelect = document.getElementById('gender');
+    var gender = genderSelect ? genderSelect.value : 'male';
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '../offer_management/ajax/get_taxinfo_ajx.php?gross_salary=' + gross + '&basic_salary=' + basic + '&gender=' + gender, true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        document.getElementById('m_income_tex').value = response.tax;
+                        calculateTotalPayable();
+                    }
+                } catch (e) { console.error('Error parsing tax data:', e); }
+            }
+        }
+    };
+    xhr.send();
+}
+
+function calculateTotalPayable() {
+    var totalSalary = safeParseFloat(document.getElementById('total_salary').value);
+    var pf = safeParseFloat(document.getElementById('pf').value);
+    var pfDeductible = safeParseFloat(document.getElementById('pf_deductible').value);
+    var incomeTax = safeParseFloat(document.getElementById('m_income_tex').value);
+
+    var totalPayable = totalSalary - pf - pfDeductible - incomeTax;
+    document.getElementById('total_payable').value = Math.round(totalPayable * 100) / 100;
 }
 
 function updateStepBar() {
@@ -169,7 +212,7 @@ function updateStepBar() {
     var panel = document.getElementById("step" + currentStep);
     if (panel) panel.classList.add("active");
     updateBottomNav();
-    if (currentStep === 5) autoCalcSalary();
+    if (currentStep === 5) calculateSalary();
 }
 
 function updateBottomNav() {
@@ -383,7 +426,7 @@ ob_start();
                     <div class="section-box-title">Classification & Grade</div>
                     <div class="form-row form-row-4">
                         <div class="form-group"><label>Employee Type</label><select class="form-control" name="employee_type" id="employee_type"><option value="Non Roster">Non Roster</option><option value="Roster">Roster</option></select></div>
-                        <div class="form-group"><label>Employment Type</label><select class="form-control" name="EMPLOYMENT_TYPE" id="EMPLOYMENT_TYPE"><option value="Full-Time">Full-Time</option><option value="Part-Time">Part-Time</option><option value="Contract">Contract</option><option value="Intern">Intern</option></select></div>
+                        <div class="form-group"><label>Employment Type</label><select class="form-control" name="EMPLOYMENT_TYPE" id="EMPLOYMENT_TYPE"><option value="">-- Select --</option><option value="Casual">Casual</option><option value="Apprentice">Apprentice</option><option value="Probationer" selected>Probationer</option><option value="Temporary">Temporary</option><option value="Replace">Replace</option><option value="Permanent">Permanent</option><option value="Seasonal">Seasonal</option><option value="Contractual">Contractual</option><option value="Regular">Regular</option></select></div>
                         <div class="form-group"><label>Contract Type</label><input type="text" class="form-control" name="PBI_CON_TYPE" id="PBI_CON_TYPE"></div>
                         <div class="form-group"><label>Organization</label><input type="number" class="form-control" name="PBI_ORG" id="PBI_ORG" value="1"></div>
                         <div class="form-group"><label>Grade</label><input type="number" class="form-control" name="grade" id="grade"></div>
@@ -484,21 +527,67 @@ ob_start();
 
             <!-- ===== STEP 6: Salary Setup ===== -->
             <div class="step-panel" id="step5">
+
                 <div class="section-box">
-                    <div class="section-box-title">Salary Type & Base</div>
+                    <div class="section-box-title">Candidate Information</div>
                     <div class="form-row form-row-4">
+                        <div class="form-group"><label>Candidate</label><input type="text" class="form-control" id="sal_candidate_name" disabled></div>
+                        <div class="form-group"><label>Job Title</label><input type="text" class="form-control" id="sal_job_title" disabled></div>
+                        <div class="form-group"><label>Offered Salary</label><input type="text" class="form-control" id="sal_offered_salary" disabled></div>
+                        <div class="form-group"><label>Gender</label><select class="form-control" id="gender" onchange="calculateSalary()"><option value="male">Male</option><option value="female">Female</option></select></div>
+                    </div>
+                </div>
+
+                <div class="section-box">
+                    <div class="section-box-title">Salary Breakdown</div>
+                    <div class="form-row form-row-3">
+                        <div class="form-group"><label>Gross Salary <span style="color:var(--danger)">*</span></label><input type="number" class="form-control" name="gross_salary" id="gross_salary" placeholder="Enter gross salary" oninput="calculateSalary()" style="font-weight:600;font-size:15px"></div>
+                        <div class="form-group"><label>Basic Salary</label><input type="number" class="form-control" name="basic_salary" id="basic_salary" placeholder="Auto-calculated" readonly></div>
+                        <div class="form-group"><label>House Rent</label><input type="number" class="form-control" name="house_rent" id="house_rent" placeholder="Auto-calculated" readonly></div>
+                        <div class="form-group"><label>Medical Allowance</label><input type="number" class="form-control" name="medical_allowance" id="medical_allowance" placeholder="Auto-calculated" readonly></div>
+                        <div class="form-group"><label>Conveyance Allowance</label><input type="number" class="form-control" name="convenience" id="convenience" placeholder="Auto-calculated" readonly></div>
+                        <div class="form-group"><label>Total Salary</label><input type="number" class="form-control" name="total_salary" id="total_salary" placeholder="Auto-calculated" readonly></div>
+                    </div>
+                </div>
+
+                <div class="section-box">
+                    <div class="section-box-title">Deductions & Overtime</div>
+                    <div class="form-row form-row-4">
+                        <div class="form-group"><label>Personal PF</label><input type="number" class="form-control" name="pf" id="pf" placeholder="0" oninput="calculateTotalPayable()"></div>
+                        <div class="form-group"><label>Company PF</label><input type="number" class="form-control" name="pf_company" id="pf_company" placeholder="0"></div>
+                        <div class="form-group"><label>PF Deductible</label><input type="number" class="form-control" name="pf_deductible" id="pf_deductible" placeholder="0" oninput="calculateTotalPayable()"></div>
+                        <div class="form-group"><label>Monthly Income Tax</label><input type="number" class="form-control" name="m_income_tex" id="m_income_tex" placeholder="Auto-calculated" readonly></div>
+                        <div class="form-group"><label>PF Applicable</label><select class="form-control" name="pf_applicable" id="pf_applicable"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+                        <div class="form-group"><label>PF Status</label><input type="text" class="form-control" name="pf_status" id="pf_status"></div>
+                        <div class="form-group"><label>Tax Status</label><input type="text" class="form-control" name="tax_status" id="tax_status"></div>
+                        <div class="form-group"><label>Income Tax</label><input type="number" class="form-control" name="income_tax" id="income_tax" step="0.01"></div>
+                        <div class="form-group"><label>Group Insurance</label><input type="number" class="form-control" name="group_insurance" id="group_insurance" step="0.01"></div>
+                        <div class="form-group"><label>C Fund</label><input type="number" class="form-control" name="cfund" id="cfund" step="0.01"></div>
+                        <div class="form-group"><label>SM Money</label><input type="number" class="form-control" name="sm_money" id="sm_money" step="0.01"></div>
+                        <div class="form-group"><label>Security Amount</label><input type="number" class="form-control" name="security_amount" id="security_amount" step="0.01"></div>
+                        <div class="form-group"><label>Cooperative Share</label><input type="number" class="form-control" name="cooperative_share" id="cooperative_share"></div>
+                        <div class="form-group"><label>Motorcycle Install</label><input type="number" class="form-control" name="motorcycle_install" id="motorcycle_install" step="0.01"></div>
+                        <div class="form-group"><label>Fixed TADA</label><input type="number" class="form-control" name="fixed_tada" id="fixed_tada" step="0.01"></div>
+                    </div>
+                    <div style="display:flex;gap:20px;flex-wrap:wrap;padding-top:4px">
+                        <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="ot_out"> OT (Out)</label>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="ot_holiday"> OT Holiday</label>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="ot_weekend"> OT Weekend</label>
+                    </div>
+                </div>
+
+                <div class="section-box">
+                    <div class="section-box-title">Summary</div>
+                    <div class="form-row form-row-2">
+                        <div class="form-group"><label>Total Payable</label><input type="number" class="form-control" name="total_payable" id="total_payable" placeholder="0" readonly></div>
                         <div class="form-group"><label>Salary Type</label><input type="text" class="form-control" name="salary_type" id="salary_type" placeholder="e.g. Consolidated"></div>
-                        <div class="form-group"><label>Gross Salary</label><input type="number" class="form-control" name="gross_salary" id="gross_salary" step="1"></div>
-                        <div class="form-group"><label>Basic Salary</label><input type="number" class="form-control" name="basic_salary" id="basic_salary" step="0.01"></div>
                         <div class="form-group"><label>Consolidated Salary</label><input type="number" class="form-control" name="consolidated_salary" id="consolidated_salary" step="0.01"></div>
                     </div>
                 </div>
+
                 <div class="section-box">
-                    <div class="section-box-title">Allowances</div>
+                    <div class="section-box-title">Other Allowances</div>
                     <div class="form-row form-row-4">
-                        <div class="form-group"><label>House Rent</label><input type="number" class="form-control" name="house_rent" id="house_rent" step="0.01"></div>
-                        <div class="form-group"><label>Medical Allowance</label><input type="number" class="form-control" name="medical_allowance" id="medical_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Convenience</label><input type="number" class="form-control" name="convenience" id="convenience" step="0.01"></div>
                         <div class="form-group"><label>Transport Allowance</label><input type="number" class="form-control" name="transport_allowance" id="transport_allowance" step="0.01"></div>
                         <div class="form-group"><label>Fuel Allowance</label><input type="number" class="form-control" name="fuel_allowance" id="fuel_allowance" step="0.01"></div>
                         <div class="form-group"><label>Food Allowance</label><input type="number" class="form-control" name="food_allowance" id="food_allowance" step="0.01"></div>
@@ -524,37 +613,17 @@ ob_start();
                         <div class="form-group"><label>Others</label><input type="number" class="form-control" name="others" id="others" step="0.01"></div>
                     </div>
                 </div>
-                <div class="section-box">
-                    <div class="section-box-title">Deductions</div>
-                    <div class="form-row form-row-4">
-                        <div class="form-group"><label>PF (Employee)</label><input type="number" class="form-control" name="pf" id="pf" step="0.01"></div>
-                        <div class="form-group"><label>PF (Company)</label><input type="number" class="form-control" name="pf_company" id="pf_company" step="0.01"></div>
-                        <div class="form-group"><label>PF Applicable</label><select class="form-control" name="pf_applicable" id="pf_applicable"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                        <div class="form-group"><label>PF Deductible</label><select class="form-control" name="pf_deductible" id="pf_deductible"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                        <div class="form-group"><label>PF Status</label><input type="text" class="form-control" name="pf_status" id="pf_status"></div>
-                        <div class="form-group"><label>Income Tax</label><input type="number" class="form-control" name="income_tax" id="income_tax" step="0.01"></div>
-                        <div class="form-group"><label>Monthly Income Tax</label><input type="number" class="form-control" name="m_income_tex" id="m_income_tex"></div>
-                        <div class="form-group"><label>Tax Status</label><input type="text" class="form-control" name="tax_status" id="tax_status"></div>
-                        <div class="form-group"><label>Group Insurance</label><input type="number" class="form-control" name="group_insurance" id="group_insurance" step="0.01"></div>
-                        <div class="form-group"><label>C Fund</label><input type="number" class="form-control" name="cfund" id="cfund" step="0.01"></div>
-                        <div class="form-group"><label>SM Money</label><input type="number" class="form-control" name="sm_money" id="sm_money" step="0.01"></div>
-                        <div class="form-group"><label>Security Amount</label><input type="number" class="form-control" name="security_amount" id="security_amount" step="0.01"></div>
-                        <div class="form-group"><label>Cooperative Share</label><input type="number" class="form-control" name="cooperative_share" id="cooperative_share"></div>
-                        <div class="form-group"><label>Motorcycle Install</label><input type="number" class="form-control" name="motorcycle_install" id="motorcycle_install" step="0.01"></div>
-                        <div class="form-group"><label>Fixed TADA</label><input type="number" class="form-control" name="fixed_tada" id="fixed_tada" step="0.01"></div>
-                    </div>
-                </div>
+
                 <div class="section-box">
                     <div class="section-box-title">Totals & Overtime</div>
                     <div class="form-row form-row-4">
-                        <div class="form-group"><label>Total Salary</label><input type="number" class="form-control" name="total_salary" id="total_salary"></div>
-                        <div class="form-group"><label>Total Payable</label><input type="number" class="form-control" name="total_payable" id="total_payable" step="0.01"></div>
                         <div class="form-group"><label>Bonus Applicable</label><select class="form-control" name="bonus_applicable" id="bonus_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
                         <div class="form-group"><label>Overtime Applicable</label><select class="form-control" name="overtime_applicable" id="overtime_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
                         <div class="form-group"><label>OT Weekend</label><select class="form-control" name="ot_weekend_applicable" id="ot_weekend_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
                         <div class="form-group"><label>OT Holiday</label><select class="form-control" name="ot_holiday_applicable" id="ot_holiday_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
                     </div>
                 </div>
+
                 <div class="section-box">
                     <div class="section-box-title">Bank & Payment</div>
                     <div class="form-row form-row-4">

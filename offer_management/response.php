@@ -30,8 +30,8 @@ function renderResponses() {
             html += "<tr>" +
                 "<td><strong>" + (o.candidate_name || o.first_name + " " + o.last_name) + "</strong></td>" +
                 "<td>" + (o.job_title || o.job || "N/A") + "</td>" +
-                "<td>" + (o.offered_salary ? formatCurrency(o.offered_salary, "৳") : "-") + "</td>" +
-                "<td>" + (o.letter_date || "-") + "</td>" +
+                "<td>" + (o.salary ? formatCurrency(o.salary, "৳") : "-") + "</td>" +
+                "<td>" + (o.letter_sent_at || o.letter_generated_at || "-") + "</td>" +
                 "<td><span class=\"badge badge-in-progress\">Pending</span></td>" +
                 "<td><button class=\"btn btn-sm btn-primary\" onclick=\"openMarkResponse(" + o.id + ")\">Record Response</button></td>" +
             "</tr>";
@@ -55,9 +55,9 @@ function renderResponded() {
             html += "<tr>" +
                 "<td><strong>" + (o.candidate_name || o.first_name + " " + o.last_name) + "</strong></td>" +
                 "<td>" + (o.job_title || o.job || "N/A") + "</td>" +
-                "<td>" + (o.offered_salary ? formatCurrency(o.offered_salary, "৳") : "-") + "</td>" +
+                "<td>" + (o.salary ? formatCurrency(o.salary, "৳") : "-") + "</td>" +
                 "<td><span class=\"" + rsClass + "\">" + o.response_status + "</span></td>" +
-                "<td>" + (o.response_date || "-") + "</td>" +
+                "<td>" + (o.responded_at || "-") + "</td>" +
                 "<td>" + (o.response_notes || "-") + "</td>" +
             "</tr>";
         }

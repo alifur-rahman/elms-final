@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELMS — System Documentation</title>
+<style>
+:root{--pri:#2563eb;--pri-d:#1d4ed8;--pri-l:#dbeafe;--sec:#059669;--warn:#d97706;--danger:#dc2626;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b;--code-bg:#1e293b;--code-fg:#e2e8f0;--sidebar-w:260px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;display:flex}
+a{color:var(--pri);text-decoration:none}
+a:hover{text-decoration:underline}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#fff;color:var(--text);overflow-y:auto;padding:20px 0;z-index:100;border-right:1px solid var(--border)}
+.sidebar h2{padding:0 20px 16px;font-size:18px;color:var(--text);border-bottom:1px solid var(--border);margin-bottom:12px}
+.sidebar h3{padding:12px 20px 4px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600}
+.sidebar a{display:block;padding:6px 20px 6px 32px;font-size:13px;color:var(--gray-600,#475569);border-left:3px solid transparent;text-decoration:none}
+.sidebar a:hover{background:var(--pri-l);color:var(--pri);text-decoration:none}
+.sidebar a.active{background:var(--pri-l);color:var(--pri);border-left-color:var(--pri);font-weight:600;text-decoration:none}
+.main{margin-left:var(--sidebar-w);padding:32px 48px;max-width:1100px}
+h1{font-size:28px;margin-bottom:8px}
+h2{font-size:22px;margin:32px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--pri)}
+h3{font-size:17px;margin:20px 0 8px;color:var(--pri-d)}
+h4{font-size:14px;margin:14px 0 6px;color:var(--muted)}
+p{margin:8px 0;font-size:14px}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-blue{background:var(--pri-l);color:var(--pri)}
+.badge-green{background:#d1fae5;color:#065f46}
+.badge-yellow{background:#fef3c7;color:#92400e}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-gray{background:#f1f5f9;color:#475569}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+th,td{padding:8px 12px;text-align:left;border:1px solid var(--border)}
+th{background:#f1f5f9;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+tr:nth-child(even){background:#f8fafc}
+code{background:var(--code-bg);color:var(--code-fg);padding:2px 6px;border-radius:3px;font-size:12px;font-family:'Fira Code',Consolas,monospace}
+pre{background:var(--code-bg);color:var(--code-fg);padding:16px 20px;border-radius:8px;overflow-x:auto;font-size:12px;line-height:1.5;margin:12px 0;font-family:'Fira Code',Consolas,monospace}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.flow-box{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;font-family:monospace;font-size:12px;line-height:1.8;white-space:pre;overflow-x:auto}
+.tag{display:inline-block;background:#e0e7ff;color:#3730a3;padding:1px 6px;border-radius:3px;font-size:11px;font-family:monospace;margin:1px}
+.endpoint{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f8fafc;border:1px solid var(--border);border-radius:6px;margin:6px 0;font-size:13px}
+.endpoint .method{font-weight:700;font-size:11px;padding:2px 8px;border-radius:3px;text-transform:uppercase}
+.method-get{background:#dbeafe;color:#1e40af}
+.method-post{background:#d1fae5;color:#065f46}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+.stat h3{font-size:28px;color:var(--pri);margin:0}
+.stat p{font-size:12px;color:var(--muted);margin:4px 0 0}
+.toc{position:fixed;right:24px;top:32px;width:200px;font-size:12px}
+.toc a{display:block;padding:3px 0;color:var(--muted)}
+.toc a:hover{color:var(--pri)}
+hr{border:none;border-top:1px solid var(--border);margin:24px 0}
+ul,ol{margin:8px 0 8px 20px;font-size:14px}
+li{margin:4px 0}
+.erd-container{overflow:auto;padding:16px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;margin:12px 0}
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+<h2>ELMS Docs</h2>
+<h3>Overview</h3>
+<a href="#overview">System Overview</a>
+<a href="#architecture">Architecture</a>
+<a href="#erd">Database ERD</a>
+<h3>Modules</h3>
+<a href="#mod-recruitment">1. Recruitment</a>
+<a href="#mod-screening">2. Screening &amp; Interview</a>
+<a href="#mod-proposal">3. Salary Proposal</a>
+<a href="#mod-offer">4. Offer Management</a>
+<a href="#mod-letter">5. Offer Letter</a>
+<a href="#mod-response">6. Candidate Response</a>
+<a href="#mod-employee">7. Employee Creation</a>
+<a href="#mod-probation">8. Probation Appraisal</a>
+<a href="#mod-confirmation">9. Confirmation</a>
+<h3>Systems</h3>
+<a href="#templates">Template Engine</a>
+<a href="#salary-calc">Salary Calculation</a>
+<a href="#tax-calc">Tax Calculation</a>
+<a href="#lifecycle">Lifecycle Logging</a>
+<h3>Reference</h3>
+<a href="#api-endpoints">API Endpoints</a>
+<a href="#file-structure">File Structure</a>
+<a href="#status-machines">Status Machines</a>
+<a href="#doc-files">Documentation Files</a>
+</nav>
+
+<div class="main">
+
+<!-- ═══════════════════════ OVERVIEW ═══════════════════════ -->
+<h1 id="overview">ELMS — Employee Lifecycle Management System</h1>
+<p>A full-stack HRIS covering the entire employee lifecycle from recruitment to confirmation. Built with PHP 8 + MySQL + vanilla JavaScript.</p>
+
+<div class="grid-3">
+<div class="stat"><h3>9</h3><p>Core Modules</p></div>
+<div class="stat"><h3>22+</h3><p>Database Tables</p></div>
+<div class="stat"><h3>40+</h3><p>API Endpoints</p></div>
+</div>
+
+<h3>System Flow</h3>
+<div class="flow-box">Requisition → Candidates → Screening → Interview → Salary Proposal → Offer Approval
+    → Offer Letter → Send Email → Candidate Response → Employee Creation → Salary Setup
+    → Probation Appraisal → Confirmation Letter → Send Confirmation</div>
+
+<!-- ═══════════════════════ ARCHITECTURE ═══════════════════════ -->
+<h2 id="architecture">Architecture</h2>
+<div class="grid-2">
+<div class="card">
+<h4>Backend</h4>
+<ul>
+<li>PHP 8.x with PDO/MySQL</li>
+<li>RESTful JSON API endpoints</li>
+<li>Transaction support for multi-step operations</li>
+<li>Lifecycle logging via <code>addCandidateLog()</code></li>
+</ul>
+</div>
+<div class="card">
+<h4>Frontend</h4>
+<ul>
+<li>Vanilla JavaScript (no framework)</li>
+<li><code>apiGet()</code> / <code>apiPost()</code> from <code>ajax/common.js</code></li>
+<li>Quill.js rich-text editor for letters</li>
+<li>Modal system, accordion, step wizard</li>
+</ul>
+</div>
+</div>
+
+<div class="card">
+<h4>Key Patterns</h4>
+<ul>
+<li><strong>Shared endpoint:</strong> <code>list_offers.php</code> serves offer_letter, response, approval, and employee modules with query param filters</li>
+<li><strong>Template engine:</strong> <code>templates/ajax/render.php</code> resolves <code>{{TAG}}</code> placeholders via module-specific render files</li>
+<li><strong>Step wizard:</strong> <code>employee/create.php</code> uses a 6-step non-interactive stepper with auto-fill from candidate data</li>
+<li><strong>Salary auto-calc:</strong> Basic=57.1425%, House Rent=50% of Basic, Medical=10%, Conveyance=15%; tax fetched via AJAX</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════ DATABASE ERD ═══════════════════════ -->
+<h2 id="erd">Database — Entity Relationship Diagram</h2>
+<p><strong>Database:</strong> <code>elms</code> | <strong>Engine:</strong> InnoDB | <strong>Charset:</strong> utf8mb4</p>
+
+<div class="erd-container">
+<pre>
+┌─────────────────────┐      ┌──────────────────────┐
+│    <strong>departments</strong>       │      │  <strong>candidate_statuses</strong>  │
+├─────────────────────┤      ├──────────────────────┤
+│ PK id               │      │ PK id                │
+│    name             │      │    code    (UNI)     │
+│    code             │      │    name              │
+└────────┬────────────┘      │    sort_order        │
+         │ 1:N               └────────┬─────────────┘
+    ┌────┴──────────────┐             │ 1:N
+    │   <strong>designations</strong>    │        ┌───┴──────────────────┐
+    ├───────────────────┤        │     <strong>candidates</strong>         │
+    │ PK id             │        ├───────────────────────┤
+    │ FK dept_id ───────┼──┐     │ PK id                 │
+    └───────────────────┘  │     │ FK job_id → requisitions
+                           │     │ FK status_id → statuses
+┌─────────────────────┐   │     │    first_name, last_name
+│   <strong>requisitions</strong>      │   │     │    email, phone, nid
+├─────────────────────┤   │     │    gender, dob
+│ PK id               │   │     │    present_address
+│ FK dept_id ─────────┼───┘     │    permanent_address
+│    title, vacancies │         │    current_salary
+│    salary_min/max   │         │    expected_salary
+└─────────────────────┘         └───────────┬───────────┘
+                                            │ 1:N
+         ┌──────────────────┬───────────────┼──────────────┐
+         │                  │               │              │
+    ┌────┴─────────┐  ┌────┴──────┐  ┌─────┴─────┐  ┌────┴──────────┐
+    │<strong>candidate_logs</strong>│  │<strong>screenings</strong>│  │<strong>interview_log</strong>│  │<strong>salary_proposals</strong>│
+    ├──────────────┤  ├───────────┤  ├───────────┤  ├───────────────┤
+    │FK candidate_id│  │FK cand_id │  │FK cand_id │  │FK candidate_id│
+    │ action       │  │ rating    │  │ round     │  │ proposed_sal  │
+    │ from/to_status│ │ result   │  │ scores    │  │ salary_breakd │
+    └──────────────┘  └───────────┘  │ decision  │  │ (JSON)        │
+                                     └───────────┘  │ status        │
+                                                    └───────┬───────┘
+                                                            │
+                      ┌─────────────────────────────────────┘
+                      │
+┌─────────────────────┴────────────────────────────────────────────┐
+│                          <strong>offers</strong>                                 │
+├──────────────────────────────────────────────────────────────────┤
+│ PK id │ FK candidate_id │ FK designation_id │ FK dept_id        │
+│ salary │ joining_date │ probation_months │ status               │
+│ response_status │ responded_at │ response_notes                 │
+│ sent_at │ accepted_at                                                │
+└──────────┬──────────────────────────┬───────────────────────────┘
+           │ 1:N                      │ 1:N
+┌──────────┴───────────┐  ┌──────────┴─────────────────────┐
+│   <strong>offer_letters</strong>      │  │       <strong>offer_approvals</strong>          │
+│ FK offer_id           │  │ FK offer_id                    │
+│ letter_content        │  │ level, approver, status        │
+│ status: Draft→Gen→Sent│  └───────────────────────────────┘
+│ generated_at, sent_at │
+│ sent_to_email         │  ┌───────────────────────────────┐
+└───────────────────────┘  │       <strong>offer_email_log</strong>          │
+                           │ FK offer_id, recipient         │
+                           │ subject, body, sent_at         │
+                           └───────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                      <strong>TEMPLATE SYSTEM</strong>                          │
+├─────────────────────────────────────────────────────────────────┤
+│  <strong>template_modules</strong>: module_name, render_file                    │
+│  <strong>letter_templates</strong>: name, type (=module), content (HTML+{{TAGS}}) │
+│  <strong>merge_tags</strong>: type, tag, label                                  │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                       <strong>PROBATION MODULE</strong>                         │
+├─────────────────────────────────────────────────────────────────┤
+│  <strong>probation_appraisals</strong>: employee_id → PBI_ID                    │
+│    end_date, overall_score, recommendation, status              │
+│  <strong>probation_categories</strong>: name, weight %                          │
+│  <strong>probation_scores</strong>: appraisal_id + category_id → score          │
+│  <strong>probation_workflow</strong>: appraisal_id + level + status              │
+│    Levels: Self Assessment → Supervisor → Dept Head             │
+│            → HR Review → GM → Managing Director                 │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    <strong>EMPLOYEE / CONFIRMATION</strong>                     │
+├─────────────────────────────────────────────────────────────────┤
+│  <strong>personnel_basic_info</strong>: PBI_ID, PBI_CODE, PBI_NAME, offer_id     │
+│    EMPLOYMENT_TYPE, dept_id, DESG_ID, 70+ fields                │
+│  <strong>salary_info</strong>: PBI_ID, offer_id, 50+ salary fields               │
+│  <strong>confirmation_letters</strong>: employee_id → PBI_ID                     │
+│    letter_content, employment_type, status                      │
+│    Draft → Generated → Approved → Sent                          │
+└─────────────────────────────────────────────────────────────────┘
+</pre>
+</div>
+
+<hr>
+
+<!-- ═══════════════════════ MODULE 1: RECRUITMENT ═══════════════════════ -->
+<h2 id="mod-recruitment">Module 1: Recruitment &amp; Candidate Pipeline</h2>
+
+<div class="card">
+<h4>Purpose</h4>
+<p>Manage job requisitions and track candidates through the hiring pipeline with full audit logging.</p>
+</div>
+
+<h3>Workflow</h3>
+<div class="flow-box">HR creates Requisition (dept, designation, vacancies, salary range)
+    ↓
+Candidates apply / are added → auto-assigned status "Applied" (status_id=1)
+    ↓
+Each status change logged to candidate_logs (from_status → to_status, notes, created_by)
+    ↓
+candidates.status_id FK → candidate_statuses (Applied → Screened → Shortlisted → Interviewed → Selected → Offered → Hired)</div>
+
+<h3>Key Tables</h3>
+<table>
+<tr><th>Table</th><th>Purpose</th><th>Key Fields</th></tr>
+<tr><td><code>departments</code></td><td>Org departments</td><td>id, name, code</td></tr>
+<tr><td><code>designations</code></td><td>Job designations</td><td>id, name, code, dept_id FK</td></tr>
+<tr><td><code>requisitions</code></td><td>Job postings</td><td>title, dept_id, vacancies, salary_min/max, skills, status</td></tr>
+<tr><td><code>candidates</code></td><td>Applicants</td><td>job_id FK, first_name, last_name, email, phone, nid, gender, dob, status_id FK</td></tr>
+<tr><td><code>candidate_statuses</code></td><td>Lookup statuses</td><td>code (UNI), name, sort_order</td></tr>
+<tr><td><code>candidate_logs</code></td><td>Audit trail</td><td>candidate_id FK, action, from_status, to_status, notes, created_by</td></tr>
+</table>
+
+<h3>Status Flow</h3>
+<pre>Applied → Screened → Shortlisted → Interviewed → Selected → Offered → Hired
+    │         │            │              │
+    └─────────┴────────────┴──────────────┴→ Rejected (at any stage)</pre>
+
+<!-- ═══════════════════════ MODULE 2: SCREENING ═══════════════════════ -->
+<h2 id="mod-screening">Module 2: Screening &amp; Interview</h2>
+
+<h3>Workflow</h3>
+<div class="flow-box">HR screens candidate → result: Shortlisted / Rejected
+    ↓ screening.match fields = Match / Partial / No Match
+Interview rounds added (1, 2, 3...) each with 4 score dimensions:
+    Technical | Communication | Problem-Solving | Attitude
+    ↓
+is_final_round=1 marks last round → triggers decision
+    ↓ decision: Shortlisted / Rejected / Selected
+Candidate status auto-updates via candidate_logs</div>
+
+<h3>Key Tables</h3>
+<table>
+<tr><th>Table</th><th>Purpose</th></tr>
+<tr><td><code>screenings</code></td><td>FK candidate_id, screened_by, rating, comm_score, exp/skill/edu_match, result</td></tr>
+<tr><td><code>interview_log</code></td><td>FK candidate_id, round, type, interviewer, 4 scores, rating, decision, is_final_round</td></tr>
+</table>
+
+<!-- ═══════════════════════ MODULE 3: SALARY PROPOSAL ═══════════════════════ -->
+<h2 id="mod-proposal">Module 3: Salary Proposal</h2>
+
+<h3>Workflow</h3>
+<div class="flow-box">HR creates proposal → enters Gross Salary
+    ↓ auto-calc (see Salary Calculation section)
+Basic = Gross × 0.571425
+House Rent = Basic × 0.5
+Medical = Basic × 0.1
+Conveyance = Basic × 0.15
+Total Salary = Gross
+    ↓
+Gender-based tax fetched via AJAX → offer_management/ajax/get_taxinfo_ajx.php
+    ↓
+Total Payable = Total Salary − Personal PF − PF Deductible − Monthly Tax
+    ↓
+Stored as JSON in salary_breakdown column
+Status: Draft → Proposed → Pending_Approval → Approved → Finalized</div>
+
+<h3>Salary Breakdown JSON</h3>
+<pre>{
+  "gross_salary": 50000,
+  "basic": 28571.25,
+  "house_rent": 14285.63,
+  "medical_allowance": 2857.13,
+  "conveyance_allowance": 4285.69,
+  "total_salary": 50000,
+  "personal_pf": 0,
+  "pf_deductible": 0,
+  "monthly_income_tax": 0,
+  "total_payable": 50000
+}</pre>
+
+<h3>Key Files</h3>
+<table>
+<tr><th>File</th><th>Purpose</th></tr>
+<tr><td><code>offer_management/salary_breakdown.php</code></td><td>Interactive salary calculator UI</td></tr>
+<tr><td><code>offer_management/proposal.php</code></td><td>Proposal list page</td></tr>
+<tr><td><code>offer_management/ajax/proposal_create.php</code></td><td>Save proposal with salary_breakdown JSON</td></tr>
+<tr><td><code>offer_management/ajax/proposal_submit.php</code></td><td>Submit for approval</td></tr>
+<tr><td><code>offer_management/ajax/proposal_approve.php</code></td><td>Approve/reject/finalize proposal</td></tr>
+<tr><td><code>offer_management/ajax/proposal_finalize.php</code></td><td>Finalize → creates offer</td></tr>
+<tr><td><code>offer_management/ajax/get_taxinfo_ajx.php</code></td><td>Bangladesh tax calculator (FY 2024-25)</td></tr>
+</table>
+
+<!-- ═══════════════════════ MODULE 4: OFFER MANAGEMENT ═══════════════════════ -->
+<h2 id="mod-offer">Module 4: Offer Management</h2>
+
+<h3>Workflow</h3>
+<div class="flow-box">Proposal Finalized → offer created (status=Pending)
+    ↓
+Offer Approval page shows Pending offers
+    ↓ approve.php
+All approval levels approved → offers.status = 'Approved'
+    ↓
+Ready for letter generation</div>
+
+<h3>Offer Status Flow</h3>
+<pre>Pending → Approved → (letter generated/sent) → Accepted / Rejected
+         ↘ Rejected</pre>
+
+<h3>Key Tables</h3>
+<table>
+<tr><th>Table</th><th>Purpose</th></tr>
+<tr><td><code>offers</code></td><td>candidate_id FK, salary, joining_date, designation_id FK, dept_id FK, probation_months, status, response_status, response_notes</td></tr>
+<tr><td><code>offer_approvals</code></td><td>offer_id FK, level, approver, status (Pending/Approved/Rejected), comment</td></tr>
+</table>
+
+<h3>Key Files</h3>
+<table>
+<tr><th>File</th><th>Purpose</th></tr>
+<tr><td><code>offer_management/approval.php</code></td><td>Offer approval page (Pending/Ready/History tabs)</td></tr>
+<tr><td><code>offer_management/ajax/create.php</code></td><td>Creates offer + first approval level, updates candidate to "Offered"</td></tr>
+<tr><td><code>offer_management/ajax/approve.php</code></td><td>Approve/reject offer at each level</td></tr>
+<tr><td><code>offer_management/ajax/list_offers.php</code></td><td>Central query — supports status, response_status, letter_status, with_letter filters</td></tr>
+</table>
+
+<!-- ═══════════════════════ MODULE 5: OFFER LETTER ═══════════════════════ -->
+<h2 id="mod-letter">Module 5: Offer Letter Generation &amp; Send</h2>
+
+<h3>Workflow</h3>
+<div class="flow-box">letter.php → shows Approved offers with letter status (Not Generated / Generated / Sent)
+    ↓ "Generate"
+generate_letter.php?offer_id=X
+    1. Fetch offer + candidate details
+    2. Load templates (type=Offer) from letter_templates
+    3. User selects template → AJAX: templates/ajax/render.php
+       { module: "Offer", record_id: offerId, content: templateHTML }
+    4. render.php loads templates/render/offer.php → getOfferTagMap()
+    5. Resolves 12 {{TAGS}} → returns rendered HTML
+    6. Loaded into Quill editor → user edits → "Generate Letter"
+    7. AJAX: letter_generate.php → INSERT/UPDATE offer_letters (status='Generated')
+    ↓
+letter.php → "Send" → email modal
+    8. AJAX: letter_send.php
+       - INSERT offer_email_log (recipient, subject, body)
+       - UPDATE offer_letters SET status='Sent', sent_at=NOW()
+       - UPDATE offers SET sent_at=NOW()
+       - Log lifecycle: offer_sent</div>
+
+<h3>Template Merge Tags (Offer)</h3>
+<table>
+<tr><th>Tag</th><th>Source</th></tr>
+<tr><td><span class="tag">{{CANDIDATE_NAME}}</span></td><td>candidates.first_name + last_name</td></tr>
+<tr><td><span class="tag">{{DESIGNATION}}</span></td><td>designations.name</td></tr>
+<tr><td><span class="tag">{{JOB_TITLE}}</span></td><td>requisitions.title</td></tr>
+<tr><td><span class="tag">{{DEPARTMENT}}</span></td><td>departments.name</td></tr>
+<tr><td><span class="tag">{{SALARY}}</span></td><td>offers.salary</td></tr>
+<tr><td><span class="tag">{{JOINING_DATE}}</span></td><td>offers.joining_date</td></tr>
+<tr><td><span class="tag">{{PROBATION_MONTHS}}</span></td><td>offers.probation_months</td></tr>
+<tr><td><span class="tag">{{COMPANY_NAME}}</span></td><td>Hardcoded: TechCorp International</td></tr>
+<tr><td><span class="tag">{{HR_NAME}}</span></td><td>Hardcoded: HR Department</td></tr>
+<tr><td><span class="tag">{{DATE}}</span></td><td>Current date</td></tr>
+<tr><td><span class="tag">{{RESPONSE_DATE}}</span></td><td>Current date + 14 days</td></tr>
+<tr><td><span class="tag">{{SALARY_BREAKDOWN}}</span></td><td>HTML table from salary_proposals.salary_breakdown JSON</td></tr>
+</table>
+
+<!-- ═══════════════════════ MODULE 6: CANDIDATE RESPONSE ═══════════════════════ -->
+<h2 id="mod-response">Module 6: Candidate Response</h2>
+
+<h3>Workflow</h3>
+<div class="flow-box">response.php → tabbed view: Pending Response / Responded
+    ↓
+Pending tab: list_offers.php?status=Approved&response_status=Pending&letter_status=Sent
+    → Only shows offers with sent letters awaiting response
+    ↓ "Record Response"
+Mark Response modal → Accept / Reject + notes
+    ↓
+respond.php → UPDATE offers SET response_status, responded_at, response_notes
+    → If Accepted: candidate status = 5 (Offered)
+    → If Rejected: candidate status = 99
+    → Log lifecycle: offer_accepted / offer_rejected_candidate</div>
+
+<h3>Response Status Flow</h3>
+<pre>Pending → Accepted → (ready for employee creation)
+       ↘ Rejected</pre>
+
+<!-- ═══════════════════════ MODULE 7: EMPLOYEE CREATION ═══════════════════════ -->
+<h2 id="mod-employee">Module 7: Employee Creation (6-Step Wizard)</h2>
+
+<h3>Workflow</h3>
+<div class="flow-box">employee/list.php → shows Accepted offers ready for employee creation
+    ↓ "Create Employee"
+employee/create.php?offer_id=X → 6-step wizard:
+    Step 1: Personal Info (auto-filled from candidate)
+    Step 2: Employment (Employment Type defaults to "Probationer")
+    Step 3: Address (present + permanent)
+    Step 4: Family & Nominee (spouse, children, nominee)
+    Step 5: Other Details (location, working days, notes)
+    Step 6: Salary Setup (interactive calculator)
+    ↓ "Create Employee"
+    1. submitEmployee() → POST employee/ajax/save.php
+       → INSERT personnel_basic_info (70+ fields, auto-generated PBI_CODE: EMP-00001)
+    2. submitSalaryData() → POST employee/ajax/save_salary.php
+       → INSERT/UPDATE salary_info (50+ salary fields)
+    3. Redirect to employee/view.php?offer_id=X</div>
+
+<h3>Step 6: Salary Setup</h3>
+<div class="flow-box">Gross Salary (editable, oninput=calculateSalary())
+    ↓ auto-calc
+Basic = Gross × 0.571425 (readonly)
+House Rent = Basic × 0.5 (readonly)
+Medical = Basic × 0.1 (readonly)
+Conveyance = Basic × 0.15 (readonly)
+Total Salary = Gross (readonly)
+    ↓ AJAX to get_taxinfo_ajx.php
+Monthly Income Tax (readonly, gender-aware)
+    ↓
+Total Payable = Total Salary − Personal PF − PF Deductible − Monthly Tax</div>
+
+<h3>Employment Types</h3>
+<p>Casual | Apprentice | <strong>Probationer (default)</strong> | Temporary | Replace | Permanent | Seasonal | Contractual | Regular</p>
+
+<h3>Key Tables</h3>
+<table>
+<tr><th>Table</th><th>Purpose</th></tr>
+<tr><td><code>personnel_basic_info</code></td><td>70+ employee fields: PBI_CODE, PBI_NAME, PBI_EMAIL, EMPLOYMENT_TYPE, dept_id, DESG_ID, offer_id, candidate_id</td></tr>
+<tr><td><code>salary_info</code></td><td>50+ salary fields: gross_salary, basic_salary, house_rent, total_payable, m_income_tex, pf, pf_deductible, ac_no, etc.</td></tr>
+</table>
+
+<!-- ═══════════════════════ MODULE 8: PROBATION ═══════════════════════ -->
+<h2 id="mod-probation">Module 8: Probation Appraisal</h2>
+
+<h3>Workflow</h3>
+<div class="flow-box">probation/list.php → shows employees with EMPLOYMENT_TYPE='Probationer'
+    ↓ "Start Appraisal"
+Creates probation_appraisals record + 6 workflow levels + empty scores
+    ↓
+Self Assessment → Supervisor → Dept Head → HR Review → GM → Managing Director
+    ↓ each level: approve / sendback / reject
+Probation scores entered per category (weighted %)
+    ↓
+Overall Score = Σ(score × weight) / Σ(weight)
+    ↓
+Recommendation: Confirm / Extend / Terminate
+    ↓ final level approved
+appraisals.status = 'Completed' → employee appears in Confirmation module</div>
+
+<h3>Multi-Level Workflow</h3>
+<table>
+<tr><th>Level</th><th>Order</th><th>Action</th></tr>
+<tr><td>Self Assessment</td><td>1</td><td>Employee self-review</td></tr>
+<tr><td>Supervisor</td><td>2</td><td>Direct manager evaluation</td></tr>
+<tr><td>Dept Head</td><td>3</td><td>Department head review</td></tr>
+<tr><td>HR Review</td><td>4</td><td>HR department assessment</td></tr>
+<tr><td>GM</td><td>5</td><td>General Manager approval</td></tr>
+<tr><td>Managing Director</td><td>6</td><td>Final approval (last level)</td></tr>
+</table>
+
+<h3>Key Tables</h3>
+<table>
+<tr><th>Table</th><th>Purpose</th></tr>
+<tr><td><code>probation_appraisals</code></td><td>employee_id (→PBI_ID), joining_date, probation_months, end_date, overall_score, recommendation, status</td></tr>
+<tr><td><code>probation_categories</code></td><td>name, weight %, sort_order</td></tr>
+<tr><td><code>probation_scores</code></td><td>appraisal_id FK, category_id FK, score, comments</td></tr>
+<tr><td><code>probation_workflow</code></td><td>appraisal_id FK, level, status (Pending/Approved/Sent Back/Rejected), approved_by, comments</td></tr>
+</table>
+
+<h3>Key Files</h3>
+<table>
+<tr><th>File</th><th>Purpose</th></tr>
+<tr><td><code>probation/list.php</code></td><td>Appraisal list page</td></tr>
+<tr><td><code>probation/approve.php</code></td><td>Multi-level approval page with accordion UI</td></tr>
+<tr><td><code>probation/ajax/eligible_employees.php</code></td><td>Employees where candidate_id IS NOT NULL AND EMPLOYMENT_TYPE='Probationer'</td></tr>
+<tr><td><code>probation/ajax/employees_list.php</code></td><td>Same filter + appraisal count</td></tr>
+<tr><td><code>probation/ajax/appraisals_get.php</code></td><td>Full join through PBI + offers, screenings via pbi.candidate_id</td></tr>
+<tr><td><code>probation/ajax/appraisals_submit.php</code></td><td>Submits scores + advances workflow</td></tr>
+<tr><td><code>probation/ajax/approval_action.php</code></td><td>Approve/sendback/reject workflow level</td></tr>
+<tr><td><code>probation/ajax/approval_list.php</code></td><td>Pending approvals with next workflow level</td></tr>
+</table>
+
+<!-- ═══════════════════════ MODULE 9: CONFIRMATION ═══════════════════════ -->
+<h2 id="mod-confirmation">Module 9: Confirmation</h2>
+
+<h3>Workflow</h3>
+<div class="flow-box">confirmation/list.php → shows employees with probation_appraisals.status='Completed'
+    ↓ "Generate Letter"
+confirmation/generate.php?employee_id=X&appraisal_id=Y
+    1. Fetch employee details from personnel_basic_info
+    2. Load templates (type=Confirmation) from letter_templates
+    3. Select employee type (Casual/Permanent/Regular/etc.)
+    4. User selects template → AJAX: render_template.php
+       { employee_id, content: templateHTML }
+    5. Resolves 15 {{TAGS}} from getConfirmationTagMap()
+    6. Quill editor → "Generate Letter"
+    7. AJAX: letter_generate.php → INSERT confirmation_letters (status='Generated')
+    ↓
+confirmation/confirmation_letters.php → shows Generated letters
+    ↓ "Approve"
+letter_approve.php → status='Approved'
+    ↓ "Send"
+Send modal (auto-filled with employee email from PBI_EMAIL)
+    ↓
+letter_send.php → status='Sent', sent_at, sent_to_email</div>
+
+<h3>Template Merge Tags (Confirmation)</h3>
+<table>
+<tr><th>Tag</th><th>Source</th></tr>
+<tr><td><span class="tag">{{EMPLOYEE_NAME}}</span></td><td>pbi.PBI_NAME + last_name</td></tr>
+<tr><td><span class="tag">{{EMPLOYEE_CODE}}</span></td><td>pbi.PBI_CODE</td></tr>
+<tr><td><span class="tag">{{DESIGNATION}}</span></td><td>designations.name</td></tr>
+<tr><td><span class="tag">{{DEPARTMENT}}</span></td><td>departments.name</td></tr>
+<tr><td><span class="tag">{{SALARY}}</span></td><td>offers.salary or salary_info.gross_salary</td></tr>
+<tr><td><span class="tag">{{JOINING_DATE}}</span></td><td>offers.joining_date or PBI_DOJ</td></tr>
+<tr><td><span class="tag">{{CONFIRMATION_DATE}}</span></td><td>joining_date + probation_months</td></tr>
+<tr><td><span class="tag">{{PROBATION_MONTHS}}</span></td><td>offers.probation_months</td></tr>
+<tr><td><span class="tag">{{COMPANY_NAME}}</span></td><td>Hardcoded: TechCorp International</td></tr>
+<tr><td><span class="tag">{{HR_NAME}}</span></td><td>Hardcoded: HR Department</td></tr>
+<tr><td><span class="tag">{{DATE}}</span></td><td>Current date</td></tr>
+<tr><td><span class="tag">{{PHONE}}</span></td><td>pbi.PBI_MOBILE</td></tr>
+<tr><td><span class="tag">{{EMAIL}}</span></td><td>pbi.PBI_EMAIL</td></tr>
+<tr><td><span class="tag">{{GENDER}}</span></td><td>pbi.PBI_SEX</td></tr>
+<tr><td><span class="tag">{{SALARY_BREAKDOWN}}</span></td><td>HTML table from salary_info</td></tr>
+</table>
+
+<h3>Confirmation Status Flow</h3>
+<pre>Draft → Generated → Approved → Sent</pre>
+
+<h3>Key Files</h3>
+<table>
+<tr><th>File</th><th>Purpose</th></tr>
+<tr><td><code>confirmation/list.php</code></td><td>Eligible employees (probation completed)</td></tr>
+<tr><td><code>confirmation/generate.php</code></td><td>Letter generation with Quill + template + employee type</td></tr>
+<tr><td><code>confirmation/confirmation_letters.php</code></td><td>Letter list with Preview/Approve/Send actions</td></tr>
+<tr><td><code>confirmation/ajax/migrate.php</code></td><td>Creates confirmation_letters table</td></tr>
+<tr><td><code>confirmation/ajax/list_eligible.php</code></td><td>Completed probation employees</td></tr>
+<tr><td><code>confirmation/ajax/list_letters.php</code></td><td>Confirmation letters with employee data</td></tr>
+<tr><td><code>confirmation/ajax/letter_generate.php</code></td><td>Save/update generated letter</td></tr>
+<tr><td><code>confirmation/ajax/letter_view.php</code></td><td>Fetch letter for preview</td></tr>
+<tr><td><code>confirmation/ajax/letter_approve.php</code></td><td>Approve/reject letter</td></tr>
+<tr><td><code>confirmation/ajax/letter_send.php</code></td><td>Mark as sent with email</td></tr>
+<tr><td><code>confirmation/ajax/render_template.php</code></td><td>Resolve {{TAGS}} for confirmation</td></tr>
+<tr><td><code>templates/render/confirmation.php</code></td><td>getConfirmationTagMap() — 15 tags</td></tr>
+</table>
+
+<!-- ═══════════════════════ TEMPLATE ENGINE ═══════════════════════ -->
+<h2 id="templates">Template Engine System</h2>
+
+<h3>Architecture</h3>
+<div class="flow-box">letter_templates table stores HTML content with {{TAG}} placeholders
+    ↓
+templates/ajax/render.php receives { module, record_id, content }
+    ↓
+1. SELECT render_file FROM template_modules WHERE module_name = :module
+2. require_once render_file (e.g. templates/render/offer.php)
+3. Call get<Module>TagMap(pdo, record_id)
+   → Each render file queries DB, returns [ 'TAG' => 'value', ... ]
+4. preg_replace /{{([A-Z_][A-Z0-9_]*)}}/ → value
+5. Return { rendered_content, tag_count }</div>
+
+<h3>Registered Modules</h3>
+<table>
+<tr><th>Module</th><th>Render File</th><th>Function</th><th>Tags</th></tr>
+<tr><td><code>Offer</code></td><td>templates/render/offer.php</td><td>getOfferTagMap()</td><td>12 tags</td></tr>
+<tr><td><code>Confirmation</code></td><td>templates/render/confirmation.php</td><td>getConfirmationTagMap()</td><td>15 tags</td></tr>
+<tr><td><code>Probation</code></td><td>templates/render/probation.php</td><td>getProbationTagMap()</td><td>TBD</td></tr>
+<tr><td><code>General</code></td><td>templates/render/general.php</td><td>getGeneralTagMap()</td><td>TBD</td></tr>
+</table>
+
+<h3>Default Templates</h3>
+<table>
+<tr><th>Name</th><th>Type</th><th>Seeded By</th></tr>
+<tr><td>Standard Offer Letter</td><td>Offer</td><td>templates/ajax/migrate.php</td></tr>
+<tr><td>Confirmation Letter Template</td><td>Confirmation</td><td>templates/ajax/seed_confirmation.php</td></tr>
+</table>
+
+<!-- ═══════════════════════ SALARY CALCULATION ═══════════════════════ -->
+<h2 id="salary-calc">Salary Calculation Logic</h2>
+
+<div class="card">
+<h4>Auto-Calculation Formula</h4>
+<table>
+<tr><th>Component</th><th>Formula</th><th>Example (Gross=50,000)</th></tr>
+<tr><td>Basic Salary</td><td>Gross × 0.571425</td><td>28,571.25</td></tr>
+<tr><td>House Rent</td><td>Basic × 0.5</td><td>14,285.63</td></tr>
+<tr><td>Medical Allowance</td><td>Basic × 0.1</td><td>2,857.13</td></tr>
+<tr><td>Conveyance Allowance</td><td>Basic × 0.15</td><td>4,285.69</td></tr>
+<tr><td>Total Salary</td><td>= Gross</td><td>50,000.00</td></tr>
+<tr><td><strong>Total Payable</strong></td><td>Total Salary − Personal PF − PF Deductible − Monthly Tax</td><td>Varies</td></tr>
+</table>
+</div>
+
+<!-- ═══════════════════════ TAX CALCULATION ═══════════════════════ -->
+<h2 id="tax-calc">Tax Calculation (Bangladesh FY 2024-25)</h2>
+
+<p>Endpoint: <code>GET offer_management/ajax/get_taxinfo_ajx.php?gross_salary=X&basic_salary=Y&gender=male|female</code></p>
+
+<div class="card">
+<h4>Response</h4>
+<pre>{ "success": true, "tax": 500.00, "annual_tax": 6000.00, "taxable_income": 60000.00 }</pre>
+<h4>Logic</h4>
+<ul>
+<li>Annual taxable income = Gross × 12 − exemptions (10% of basic, 30% of basic, 10% of basic = 50% of basic total)</li>
+<li>Minimum taxable: 3,50,000 BDT for males, 4,00,000 for females</li>
+<li>Tax slabs: First 3.5L = 0%, 3.5-5L = 5%, 5-8L = 10%, 8-12L = 15%, 12-16L = 20%, 16-20L = 25%, 20L+ = 30%</li>
+<li>Minimum annual tax: 5,000 BDT</li>
+<li>Monthly tax = annual_tax / 12</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════ LIFECYCLE ═══════════════════════ -->
+<h2 id="lifecycle">Lifecycle Logging</h2>
+
+<p>All key actions are logged via <code>addCandidateLog($pdo, $candidateId, $action, $from, $to, $notes)</code> in <code>includes/functions.php</code>.</p>
+
+<table>
+<tr><th>Action</th><th>Module</th><th>When</th></tr>
+<tr><td><code>offer_created</code></td><td>Offer</td><td>Offer created for candidate</td></tr>
+<tr><td><code>offer_approved</code></td><td>Offer</td><td>All approval levels passed</td></tr>
+<tr><td><code>offer_rejected</code></td><td>Offer</td><td>Rejected at any approval level</td></tr>
+<tr><td><code>offer_letter_generated</code></td><td>Letter</td><td>Letter content saved</td></tr>
+<tr><td><code>offer_sent</code></td><td>Letter</td><td>Email logged as sent</td></tr>
+<tr><td><code>offer_accepted</code></td><td>Response</td><td>Candidate accepted offer</td></tr>
+<tr><td><code>offer_rejected_candidate</code></td><td>Response</td><td>Candidate rejected offer</td></tr>
+<tr><td><code>probation_approved</code></td><td>Probation</td><td>Approved at a workflow level</td></tr>
+<tr><td><code>probation_completed</code></td><td>Probation</td><td>All levels approved</td></tr>
+<tr><td><code>probation_sentback</code></td><td>Probation</td><td>Sent back to previous level</td></tr>
+<tr><td><code>probation_rejected</code></td><td>Probation</td><td>Rejected at any level</td></tr>
+</table>
+
+<p>Lifecycle timeline viewable at <code>lifecycle/view.php</code>.</p>
+
+<!-- ═══════════════════════ API ENDPOINTS ═══════════════════════ -->
+<h2 id="api-endpoints">API Endpoints Reference</h2>
+
+<h3>Offer Management</h3>
+<div class="endpoint"><span class="method method-post">POST</span> <code>offer_management/ajax/create.php</code> — Create offer + first approval</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>offer_management/ajax/approve.php</code> — Approve/reject offer</div>
+<div class="endpoint"><span class="method method-get">GET</span> <code>offer_management/ajax/list_offers.php</code> — Central offer list (status, response_status, letter_status, with_letter params)</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>offer_management/ajax/letter_generate.php</code> — Save offer letter</div>
+<div class="endpoint"><span class="method method-get">GET</span> <code>offer_management/ajax/letter_view.php</code> — Preview offer letter</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>offer_management/ajax/letter_send.php</code> — Send offer letter email</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>offer_management/ajax/respond.php</code> — Record candidate response</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>offer_management/ajax/proposal_create.php</code> — Create salary proposal</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>offer_management/ajax/proposal_submit.php</code> — Submit for approval</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>offer_management/ajax/proposal_approve.php</code> — Approve/reject proposal</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>offer_management/ajax/proposal_finalize.php</code> — Finalize proposal</div>
+<div class="endpoint"><span class="method method-get">GET</span> <code>offer_management/ajax/get_taxinfo_ajx.php</code> — Tax calculation</div>
+
+<h3>Employee</h3>
+<div class="endpoint"><span class="method method-post">POST</span> <code>employee/ajax/save.php</code> — Create employee (personnel_basic_info)</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>employee/ajax/save_salary.php</code> — Save salary info</div>
+<div class="endpoint"><span class="method method-get">GET</span> <code>employee/ajax/get_candidate.php</code> — Get offer + employee + salary data</div>
+<div class="endpoint"><span class="method method-get">GET</span> <code>employee/ajax/list_offers.php</code> — List accepted offers ready for employee creation</div>
+
+<h3>Probation</h3>
+<div class="endpoint"><span class="method method-get">GET</span> <code>probation/ajax/eligible_employees.php</code> — Probationer employees</div>
+<div class="endpoint"><span class="method method-get">GET</span> <code>probation/ajax/employees_list.php</code> — Employees + appraisal count</div>
+<div class="endpoint"><span class="method method-get">GET</span> <code>probation/ajax/appraisals_list.php</code> — Appraisals with scores</div>
+<div class="endpoint"><span class="method method-get">GET</span> <code>probation/ajax/appraisals_get.php</code> — Full appraisal detail</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>probation/ajax/appraisals_submit.php</code> — Submit scores + advance workflow</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>probation/ajax/appraisals_update.php</code> — Update scores</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>probation/ajax/approval_action.php</code> — Approve/sendback/reject level</div>
+<div class="endpoint"><span class="method method-get">GET</span> <code>probation/ajax/approval_list.php</code> — Pending approvals</div>
+
+<h3>Confirmation</h3>
+<div class="endpoint"><span class="method method-get">GET</span> <code>confirmation/ajax/list_eligible.php</code> — Completed probation employees</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>confirmation/ajax/letter_generate.php</code> — Generate confirmation letter</div>
+<div class="endpoint"><span class="method method-get">GET</span> <code>confirmation/ajax/list_letters.php</code> — List confirmation letters</div>
+<div class="endpoint"><span class="method method-get">GET</span> <code>confirmation/ajax/letter_view.php</code> — Preview confirmation letter</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>confirmation/ajax/letter_approve.php</code> — Approve/reject letter</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>confirmation/ajax/letter_send.php</code> — Send confirmation letter</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>confirmation/ajax/render_template.php</code> — Resolve confirmation tags</div>
+
+<h3>Templates</h3>
+<div class="endpoint"><span class="method method-get">GET</span> <code>templates/ajax/templates_list.php</code> — List templates (type param)</div>
+<div class="endpoint"><span class="method method-post">POST</span> <code>templates/ajax/render.php</code> — Render template tags (module, record_id, content)</div>
+
+<!-- ═══════════════════════ FILE STRUCTURE ═══════════════════════ -->
+<h2 id="file-structure">File Structure</h2>
+
+<pre>
+ELMS-final/
+├── ajax/common.js              # apiGet(), apiPost(), formatCurrency(), filterTable()
+├── includes/
+│   ├── config.php              # getDB(), ROOT_PATH, APP_SHORT
+│   ├── functions.php           # addCandidateLog()
+│   ├── layout.php              # Master layout (sidebar + content)
+│   └── sidebar.php             # Navigation with all modules
+├── candidates/                 # Candidate CRUD
+├── screening/                  # Screening forms
+├── interview/                  # Interview rounds
+├── requisition/                # Job requisitions
+├── offer_management/
+│   ├── index.php               # Overview dashboard
+│   ├── proposal.php            # Salary proposal list
+│   ├── salary_breakdown.php    # Interactive salary calculator
+│   ├── proposal_approval.php   # Proposal approval (Pending/Finalized/Rejected)
+│   ├── approval.php            # Offer approval (Pending/Ready/History)
+│   ├── letter.php              # Offer letter list + send
+│   ├── generate_letter.php     # Letter generation (Quill + templates)
+│   ├── response.php            # Candidate response (Pending/Responded)
+│   └── ajax/                   # 12+ AJAX endpoints
+├── employee/
+│   ├── list.php                # Offers ready for employee creation
+│   ├── create.php              # 6-step wizard
+│   ├── view.php                # Employee profile (6 tabs including Salary)
+│   ├── salary_information.php  # Standalone salary form
+│   └── ajax/                   # save.php, save_salary.php, get_candidate.php
+├── probation/
+│   ├── list.php                # Appraisal list
+│   ├── approve.php             # Multi-level approval
+│   └── ajax/                   # 8 AJAX endpoints
+├── confirmation/
+│   ├── list.php                # Eligible employees
+│   ├── generate.php            # Letter generation (Quill + templates + emp type)
+│   ├── confirmation_letters.php # Letter list (Preview/Approve/Send)
+│   └── ajax/                   # 7 AJAX endpoints
+├── templates/
+│   ├── list.php                # Template CRUD
+│   ├── tags.php                # Merge tag management
+│   ├── render/                 # Module-specific tag resolvers
+│   │   ├── offer.php           # getOfferTagMap() — 12 tags
+│   │   ├── confirmation.php    # getConfirmationTagMap() — 15 tags
+│   │   └── probation.php       # getProbationTagMap()
+│   └── ajax/                   # render.php, templates_list.php, migrate.php
+├── lifecycle/
+│   └── view.php                # Timeline view of all candidate actions
+└── docs/
+    ├── system-logic.md         # Phase-by-phase system logic
+    ├── database-erd.md         # Full ERD + table schemas
+    ├── elms-erd.dbml           # DBML format ERD
+    └── documentation.html      # This file
+</pre>
+
+<!-- ═══════════════════════ STATUS MACHINES ═══════════════════════ -->
+<h2 id="status-machines">Status State Machines</h2>
+
+<div class="grid-2">
+<div class="card">
+<h4>Candidate Status</h4>
+<pre>Applied → Screened → Shortlisted
+→ Interviewed → Selected → Offered → Hired
+↗ Rejected (at any stage)</pre>
+</div>
+<div class="card">
+<h4>Offer Status</h4>
+<pre>Pending → Approved → (letter flow)
+       ↘ Rejected</pre>
+</div>
+<div class="card">
+<h4>Offer Response</h4>
+<pre>Pending → Accepted
+       ↘ Rejected</pre>
+</div>
+<div class="card">
+<h4>Offer Letter</h4>
+<pre>Draft → Generated → Sent</pre>
+</div>
+<div class="card">
+<h4>Salary Proposal</h4>
+<pre>Draft → Proposed → Pending_Approval
+→ Approved → Finalized
+↗ Rejected (can revise)</pre>
+</div>
+<div class="card">
+<h4>Probation Appraisal</h4>
+<pre>Draft → In Progress → Completed
+         ↘ Rejected
+↗ Sent Back (to Draft)</pre>
+</div>
+<div class="card">
+<h4>Probation Workflow</h4>
+<pre>Pending → Approved
+       ↘ Rejected
+       ↘ Sent Back</pre>
+</div>
+<div class="card">
+<h4>Confirmation Letter</h4>
+<pre>Draft → Generated → Approved → Sent
+                       ↘ Rejected</pre>
+</div>
+</div>
+
+<hr>
+
+<!-- ═══════════════════════ DOCUMENTATION FILES ═══════════════════════ -->
+<h2 id="doc-files">Documentation Files</h2>
+<p>Download or view the full documentation files for deeper reference. These files contain detailed schemas, complete system logic diagrams, and importable ERD definitions.</p>
+
+<div class="grid-2" style="margin-top:16px">
+
+<div class="card" style="display:flex;flex-direction:column;justify-content:space-between">
+<div>
+<div class="card-header">
+<h4 style="margin:0;color:var(--text);font-size:15px">System Logic Diagram</h4>
+<span class="badge badge-blue">Markdown</span>
+</div>
+<p style="font-size:13px;color:var(--muted)">Phase-by-phase system flow with ASCII diagrams covering all 9 modules: Recruitment, Screening, Salary Proposal, Offer, Letter Generation, Response, Template Engine, Probation, and Confirmation.</p>
+<ul style="font-size:12px;color:var(--muted)">
+<li>9 phase diagrams with file references</li>
+<li>Data flow summary</li>
+<li>All status state machines</li>
+</ul>
+</div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<a href="system-logic.md" target="_blank" class="btn btn-sm" style="border:1px solid var(--border);color:var(--text);padding:6px 14px;border-radius:6px;font-size:12px;text-decoration:none">View File</a>
+<a href="system-logic.md" download class="btn btn-sm" style="background:var(--pri);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;text-decoration:none">Download</a>
+</div>
+</div>
+
+<div class="card" style="display:flex;flex-direction:column;justify-content:space-between">
+<div>
+<div class="card-header">
+<h4 style="margin:0;color:var(--text);font-size:15px">Database ERD</h4>
+<span class="badge badge-blue">Markdown</span>
+</div>
+<p style="font-size:13px;color:var(--muted)">Full entity relationship diagram with all 23 tables, complete field schemas, foreign key constraints, and ASCII ERD visualization.</p>
+<ul style="font-size:12px;color:var(--muted)">
+<li>23 table schemas with types and keys</li>
+<li>20 foreign key constraints</li>
+<li>ASCII ERD with relationships</li>
+</ul>
+</div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<a href="database-erd.md" target="_blank" class="btn btn-sm" style="border:1px solid var(--border);color:var(--text);padding:6px 14px;border-radius:6px;font-size:12px;text-decoration:none">View File</a>
+<a href="database-erd.md" download class="btn btn-sm" style="background:var(--pri);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;text-decoration:none">Download</a>
+</div>
+</div>
+
+<div class="card" style="display:flex;flex-direction:column;justify-content:space-between">
+<div>
+<div class="card-header">
+<h4 style="margin:0;color:var(--text);font-size:15px">DBML ERD Definition</h4>
+<span class="badge badge-green">DBML</span>
+</div>
+<p style="font-size:13px;color:var(--muted)">Importable DBML file for <a href="https://dbdiagram.io/d" target="_blank" style="font-size:13px">dbdiagram.io</a>. Paste this code to generate a visual, shareable ERD diagram instantly.</p>
+<ul style="font-size:12px;color:var(--muted)">
+<li>All 23 tables with column types</li>
+<li>FK references between tables</li>
+<li>Ready to paste into dbdiagram.io</li>
+</ul>
+</div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<a href="elms-erd.dbml" target="_blank" class="btn btn-sm" style="border:1px solid var(--border);color:var(--text);padding:6px 14px;border-radius:6px;font-size:12px;text-decoration:none">View File</a>
+<a href="elms-erd.dbml" download class="btn btn-sm" style="background:var(--pri);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;text-decoration:none">Download</a>
+</div>
+</div>
+
+<div class="card" style="display:flex;flex-direction:column;justify-content:space-between">
+<div>
+<div class="card-header">
+<h4 style="margin:0;color:var(--text);font-size:15px">Full Documentation</h4>
+<span class="badge badge-yellow">HTML</span>
+</div>
+<p style="font-size:13px;color:var(--muted)">This documentation page itself. A self-contained HTML file with inline styles — works offline, no server required. Share it with anyone.</p>
+<ul style="font-size:12px;color:var(--muted)">
+<li>9 module breakdowns with workflows</li>
+<li>API endpoint reference</li>
+<li>Salary &amp; tax calculation formulas</li>
+</ul>
+</div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<a href="documentation.html" target="_blank" class="btn btn-sm" style="border:1px solid var(--border);color:var(--text);padding:6px 14px;border-radius:6px;font-size:12px;text-decoration:none">View File</a>
+<a href="documentation.html" download class="btn btn-sm" style="background:var(--pri);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;text-decoration:none">Download</a>
+</div>
+</div>
+
+</div>
+
+<p style="font-size:12px;color:var(--muted);margin-top:12px;text-align:center">For more details, download and view the files above. The DBML file can be imported directly into <a href="https://dbdiagram.io/d" target="_blank">dbdiagram.io</a> to generate an interactive ERD.</p>
+
+<hr>
+<p style="text-align:center;color:var(--muted);font-size:12px;margin-top:32px">ELMS Documentation — Generated July 2026</p>
+
+</div>
+</body>
+</html>

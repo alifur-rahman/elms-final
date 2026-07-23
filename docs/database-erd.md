@@ -4,7 +4,7 @@
 
 ---
 
-## All Tables (20)
+## All Tables (23)
 
 | # | Table | Rows | Module |
 |---|-------|------|--------|
@@ -28,6 +28,9 @@
 | 18 | `probation_categories` | 10 | Probation |
 | 19 | `probation_scores` | 59 | Probation |
 | 20 | `probation_workflow` | 12 | Probation |
+| 21 | `personnel_basic_info` | — | Employee |
+| 22 | `salary_info` | — | Employee |
+| 23 | `confirmation_letters` | — | Confirmation |
 
 ---
 
@@ -270,6 +273,49 @@
 │  │    action_at         │                                                  │
 │  │    created_at        │                                                  │
 │  └──────────────────────┘                                                  │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│                       EMPLOYEE MODULE                                      │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  ┌──────────────────────────┐    ┌──────────────────────────┐             │
+│  │  personnel_basic_info     │    │      salary_info          │             │
+│  ├──────────────────────────┤    ├──────────────────────────┤             │
+│  │ PK PBI_ID                │    │ PK id                     │             │
+│  │    PBI_CODE              │    │ FK PBI_ID ────────────────┼──┐          │
+│  │    PBI_NAME              │    │ FK offer_id ──────────────┼──┼──→ offers│
+│  │    last_name             │    │    basic_salary           │  │          │
+│  │    PBI_DEPARTMENT        │    │    house_rent             │  │          │
+│  │    PBI_DESIGNATION       │    │    medical_allowance      │  │          │
+│  │    PBI_DOJ               │    │    convenience            │  │          │
+│  │    PBI_SEX               │    │    gross_salary           │  │          │
+│  │    PBI_EMAIL             │    │    total_salary           │  │          │
+│  │    PBI_MOBILE            │    │    total_payable          │  │          │
+│  │    EMPLOYMENT_TYPE       │    │    pf, income_tax         │  │          │
+│  │    employee_type         │    │    bank_name, ac_no       │  │          │
+│  │ FK candidate_id ─────────┼──┐ │    pf_applicable          │  │          │
+│  │ FK offer_id ─────────────┼──┼─┤    pf_deductible          │  │          │
+│  │    ... (100+ columns)    │  │ │    tax_status, pf_status  │  │          │
+│  └──────────────────────────┘  │ └──────────────────────────┘  │          │
+│                                │                                 │          │
+│  ┌──────────────────────────┐  │                                 │          │
+│  │   confirmation_letters    │  │                                 │          │
+│  ├──────────────────────────┤  │                                 │          │
+│  │ PK id                    │  │                                 │          │
+│  │ FK employee_id ──────────┼──┘                                 │          │
+│  │    offer_id              │                                    │          │
+│  │ FK appraisal_id ─────────┼──→ probation_appraisals            │          │
+│  │    letter_content        │                                    │          │
+│  │    employment_type       │                                    │          │
+│  │    status: Draft →       │                                    │          │
+│  │      Generated →         │                                    │          │
+│  │      Approved → Sent     │                                    │          │
+│  │    generated_at          │                                    │          │
+│  │    approved_at           │                                    │          │
+│  │    sent_at               │                                    │          │
+│  │    sent_to_email         │                                    │          │
+│  └──────────────────────────┘                                    │          │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -612,7 +658,106 @@
 
 ---
 
-## Foreign Key Map (17 constraints)
+### Module 6: Employee (personnel_basic_info + salary_info)
+
+#### `personnel_basic_info` (Employee Master)
+| Field | Type | Null | Key | Default | Extra |
+|-------|------|------|-----|---------|-------|
+| PBI_ID | bigint(20) | NO | PRI | NULL | auto_increment |
+| PBI_CODE | varchar(100) | NO | | NULL | |
+| MACHINE_ID | varchar(50) | NO | | NULL | |
+| PBI_DUE_DOJ | date | NO | | NULL | |
+| PBI_NAME | varchar(50) | YES | | NULL | |
+| PBI_FATHER_NAME | varchar(50) | YES | | NULL | |
+| PBI_MOTHER_NAME | varchar(50) | YES | | NULL | |
+| DEPT_ID | int(10) | YES | | NULL | |
+| PBI_DEPARTMENT | int(10) | YES | | NULL | |
+| nid | bigint(20) | YES | | NULL | |
+| employee_type | varchar(20) | NO | | Non Roster | |
+| DESG_ID | int(10) | YES | | NULL | |
+| PBI_DESIGNATION | varchar(50) | YES | | NULL | |
+| PBI_DOJ | date | YES | | NULL | |
+| PBI_DOB | date | YES | | NULL | |
+| PBI_SEX | varchar(10) | YES | | NULL | |
+| PBI_MARITAL_STA | varchar(12) | YES | | NULL | |
+| PBI_RELIGION | varchar(12) | YES | | NULL | |
+| PBI_NATIONALITY | varchar(50) | YES | | NULL | |
+| PBI_PERMANENT_ADD | varchar(250) | YES | | NULL | |
+| PBI_PRESENT_ADD | varchar(250) | YES | | NULL | |
+| PBI_PHONE | varchar(50) | YES | | NULL | |
+| PBI_MOBILE | varchar(50) | YES | | NULL | |
+| PBI_EMAIL | varchar(50) | YES | | NULL | |
+| PBI_BLOOD_GROUP | varchar(32) | NO | | | |
+| EMPLOYMENT_TYPE | varchar(70) | NO | | | |
+| candidate_id | int(11) | YES | MUL | NULL | |
+| offer_id | int(11) | YES | MUL | NULL | |
+| last_name | varchar(100) | NO | | | |
+| job_title | varchar(100) | NO | | | |
+| ... | (100+ columns) | | | | |
+
+> Note: `personnel_basic_info` is the employee master table. Key fields: `PBI_ID` (PK), `PBI_CODE` (employee code, e.g. EMP-00001), `EMPLOYMENT_TYPE` (Casual, Apprentice, Probationer, Temporary, Replace, Permanent, Seasonal, Contractual, Regular), `candidate_id` (FK to candidates), `offer_id` (FK to offers).
+
+**FK:** `candidate_id` -> `candidates(id)`, `offer_id` -> `offers(id)`
+
+#### `salary_info` (Employee Salary Breakdown)
+| Field | Type | Null | Key | Default | Extra |
+|-------|------|------|-----|---------|-------|
+| id | int(11) | NO | PRI | NULL | auto_increment |
+| PBI_ID | int(11) | NO | MUL | NULL | |
+| offer_id | int(11) | NO | MUL | NULL | |
+| salary_type | varchar(255) | NO | | | |
+| basic_salary | decimal(15,2) | NO | | 0.00 | |
+| house_rent | decimal(20,2) | NO | | 0.00 | |
+| medical_allowance | decimal(20,2) | NO | | 0.00 | |
+| convenience | decimal(20,2) | NO | | 0.00 | |
+| gross_salary | int(11) | NO | | 0 | |
+| total_salary | int(11) | NO | | 0 | |
+| total_payable | decimal(20,0) | NO | | 0 | |
+| m_income_tex | int(100) | NO | | 0 | |
+| pf | decimal(20,2) | NO | | 0.00 | |
+| pf_applicable | enum('Yes','No') | NO | | No | |
+| pf_deductible | enum('Yes','No') | NO | | No | |
+| income_tax | decimal(20,2) | NO | | 0.00 | |
+| cash_bank | varchar(32) | NO | | | |
+| ac_no | varchar(255) | NO | | | |
+| bank_name | int(11) | NO | | 0 | |
+| tax_status | varchar(100) | NO | | | |
+| pf_status | varchar(100) | NO | | | |
+| created_at | timestamp | NO | | current_timestamp() | |
+| updated_at | timestamp | NO | | current_timestamp() | on update current_timestamp() |
+
+**FK:** `PBI_ID` -> `personnel_basic_info(PBI_ID)`, `offer_id` -> `offers(id)`
+
+---
+
+### Module 7: Confirmation
+
+#### `confirmation_letters` (Confirmation Letter Generation)
+| Field | Type | Null | Key | Default | Extra |
+|-------|------|------|-----|---------|-------|
+| id | int(11) | NO | PRI | NULL | auto_increment |
+| employee_id | int(11) | NO | | NULL | |
+| offer_id | int(11) | YES | | NULL | |
+| appraisal_id | int(11) | YES | | NULL | |
+| letter_content | longtext | YES | | NULL | |
+| letter_format | varchar(10) | YES | | html | |
+| employment_type | varchar(50) | YES | | Probationer | |
+| status | varchar(20) | NO | | Draft | |
+| generated_at | datetime | YES | | NULL | |
+| approved_at | datetime | YES | | NULL | |
+| approved_by | varchar(100) | YES | | NULL | |
+| sent_at | datetime | YES | | NULL | |
+| sent_to_email | varchar(100) | YES | | NULL | |
+| created_at | timestamp | NO | | current_timestamp() | |
+| updated_at | timestamp | NO | | current_timestamp() | on update current_timestamp() |
+
+> Note: `employee_id` stores `personnel_basic_info.PBI_ID`. `appraisal_id` stores `probation_appraisals.id`. Status flow: Draft → Generated → Approved → Sent.
+
+**FK:** `employee_id` -> `personnel_basic_info(PBI_ID)`, `appraisal_id` -> `probation_appraisals(id)`
+
+---
+
+## Foreign Key Map (20 constraints)
 
 | Parent Table | Child Table | FK Column | References |
 |---|---|---|---|
@@ -633,3 +778,9 @@
 | `probation_appraisals` | `probation_scores` | `appraisal_id` | `probation_appraisals(id)` |
 | `probation_categories` | `probation_scores` | `category_id` | `probation_categories(id)` |
 | `probation_appraisals` | `probation_workflow` | `appraisal_id` | `probation_appraisals(id)` |
+| `candidates` | `personnel_basic_info` | `candidate_id` | `candidates(id)` |
+| `offers` | `personnel_basic_info` | `offer_id` | `offers(id)` |
+| `personnel_basic_info` | `salary_info` | `PBI_ID` | `personnel_basic_info(PBI_ID)` |
+| `offers` | `salary_info` | `offer_id` | `offers(id)` |
+| `personnel_basic_info` | `confirmation_letters` | `employee_id` | `personnel_basic_info(PBI_ID)` |
+| `probation_appraisals` | `confirmation_letters` | `appraisal_id` | `probation_appraisals(id)` |

@@ -36,6 +36,7 @@ $sidebarItems = [
     ],
     'Settings' => [
         ['id' => 'reports',   'text' => 'Reports',          'href' => 'reports/probation_summary.html'],
+        ['id' => 'docs',      'text' => 'Documentation',    'href' => 'docs/documentation.html'],
     ],
 ];
 ?>

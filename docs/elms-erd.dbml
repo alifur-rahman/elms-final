@@ -287,3 +287,88 @@ Table probation_workflow {
   action_at datetime [null]
   created_at timestamp [not null, default: `current_timestamp()`]
 }
+
+// ========================================
+// MODULE 6: EMPLOYEE
+// ========================================
+
+Table personnel_basic_info {
+  PBI_ID bigint(20) [pk, increment]
+  PBI_CODE varchar(100) [not null]
+  MACHINE_ID varchar(50) [not null]
+  PBI_DUE_DOJ date [not null]
+  PBI_NAME varchar(50) [null]
+  PBI_FATHER_NAME varchar(50) [null]
+  PBI_MOTHER_NAME varchar(50) [null]
+  DEPT_ID int(10) [null]
+  PBI_DEPARTMENT int(10) [null]
+  nid bigint(20) [null]
+  employee_type varchar(20) [not null, default: 'Non Roster']
+  DESG_ID int(10) [null]
+  PBI_DESIGNATION varchar(50) [null]
+  PBI_DOJ date [null]
+  PBI_DOB date [null]
+  PBI_SEX varchar(10) [null]
+  PBI_MARITAL_STA varchar(12) [null]
+  PBI_RELIGION varchar(12) [null]
+  PBI_NATIONALITY varchar(50) [null]
+  PBI_PERMANENT_ADD varchar(250) [null]
+  PBI_PRESENT_ADD varchar(250) [null]
+  PBI_PHONE varchar(50) [null]
+  PBI_MOBILE varchar(50) [null]
+  PBI_EMAIL varchar(50) [null]
+  PBI_BLOOD_GROUP varchar(32) [not null, default: '']
+  EMPLOYMENT_TYPE varchar(70) [not null, default: '']
+  candidate_id int(11) [null, ref: > candidates.id]
+  offer_id int(11) [null, ref: > offers.id]
+  last_name varchar(100) [not null, default: '']
+  job_title varchar(100) [not null, default: '']
+}
+
+Table salary_info {
+  id int(11) [pk, increment]
+  PBI_ID int(11) [not null, ref: > personnel_basic_info.PBI_ID]
+  offer_id int(11) [not null, ref: > offers.id]
+  salary_type varchar(255) [not null, default: '']
+  basic_salary decimal(15,2) [not null, default: 0.00]
+  house_rent decimal(20,2) [not null, default: 0.00]
+  medical_allowance decimal(20,2) [not null, default: 0.00]
+  convenience decimal(20,2) [not null, default: 0.00]
+  gross_salary int(11) [not null, default: 0]
+  total_salary int(11) [not null, default: 0]
+  total_payable decimal(20,0) [not null, default: 0]
+  m_income_tex int(100) [not null, default: 0]
+  pf decimal(20,2) [not null, default: 0.00]
+  pf_applicable enum('Yes','No') [not null, default: 'No']
+  pf_deductible enum('Yes','No') [not null, default: 'No']
+  income_tax decimal(20,2) [not null, default: 0.00]
+  cash_bank varchar(32) [not null, default: '']
+  ac_no varchar(255) [not null, default: '']
+  bank_name int(11) [not null, default: 0]
+  tax_status varchar(100) [not null, default: '']
+  pf_status varchar(100) [not null, default: '']
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}
+
+// ========================================
+// MODULE 7: CONFIRMATION
+// ========================================
+
+Table confirmation_letters {
+  id int(11) [pk, increment]
+  employee_id int(11) [not null, ref: > personnel_basic_info.PBI_ID]
+  offer_id int(11) [null]
+  appraisal_id int(11) [null, ref: > probation_appraisals.id]
+  letter_content longtext [null]
+  letter_format varchar(10) [null, default: 'html']
+  employment_type varchar(50) [null, default: 'Probationer']
+  status varchar(20) [not null, default: 'Draft']
+  generated_at datetime [null]
+  approved_at datetime [null]
+  approved_by varchar(100) [null]
+  sent_at datetime [null]
+  sent_to_email varchar(100) [null]
+  created_at timestamp [not null, default: `current_timestamp()`]
+  updated_at timestamp [not null, default: `current_timestamp()`]
+}

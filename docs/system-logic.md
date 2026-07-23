@@ -406,6 +406,103 @@
 
 ---
 
+## Phase 9: Confirmation Module
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  PHASE 9: CONFIRMATION (Post-Probation Letter Generation)        │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────────┐                                    │
+│  │  ELIGIBLE EMPLOYEES       │                                    │
+│  ├──────────────────────────┤                                    │
+│  │ Query: probation_appraisals│                                   │
+│  │   JOIN personnel_basic_info│                                   │
+│  │   WHERE status = 'Completed'                                   │
+│  │   AND EMPLOYMENT_TYPE = 'Probationer'                         │
+│  │                                           │                    │
+│  │ Shows: name, code, dept, designation,     │                    │
+│  │        joining_date, probation_months,     │                    │
+│  │        appraisal result, salary            │                   │
+│  └──────────┬───────────────┘                                    │
+│             │                                                    │
+│             ▼                                                    │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │          CONFIRMATION LETTER GENERATION                     │ │
+│  │                                                             │ │
+│  │  generate.php                                               │ │
+│  │    │                                                        │ │
+│  │    ├─→ Select employee from eligible list                   │ │
+│  │    ├─→ Select employment type (dropdown)                    │ │
+│  │    ├─→ Select template (type=Confirmation)                  │ │
+│  │    │                                                        │ │
+│  │    │  AJAX POST → templates/ajax/render.php                 │ │
+│  │    │  { module: "Confirmation", record_id: appraisal_id }   │ │
+│  │    │                                                        │ │
+│  │    │  render.php:                                            │ │
+│  │    │    a. Load template_modules WHERE module_name=          │ │
+│  │    │       "Confirmation"                                    │ │
+│  │    │    b. require_once confirmation.php                     │ │
+│  │    │    c. Call getConfirmationTagMap(pdo, appraisal_id)     │ │
+│  │    │       - Queries probation_appraisals +                  │ │
+│  │    │         personnel_basic_info + salary_info              │ │
+│  │    │       - Returns 15 tags: EMPLOYEE_NAME,                 │ │
+│  │    │         EMPLOYEE_CODE, DESIGNATION, DEPARTMENT,         │ │
+│  │    │         SALARY, JOINING_DATE, CONFIRMATION_DATE,        │ │
+│  │    │         PROBATION_MONTHS, COMPANY_NAME, HR_NAME,        │ │
+│  │    │         DATE, PHONE, EMAIL, GENDER, SALARY_BREAKDOWN    │ │
+│  │    │    d. preg_replace /{{TAG}}/ → value                    │ │
+│  │    │    e. Returns rendered HTML                             │ │
+│  │    │                                                        │ │
+│  │    │  5. Rendered content loaded into Quill editor          │ │
+│  │    │  6. User edits if needed                               │ │
+│  │    │  7. "Generate Letter" → AJAX letter_generate.php       │ │
+│  │    │     → INSERT INTO confirmation_letters                  │ │
+│  │    │       (employee_id, offer_id, appraisal_id,            │ │
+│  │    │        letter_content, employment_type, status)        │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │          CONFIRMATION LETTERS LIST                          │ │
+│  │                                                             │ │
+│  │  confirmation_letters.php                                   │ │
+│  │    │                                                        │ │
+│  │    ├─→ "Preview" → letter_view.php → styled HTML view      │ │
+│  │    ├─→ "Approve" → letter_approve.php                      │ │
+│  │    │     → UPDATE status='Approved', approved_at=NOW()      │ │
+│  │    └─→ "Send" → Send modal with auto-filled email          │ │
+│  │          → letter_send.php                                  │ │
+│  │          → UPDATE status='Sent', sent_at=NOW()              │ │
+│  │          → Logs to offer_email_log (module='Confirmation')  │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+│                                                                  │
+│  LOGIC:                                                          │
+│  1. Probation completed → status='Completed' on appraisal        │
+│  2. Eligible list filtered: Completed + Probationer type         │
+│  3. Letter generated via template engine (15 merge tags)         │
+│  4. Status: Draft → Generated → Approved → Sent                 │
+│  5. Send modal auto-fills email from PBI_EMAIL                   │
+│  6. Confirmation date = joining_date + probation_months           │
+│                                                                  │
+│  FILES INVOLVED:                                                 │
+│  - confirmation/list.php            (eligible employees)        │
+│  - confirmation/generate.php        (letter gen UI)             │
+│  - confirmation/confirmation_letters.php (letter list)          │
+│  - confirmation/ajax/migrate.php    (data migration)            │
+│  - confirmation/ajax/list_eligible.php (eligible data)          │
+│  - confirmation/ajax/letter_generate.php (save)                 │
+│  - confirmation/ajax/list_letters.php (list data)               │
+│  - confirmation/ajax/letter_view.php  (preview)                 │
+│  - confirmation/ajax/letter_approve.php (approve)               │
+│  - confirmation/ajax/letter_send.php  (send email)              │
+│  - confirmation/ajax/render_template.php (template render)      │
+│  - templates/render/confirmation.php  (tag resolver)            │
+│  - templates/ajax/seed_confirmation.php (default template)      │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## Data Flow Summary
 
 ```
@@ -413,8 +510,8 @@
 │ Requisition │────→│  Candidates   │────→│  Screening    │
 │ (Job Post)  │     │ (Applicants) │     │  & Interview  │
 └─────────────┘     └──────────────┘     └───────┬───────┘
-                                                  │
-                                                  ▼
+                                                 │
+                                                 ▼
 ┌─────────────┐     ┌──────────────┐     ┌───────────────┐
 │  Offer      │◄────│  Proposal    │◄────│   Salary      │
 │  Response   │     │  Approval    │     │   Proposal    │
@@ -425,7 +522,14 @@
 │  Letter     │────→│  Email       │
 │  Generation │     │  Delivery    │
 │  (Templates)│     │              │
-└─────────────┘     └──────────────┘
+└──────┬──────┘     └──────────────┘
+       │
+       ▼
+┌─────────────┐     ┌──────────────┐     ┌───────────────┐
+│  Employee   │────→│  Probation   │────→│ Confirmation  │
+│  Creation   │     │  Appraisal   │     │  Letter Gen   │
+│  (Wizard)   │     │  (Scoring)   │     │  (Template)   │
+└─────────────┘     └──────────────┘     └───────────────┘
 ```
 
 ---
@@ -450,7 +554,7 @@ Draft → Proposed → Pending_Approval → Finalized
 Pending → Sent → Accepted / Rejected
 ```
 
-### Letter Status Flow
+### Letter Status Flow (Offer)
 ```
 Draft → Generated → Sent
 ```
@@ -458,4 +562,9 @@ Draft → Generated → Sent
 ### Probation Appraisal Status Flow
 ```
 Draft → In_Review → Supervisor_Approved → Dept_Head_Approved → HR_Reviewed → Finalized
+```
+
+### Confirmation Letter Status Flow
+```
+Draft → Generated → Approved → Sent
 ```

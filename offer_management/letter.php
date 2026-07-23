@@ -7,6 +7,19 @@ $pageStyles  = '
 .empty-state { text-align:center; padding:48px 24px; color:var(--gray-500) }
 .empty-state .empty-icon { font-size:48px; margin-bottom:12px }
 .empty-state p { font-size:14px }
+.preview-wide { max-width:900px !important; width:90% !important; max-height:90vh !important; height:auto !important; }
+.preview-wide .modal-body { overflow-y:auto; flex:1; padding:20px 24px; }
+.preview-content-wrap { padding:40px 48px; border:1px solid var(--gray-200); border-radius:8px; min-height:600px; background:#fff; line-height:1.8; font-size:15px; }
+.preview-content-wrap h1 { text-align:center; color:#1a73e8; margin-bottom:4px; }
+.preview-content-wrap h2 { color:#1a73e8; border-bottom:2px solid #1a73e8; padding-bottom:6px; margin:20px 0 10px; }
+.preview-content-wrap h3 { color:#3c4043; margin:16px 0 8px; }
+.preview-content-wrap hr { border:none; border-top:1px solid var(--gray-200); margin:16px 0; }
+.preview-content-wrap blockquote { border-left:4px solid #1a73e8; padding:10px 16px; background:#f1f3f4; margin:16px 0; color:#5f6368; }
+.preview-content-wrap table { width:100%; border-collapse:collapse; margin:10px 0; font-size:13px; }
+.preview-content-wrap th { background:#f5f5f5; border:1px solid #ddd; padding:6px 10px; text-align:left; }
+.preview-content-wrap td { border:1px solid #ddd; padding:6px 10px; }
+.preview-content-wrap tr:nth-child(even) { background:#fafafa; }
+.preview-content-wrap tr:last-child { background:#f0f7ff; font-weight:600; }
 ';
 $pageScripts = <<<'EOSCRIPT'
 var lettersData = [];
@@ -162,13 +175,13 @@ ob_start();
 
 <!-- Preview Letter Modal -->
 <div class="modal-overlay" id="previewLetterModal" onclick="if(event.target===this)closeModal('previewLetterModal')">
-    <div class="modal modal-wide">
+    <div class="modal modal-sticky preview-wide">
         <div class="modal-header modal-header-navy">
             <h3>Preview Offer Letter</h3>
             <button class="modal-close" onclick="closeModal('previewLetterModal')">&times;</button>
         </div>
         <div class="modal-body">
-            <div id="previewContent" style="padding:24px;border:1px solid var(--gray-200);border-radius:6px;min-height:200px;background:#fff"></div>
+            <div id="previewContent" class="preview-content-wrap"></div>
         </div>
         <div class="modal-footer modal-footer-light">
             <button type="button" class="btn btn-outline" onclick="closeModal('previewLetterModal')">Close</button>

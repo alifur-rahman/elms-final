@@ -39,6 +39,7 @@ if ($offerId > 0) {
 
 $candidateName = $offer ? trim(($offer['first_name'] ?? '') . ' ' . ($offer['last_name'] ?? '')) : '';
 $existingContentJson = json_encode($existingContent);
+
 $pageStyles  = '
 @import url("https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css");
 .form-section { margin-bottom:24px }
@@ -52,13 +53,14 @@ $pageStyles  = '
 $pageScripts = <<<EOSCRIPT
 var quill = null;
 var existingContent = $existingContentJson;
+var offerId = $offerId;
 
 function initQuillInstance() {
     var editorEl = document.getElementById("quillEditor");
     if (!editorEl) return;
     quill = new Quill("#quillEditor", {
         theme: "snow",
-        placeholder: "Compose offer letter...",
+        placeholder: "Select a template above or start composing...",
         modules: {
             toolbar: [
                 ["bold","italic","underline","strike"],
@@ -103,7 +105,6 @@ function applyTemplate() {
     if (!option || !option.value || !quill) return;
     var content = option.dataset.content;
     if (!content) return;
-    var offerId = $offerId;
     if (!offerId) {
         quill.setText("");
         quill.clipboard.dangerouslyPasteHTML(0, content);
@@ -130,7 +131,6 @@ function applyTemplate() {
 }
 
 function saveLetter() {
-    var offerId = $offerId;
     var letterContent = quill ? quill.root.innerHTML : "";
     if (!letterContent || letterContent === "<p><br></p>") { showAlert("Please write letter content", "error"); return; }
     apiPost("ajax/letter_generate.php", {
@@ -209,11 +209,7 @@ ob_start();
                 <div class="form-section-title">
                     <span class="section-icon">&#128203;</span> Template
                 </div>
-                <div style="display:flex;gap:8px;margin-bottom:14px">
-                    <select class="form-control" id="templateSelect" onchange="applyTemplate()" style="flex:1"></select>
-                   
-                </div>
-               
+                <select class="form-control" id="templateSelect" onchange="applyTemplate()" style="margin-bottom:14px"></select>
                 <div id="quillEditor"></div>
             </div>
 

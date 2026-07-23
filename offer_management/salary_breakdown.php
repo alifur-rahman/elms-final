@@ -102,8 +102,8 @@ function setVal(id, val) {
 }
 
 function saveProposal() {
-    function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
-    function t(id) { return document.getElementById(id).value.trim(); }
+    function v(id) { var el = document.getElementById(id); return el ? parseFloat(el.value) || 0 : 0; }
+    function t(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
 
     var grossSalary = v("gross-salary");
     if (!grossSalary) { showAlert("Gross Salary is required", "error"); return; }

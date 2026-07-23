@@ -99,17 +99,12 @@ try {
         'SALARY_BREAKDOWN' => $salaryBreakdownHtml,
     ];
 
-    // Also load dynamic merge tags from DB for extensibility
-    $mtStmt = $pdo->query("SELECT tag, source FROM merge_tags WHERE type = 'Offer'");
-    $dbTags = $mtStmt->fetchAll();
-
     // Apply replacements - iterate over all pattern matches
-    $rendered = preg_replace_callback('/\{\{([A-Z_][A-Z0-9_]*)\}\}/', function ($m) use ($tagMap, $offer) {
+    $rendered = preg_replace_callback('/\{\{([A-Z_][A-Z0-9_]*)\}\}/', function ($m) use ($tagMap) {
         $tag = $m[1];
         if (isset($tagMap[$tag])) {
             return $tagMap[$tag];
         }
-        // Tag not in map, leave as-is (raw)
         return $m[0];
     }, $content);
 

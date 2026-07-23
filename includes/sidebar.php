@@ -27,8 +27,8 @@ $sidebarItems = [
         ['id' => 'probation_approve', 'text' => 'Pending Approval',    'href' => 'probation/approve.php'],
     ],
     'Confirmation' => [
-        ['id' => 'confirmation_approve',  'text' => 'Pending Approval','href' => 'confirmation/employee_approve.php'],
-        ['id' => 'confirmation_letter',          'text' => 'Confirmation Letters',    'href' => 'confirmation/confirmation_letters.php'],
+        ['id' => 'confirmation_list',       'text' => 'Eligible Employees',  'href' => 'confirmation/list.php'],
+        ['id' => 'confirmation_letter',     'text' => 'Confirmation Letters','href' => 'confirmation/confirmation_letters.php'],
     ],
     'Template Management' => [
         ['id' => 'templates',      'text' => 'Templates',       'href' => 'templates/list.php'],

@@ -53,17 +53,217 @@ pre{background:var(--code-bg);color:var(--code-fg);padding:16px 20px;border-radi
 hr{border:none;border-top:1px solid var(--border);margin:24px 0}
 ul,ol{margin:8px 0 8px 20px;font-size:14px}
 li{margin:4px 0}
-.erd-container{overflow:auto;padding:16px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;margin:12px 0}
+/* .erd-container{overflow:auto;padding:16px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;margin:12px 0} */
+.erd-container iframe {
+	width: 100%;
+	height: 600px;
+	border: none;
+	/* border-radius: 11px; */
+	outline: none;
+}
+
+/* ===== STEP PIPELINE ===== */
+.pipeline{display:flex;flex-wrap:wrap;gap:0;margin:20px 0;align-items:flex-start}
+.pipe-step{display:flex;flex-direction:column;align-items:center;min-width:90px;flex:1 0 auto;position:relative}
+.pipe-step .pipe-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;font-weight:700;position:relative;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.pipe-step .pipe-label{font-size:11px;font-weight:600;text-align:center;margin-top:6px;color:var(--text);line-height:1.3;max-width:100px}
+.pipe-step .pipe-sub{font-size:10px;color:var(--muted);text-align:center;margin-top:2px}
+.pipe-arrow{display:flex;align-items:center;padding-top:10px;color:var(--border);font-size:20px;flex:0 0 20px;justify-content:center}
+.pipe-step:nth-child(1) .pipe-icon{background:#6366f1}
+.pipe-step:nth-child(2) .pipe-icon{background:#8b5cf6}
+.pipe-step:nth-child(3) .pipe-icon{background:#0891b2}
+.pipe-step:nth-child(4) .pipe-icon{background:#059669}
+.pipe-step:nth-child(5) .pipe-icon{background:#2563eb}
+.pipe-step:nth-child(6) .pipe-icon{background:#6366f1}
+.pipe-step:nth-child(7) .pipe-icon{background:#d97706}
+.pipe-step:nth-child(8) .pipe-icon{background:#dc2626}
+.pipe-step:nth-child(9) .pipe-icon{background:#059669}
+.pipe-step:nth-child(10) .pipe-icon{background:#6366f1}
+.pipe-step:nth-child(11) .pipe-icon{background:#8b5cf6}
+.pipe-step:nth-child(12) .pipe-icon{background:#0891b2}
+.pipe-step:nth-child(13) .pipe-icon{background:#2563eb}
+.pipe-step:nth-child(14) .pipe-icon{background:#d97706}
+
+/* Data Flow CTA */
+.flow-cta{display:flex;align-items:center;gap:16px;padding:20px 24px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #bfdbfe;border-radius:10px;margin:24px 0;text-decoration:none;color:var(--text);transition:box-shadow .2s}
+.flow-cta:hover{box-shadow:0 4px 16px rgba(37,99,235,.15);text-decoration:none}
+.flow-cta .cta-icon{width:56px;height:56px;border-radius:12px;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.flow-cta .cta-text h4{margin:0;font-size:16px;color:var(--text)}
+.flow-cta .cta-text p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.flow-cta .cta-arrow{margin-left:auto;font-size:20px;color:var(--pri);font-weight:700}
+
+/* ===== FLOW SYSTEM ===== */
+.flow{position:relative;padding:0 0 0 40px}
+.flow::before{content:'';position:absolute;left:18px;top:0;bottom:0;width:2px;background:var(--border)}
+.module{position:relative;margin:40px 0 0}
+.module-marker{position:absolute;left:-40px;top:0;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.module-content{padding:0 0 0 20px}
+.module-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+.module-subtitle{font-size:13px;color:var(--muted);margin-bottom:12px}
+.step{position:relative;margin:8px 0;padding:14px 18px;background:var(--card);border:1px solid var(--border);border-radius:8px;transition:border-color .2s}
+.step:hover{border-color:var(--pri)}
+.step-num{position:absolute;left:-48px;top:14px;width:22px;height:22px;border-radius:50%;background:var(--border);color:var(--muted);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:2}
+.step-header{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.step-title{font-size:14px;font-weight:600;color:var(--text)}
+.step-actor{font-size:11px;padding:1px 7px;border-radius:10px;font-weight:600}
+.actor-hr{background:#ede9fe;color:#5b21b6}
+.actor-system{background:#dbeafe;color:#1e40af}
+.actor-mgr{background:#d1fae5;color:#065f46}
+.actor-candidate{background:#fef3c7;color:#92400e}
+.actor-gm{background:#fee2e2;color:#991b1b}
+.step-body{font-size:13px;color:var(--muted);margin:4px 0 0}
+.step-body ul{margin:4px 0 0 16px}
+.step-body li{margin:2px 0}
+.db-write{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:4px;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;margin:4px 2px 0 0;font-family:monospace}
+.db-read{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:4px;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;margin:4px 2px 0 0;font-family:monospace}
+.api-call{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:4px;background:#fefce8;color:#854d0e;border:1px solid #fef08a;margin:4px 2px 0 0;font-family:monospace}
+.decision{position:relative;margin:8px 0;padding:14px 18px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px}
+.decision::before{content:'DECISION';position:absolute;top:-9px;left:16px;font-size:9px;font-weight:700;color:#b45309;background:#fffbeb;padding:0 6px;letter-spacing:.5px}
+.branch{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.branch-yes,.branch-no{padding:10px 14px;border-radius:6px;font-size:13px}
+.branch-yes{background:#f0fdf4;border:1px solid #bbf7d0}
+.branch-no{background:#fef2f2;border:1px solid #fecaca}
+.branch-label{font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:4px}
+.branch-yes .branch-label{color:#166534}
+.branch-no .branch-label{color:#991b1b}
+.module-arrow{text-align:center;padding:16px 0;font-size:24px;color:var(--pri)}
+.module-arrow span{display:inline-block;background:var(--pri-l);color:var(--pri);width:36px;height:36px;border-radius:50%;line-height:36px;text-align:center;font-size:18px;box-shadow:0 2px 4px rgba(0,0,0,.08)}
+.mod-recruit .module-marker{background:#6366f1}
+.mod-screen .module-marker{background:#8b5cf6}
+.mod-proposal .module-marker{background:#0891b2}
+.mod-offer .module-marker{background:var(--pri)}
+.mod-letter .module-marker{background:#2563eb}
+.mod-response .module-marker{background:var(--sec)}
+.mod-employee .module-marker{background:#d97706}
+.mod-probation .module-marker{background:#dc2626}
+.mod-confirm .module-marker{background:#059669}
+.connector{position:relative}
+.connector::before{content:'';position:absolute;left:-31px;top:50%;width:10px;height:10px;border-radius:50%;background:var(--border);border:2px solid #fff;z-index:2;transform:translateY(-50%)}
+
+/* ===== HAMBURGER ===== */
+.hamburger{display:none;position:fixed;top:12px;left:12px;z-index:200;width:40px;height:40px;background:var(--pri);color:#fff;border:none;border-radius:8px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px){
+.main{padding:24px 24px}
+.grid-3{grid-template-columns:1fr 1fr}
+.card{overflow-x:auto}
+}
+
+@media(max-width:768px){
+/* Sidebar off-canvas */
+.hamburger{display:flex}
+.sidebar{transform:translateX(-100%);transition:transform .3s ease;width:280px;z-index:150}
+.sidebar.open{transform:translateX(0)}
+.sidebar-overlay.open{display:block}
+/* Main full width */
+.main{margin-left:0;padding:60px 16px 32px;max-width:100%}
+/* Grids stack */
+.grid-2,.grid-3{grid-template-columns:1fr}
+/* ALL tables: block + scroll */
+table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+table thead{display:table-header-group}
+table tr{display:table-row}
+table th,table td{display:table-cell;white-space:nowrap;padding:8px 12px;font-size:12px}
+table th{font-size:11px}
+table th:first-child,table td:first-child{min-width:140px}
+/* File-path cells: allow wrap */
+table td code{word-break:break-all;white-space:normal;font-size:11px}
+/* Tag columns: allow wrap */
+.tag{white-space:normal;word-break:break-word;font-size:10px;padding:2px 5px}
+/* Card scroll */
+.card{overflow-x:auto}
+/* Flow-box: already scrollable via overflow-x:auto, ensure parent doesn't clip */
+.flow-box{font-size:11px;padding:12px;max-width:100%;overflow-x:auto}
+/* Pipeline scroll */
+.pipeline{flex-wrap:nowrap;overflow-x:auto;padding-bottom:12px;-webkit-overflow-scrolling:touch}
+.pipe-step{min-width:72px;flex:0 0 auto}
+.pipe-arrow{flex:0 0 12px;font-size:16px}
+/* Flow system */
+.flow{padding:0 0 0 28px}
+.flow::before{left:12px}
+.module-marker{left:-28px;width:30px;height:30px;font-size:12px}
+.module-content{padding:0 0 0 12px}
+.module-title{font-size:16px}
+.step{padding:12px 14px}
+.step-num{left:-36px;width:20px;height:20px;font-size:10px}
+.step-header{gap:6px}
+.step-title{font-size:13px}
+.step-body{font-size:12px}
+.connector::before{left:-22px;width:8px;height:8px}
+/* Branches stack */
+.branch{grid-template-columns:1fr}
+/* Tags wrap */
+.tag,.db-write,.db-read,.api-call{font-size:10px;padding:2px 6px}
+/* Headings */
+h1{font-size:22px}
+h2{font-size:18px;margin:24px 0 10px}
+h3{font-size:15px}
+/* ERD iframe */
+.erd-container iframe{height:400px}
+/* Flow CTA */
+.flow-cta{flex-direction:column;text-align:center;gap:12px;padding:16px}
+.flow-cta .cta-arrow{margin-left:0}
+/* Endpoint: stack method badge above path */
+.endpoint{flex-direction:column;align-items:flex-start;gap:4px}
+.endpoint code{word-break:break-all;white-space:normal;font-size:11px;line-height:1.4}
+/* Pre code */
+pre{font-size:11px;padding:12px;overflow-x:auto}
+code{font-size:11px}
+/* Stat */
+.stat h3{font-size:22px}
+/* Pre/code in general */
+pre code{white-space:pre-wrap;word-break:break-all}
+}
+
+@media(max-width:480px){
+.main{padding:60px 12px 24px}
+h1{font-size:20px}
+h2{font-size:16px}
+.card{padding:14px}
+.module-title{font-size:14px}
+.step-num{left:-32px;width:18px;height:18px;font-size:9px}
+.flow{padding:0 0 0 22px}
+.flow::before{left:9px}
+.module-marker{left:-22px;width:26px;height:26px;font-size:11px}
+.module-content{padding:0 0 0 8px}
+.connector::before{left:-19px;width:7px;height:7px}
+.db-write,.db-read,.api-call{display:block;margin:4px 0 0;font-size:10px}
+table th,table td{padding:6px 8px;font-size:11px}
+table th:first-child,table td:first-child{min-width:120px}
+table th{font-size:10px}
+.endpoint code{font-size:10px}
+.flow-box{font-size:10px;padding:10px}
+}
 </style>
 </head>
 <body>
 
-<nav class="sidebar">
+<button class="hamburger" id="hamburger" aria-label="Toggle navigation">&#9776;</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<nav class="sidebar" id="sidebar">
 <h2>ELMS Docs</h2>
 <h3>Overview</h3>
 <a href="#overview">System Overview</a>
 <a href="#architecture">Architecture</a>
 <a href="#erd">Database ERD</a>
+<h3>Data Flow (45 Steps)</h3>
+<a href="#data-flow">Complete Flow</a>
+<a href="#df-mod1">1. Requisition</a>
+<a href="#df-mod2">2. Screening</a>
+<a href="#df-mod3">3. Salary Proposal</a>
+<a href="#df-mod4">4. Proposal Approval</a>
+<a href="#df-mod5">5. Offer Creation</a>
+<a href="#df-mod6">6. Letter Generation</a>
+<a href="#df-mod7">7. Send &amp; Response</a>
+<a href="#df-mod8">8. Employee Creation</a>
+<a href="#df-mod9">9. Probation</a>
+<a href="#df-mod10">10. Confirmation</a>
+<a href="#db-summary">DB Writes Summary</a>
+<a href="#actors">Actors &amp; Roles</a>
+<a href="#decision-points">Decision Points</a>
 <h3>Modules</h3>
 <a href="#mod-recruitment">1. Recruitment</a>
 <a href="#mod-screening">2. Screening &amp; Interview</a>
@@ -94,14 +294,11 @@ li{margin:4px 0}
 
 <div class="grid-3">
 <div class="stat"><h3>9</h3><p>Core Modules</p></div>
-<div class="stat"><h3>22+</h3><p>Database Tables</p></div>
-<div class="stat"><h3>40+</h3><p>API Endpoints</p></div>
+<div class="stat"><h3>23</h3><p>Database Tables</p></div>
+<div class="stat"><h3>45+</h3><p>API Endpoints</p></div>
 </div>
 
-<h3>System Flow</h3>
-<div class="flow-box">Requisition → Candidates → Screening → Interview → Salary Proposal → Offer Approval
-    → Offer Letter → Send Email → Candidate Response → Employee Creation → Salary Setup
-    → Probation Appraisal → Confirmation Letter → Send Confirmation</div>
+
 
 <!-- ═══════════════════════ ARCHITECTURE ═══════════════════════ -->
 <h2 id="architecture">Architecture</h2>
@@ -141,100 +338,247 @@ li{margin:4px 0}
 <p><strong>Database:</strong> <code>elms</code> | <strong>Engine:</strong> InnoDB | <strong>Charset:</strong> utf8mb4</p>
 
 <div class="erd-container">
-<pre>
-┌─────────────────────┐      ┌──────────────────────┐
-│    <strong>departments</strong>       │      │  <strong>candidate_statuses</strong>  │
-├─────────────────────┤      ├──────────────────────┤
-│ PK id               │      │ PK id                │
-│    name             │      │    code    (UNI)     │
-│    code             │      │    name              │
-└────────┬────────────┘      │    sort_order        │
-         │ 1:N               └────────┬─────────────┘
-    ┌────┴──────────────┐             │ 1:N
-    │   <strong>designations</strong>    │        ┌───┴──────────────────┐
-    ├───────────────────┤        │     <strong>candidates</strong>         │
-    │ PK id             │        ├───────────────────────┤
-    │ FK dept_id ───────┼──┐     │ PK id                 │
-    └───────────────────┘  │     │ FK job_id → requisitions
-                           │     │ FK status_id → statuses
-┌─────────────────────┐   │     │    first_name, last_name
-│   <strong>requisitions</strong>      │   │     │    email, phone, nid
-├─────────────────────┤   │     │    gender, dob
-│ PK id               │   │     │    present_address
-│ FK dept_id ─────────┼───┘     │    permanent_address
-│    title, vacancies │         │    current_salary
-│    salary_min/max   │         │    expected_salary
-└─────────────────────┘         └───────────┬───────────┘
-                                            │ 1:N
-         ┌──────────────────┬───────────────┼──────────────┐
-         │                  │               │              │
-    ┌────┴─────────┐  ┌────┴──────┐  ┌─────┴─────┐  ┌────┴──────────┐
-    │<strong>candidate_logs</strong>│  │<strong>screenings</strong>│  │<strong>interview_log</strong>│  │<strong>salary_proposals</strong>│
-    ├──────────────┤  ├───────────┤  ├───────────┤  ├───────────────┤
-    │FK candidate_id│  │FK cand_id │  │FK cand_id │  │FK candidate_id│
-    │ action       │  │ rating    │  │ round     │  │ proposed_sal  │
-    │ from/to_status│ │ result   │  │ scores    │  │ salary_breakd │
-    └──────────────┘  └───────────┘  │ decision  │  │ (JSON)        │
-                                     └───────────┘  │ status        │
-                                                    └───────┬───────┘
-                                                            │
-                      ┌─────────────────────────────────────┘
-                      │
-┌─────────────────────┴────────────────────────────────────────────┐
-│                          <strong>offers</strong>                                 │
-├──────────────────────────────────────────────────────────────────┤
-│ PK id │ FK candidate_id │ FK designation_id │ FK dept_id        │
-│ salary │ joining_date │ probation_months │ status               │
-│ response_status │ responded_at │ response_notes                 │
-│ sent_at │ accepted_at                                                │
-└──────────┬──────────────────────────┬───────────────────────────┘
-           │ 1:N                      │ 1:N
-┌──────────┴───────────┐  ┌──────────┴─────────────────────┐
-│   <strong>offer_letters</strong>      │  │       <strong>offer_approvals</strong>          │
-│ FK offer_id           │  │ FK offer_id                    │
-│ letter_content        │  │ level, approver, status        │
-│ status: Draft→Gen→Sent│  └───────────────────────────────┘
-│ generated_at, sent_at │
-│ sent_to_email         │  ┌───────────────────────────────┐
-└───────────────────────┘  │       <strong>offer_email_log</strong>          │
-                           │ FK offer_id, recipient         │
-                           │ subject, body, sent_at         │
-                           └───────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                      <strong>TEMPLATE SYSTEM</strong>                          │
-├─────────────────────────────────────────────────────────────────┤
-│  <strong>template_modules</strong>: module_name, render_file                    │
-│  <strong>letter_templates</strong>: name, type (=module), content (HTML+{{TAGS}}) │
-│  <strong>merge_tags</strong>: type, tag, label                                  │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                       <strong>PROBATION MODULE</strong>                         │
-├─────────────────────────────────────────────────────────────────┤
-│  <strong>probation_appraisals</strong>: employee_id → PBI_ID                    │
-│    end_date, overall_score, recommendation, status              │
-│  <strong>probation_categories</strong>: name, weight %                          │
-│  <strong>probation_scores</strong>: appraisal_id + category_id → score          │
-│  <strong>probation_workflow</strong>: appraisal_id + level + status              │
-│    Levels: Self Assessment → Supervisor → Dept Head             │
-│            → HR Review → GM → Managing Director                 │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                    <strong>EMPLOYEE / CONFIRMATION</strong>                     │
-├─────────────────────────────────────────────────────────────────┤
-│  <strong>personnel_basic_info</strong>: PBI_ID, PBI_CODE, PBI_NAME, offer_id     │
-│    EMPLOYMENT_TYPE, dept_id, DESG_ID, 70+ fields                │
-│  <strong>salary_info</strong>: PBI_ID, offer_id, 50+ salary fields               │
-│  <strong>confirmation_letters</strong>: employee_id → PBI_ID                     │
-│    letter_content, employment_type, status                      │
-│    Draft → Generated → Approved → Sent                          │
-└─────────────────────────────────────────────────────────────────┘
-</pre>
+    <iframe  allowfullscreen src="https://dbdocs.io/embed/68422dd3b5bd5c094ae78a66f4f5a1eb/19a9f26988464ed7a41da4f0d20ac6d5"> </iframe>
 </div>
 
 <hr>
+
+<!-- ═══════════════════════ COMPLETE DATA FLOW ═══════════════════════ -->
+<h2 id="data-flow">Complete Data Flow — 45 Steps</h2>
+<p>Every user action, database write, API call, and module transition from job requisition to employee confirmation.</p>
+
+<div class="grid-3" style="margin:16px 0">
+<div class="stat"><h3>10</h3><p>Flow Stages</p></div>
+<div class="stat"><h3>45</h3><p>User Actions</p></div>
+<div class="stat"><h3>6</h3><p>Decision Points</p></div>
+</div>
+
+<div class="flow">
+
+<!-- MODULE 1 -->
+<div class="module mod-recruit" id="df-mod1">
+<div class="module-content">
+<div class="module-title">Module 1 — Requisition &amp; Candidate Pipeline</div>
+<div class="module-subtitle">HR creates job posting, candidates apply and move through pipeline</div>
+<div class="step connector"><div class="step-num">1</div><div class="step-header"><span class="step-title">HR Creates Requisition</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Fill: title, department, designation, vacancies, salary range, skills, deadline</li><li>Auto-set: status = "Active"</li></ul><div class="db-write">INSERT → requisitions</div><div class="db-read">READ → departments, designations</div></div></div>
+<div class="step connector"><div class="step-num">2</div><div class="step-header"><span class="step-title">Candidate Applies / HR Adds</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Fill: first_name, last_name, email, phone, nid, gender, dob, address</li><li>Auto: status_id = 1 (Applied), code auto-generated</li></ul><div class="db-write">INSERT → candidates</div><div class="db-write">INSERT → candidate_logs (action: "applied")</div></div></div>
+<div class="step connector"><div class="step-num">3</div><div class="step-header"><span class="step-title">HR Changes Candidate Status</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Move candidate: Applied → Screened → Shortlisted → Interviewed → Selected → Offered</li><li>Each change logged with from_status, to_status, notes</li></ul><div class="db-write">UPDATE → candidates.status_id</div><div class="db-write">INSERT → candidate_logs</div></div></div>
+</div>
+<div class="module-marker">1</div>
+</div>
+<div class="module-arrow"><span>&#8595;</span></div>
+
+<!-- MODULE 2 -->
+<div class="module mod-screen" id="df-mod2">
+<div class="module-content">
+<div class="module-title">Module 2 — Screening &amp; Interview</div>
+<div class="module-subtitle">HR screens candidates, interview rounds scored</div>
+<div class="step connector"><div class="step-num">4</div><div class="step-header"><span class="step-title">HR Screens Candidate</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Evaluate: communication_score, experience_match, skill_match, education_match</li><li>Rate: 1-5 rating, result = "Shortlisted" / "Rejected"</li></ul><div class="db-write">INSERT/UPDATE → screenings</div><div class="db-write">INSERT → candidate_logs (action: "screened")</div></div></div>
+<div class="step connector"><div class="step-num">5</div><div class="step-header"><span class="step-title">Add Interview Round(s)</span><span class="step-actor actor-hr">HR / Interviewer</span></div><div class="step-body"><ul><li>Each round: type, interviewer, date</li><li>4 scores: Technical, Communication, Problem-Solving, Attitude</li><li>Final round: is_final_round = 1 → triggers decision</li></ul><div class="db-write">INSERT → interview_log</div></div></div>
+<div class="decision connector"><div class="step-num">6</div><div class="step-header"><span class="step-title">Interview Decision</span><span class="step-actor actor-system">System / HR</span></div><div class="branch"><div class="branch-yes"><div class="branch-label">&#10003; Selected</div><div>Candidate status → "Selected"<br><div class="db-write">UPDATE → candidates.status_id</div><div class="db-write">INSERT → candidate_logs</div></div></div><div class="branch-no"><div class="branch-label">&#10007; Rejected</div><div>Candidate status → "Rejected"<br><div class="db-write">UPDATE → candidates.status_id</div><div class="db-write">INSERT → candidate_logs</div></div></div></div></div>
+</div>
+<div class="module-marker">2</div>
+</div>
+<div class="module-arrow"><span>&#8595;</span></div>
+
+<!-- MODULE 3 -->
+<div class="module mod-proposal" id="df-mod3">
+<div class="module-content">
+<div class="module-title">Module 3 — Salary Proposal</div>
+<div class="module-subtitle">HR creates salary breakdown with auto-calculations</div>
+<div class="step connector"><div class="step-num">7</div><div class="step-header"><span class="step-title">HR Enters Gross Salary</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Enter gross → auto-calc: Basic = Gross × 0.571425, House Rent = Basic × 0.5, Medical = Basic × 0.1, Conveyance = Basic × 0.15</li><li>Select gender → AJAX to get_taxinfo_ajx.php → fetches monthly tax</li><li>Total Payable = Total Salary − Personal PF − PF Deductible − Monthly Tax</li></ul><div class="api-call">GET → get_taxinfo_ajx.php?gross_salary=X&amp;gender=male</div></div></div>
+<div class="step connector"><div class="step-num">8</div><div class="step-header"><span class="step-title">Save Proposal</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Salary breakdown stored as JSON in salary_breakdown column</li><li>Auto-set: status = "Draft", version = 1</li></ul><div class="db-write">INSERT → salary_proposals</div></div></div>
+<div class="step connector"><div class="step-num">9</div><div class="step-header"><span class="step-title">Submit for Approval</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Status: Draft → Proposed → Pending_Approval</li></ul><div class="db-write">UPDATE → salary_proposals SET status='Pending_Approval'</div></div></div>
+</div>
+<div class="module-marker">3</div>
+</div>
+<div class="module-arrow"><span>&#8595;</span></div>
+
+<!-- MODULE 4 -->
+<div class="module mod-offer" id="df-mod4">
+<div class="module-content">
+<div class="module-title">Module 4 — Proposal Approval</div>
+<div class="module-subtitle">Manager reviews and approves/rejects salary proposal</div>
+<div class="decision connector"><div class="step-num">10</div><div class="step-header"><span class="step-title">Manager Reviews Proposal</span><span class="step-actor actor-mgr">Manager</span></div><div class="step-body"><ul><li>Views full salary breakdown + candidate info</li></ul><div class="db-read">READ → salary_proposals JOIN candidates</div></div><div class="branch"><div class="branch-yes"><div class="branch-label">&#10003; Approve &amp; Finalize</div><div>Status → Finalized<br><div class="db-write">UPDATE → salary_proposals SET status='Finalized'</div><div class="db-write">INSERT → offers (auto-created, status='Pending')</div><div class="db-write">UPDATE → candidates SET status='Offered'</div></div></div><div class="branch-no"><div class="branch-label">&#10007; Reject</div><div>Status → Rejected<br><div class="db-write">UPDATE → salary_proposals SET status='Rejected'</div><div>HR can revise and resubmit</div></div></div></div></div>
+</div>
+<div class="module-marker">4</div>
+</div>
+<div class="module-arrow"><span>&#8595;</span></div>
+
+<!-- MODULE 5 -->
+<div class="module mod-letter" id="df-mod5">
+<div class="module-content">
+<div class="module-title">Module 5 — Offer Management</div>
+<div class="module-subtitle">Offer created, multi-level approval, then ready for letter</div>
+<div class="step connector"><div class="step-num">11</div><div class="step-header"><span class="step-title">Offer Auto-Created on Finalize</span><span class="step-actor actor-system">System</span></div><div class="step-body"><ul><li>Fields: candidate_id, salary, joining_date, designation_id, dept_id, probation_months</li><li>First approval level auto-created</li></ul><div class="db-write">INSERT → offers</div><div class="db-write">INSERT → offer_approvals (level=1)</div><div class="db-write">INSERT → candidate_logs (action: "offer_created")</div></div></div>
+<div class="step connector"><div class="step-num">12</div><div class="step-header"><span class="step-title">Approver Reviews Offer</span><span class="step-actor actor-mgr">Manager / Director</span></div><div class="step-body"><ul><li>Each approval level reviewed sequentially</li></ul></div></div>
+<div class="decision connector"><div class="step-num">13</div><div class="step-header"><span class="step-title">Offer Approval Decision</span><span class="step-actor actor-system">System</span></div><div class="branch"><div class="branch-yes"><div class="branch-label">&#10003; All Levels Approved</div><div>offers.status → "Approved"<br><div class="db-write">UPDATE → offers SET status='Approved'</div><div class="db-write">INSERT → candidate_logs (action: "offer_approved")</div></div></div><div class="branch-no"><div class="branch-label">&#10007; Rejected at Any Level</div><div>offers.status → "Rejected"<br><div class="db-write">UPDATE → offers SET status='Rejected'</div><div class="db-write">INSERT → candidate_logs (action: "offer_rejected")</div></div></div></div></div>
+</div>
+<div class="module-marker">5</div>
+</div>
+<div class="module-arrow"><span>&#8595;</span></div>
+
+<!-- MODULE 6 -->
+<div class="module mod-letter" id="df-mod6">
+<div class="module-content">
+<div class="module-title">Module 6 — Offer Letter Generation</div>
+<div class="module-subtitle">Template selection, tag resolution, Quill editor, save letter</div>
+<div class="step connector"><div class="step-num">14</div><div class="step-header"><span class="step-title">HR Opens Letter Generator</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Fetch offer + candidate + designation + department details</li><li>Load available templates (type = "Offer")</li></ul><div class="db-read">READ → offers JOIN candidates JOIN designations JOIN departments</div><div class="db-read">READ → letter_templates WHERE type='Offer'</div></div></div>
+<div class="step connector"><div class="step-num">15</div><div class="step-header"><span class="step-title">HR Selects Template</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Template HTML sent to render engine with module + record_id</li><li>Engine resolves 12 {{TAGS}} via getOfferTagMap()</li></ul><div class="api-call">POST → templates/ajax/render.php</div></div></div>
+<div class="step connector"><div class="step-num">16</div><div class="step-header"><span class="step-title">Edit in Quill Editor</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Rendered HTML loaded into Quill.js editor</li><li>HR can modify content before generating</li></ul></div></div>
+<div class="step connector"><div class="step-num">17</div><div class="step-header"><span class="step-title">Generate &amp; Save Letter</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Letter content saved, status set to "Generated"</li></ul><div class="db-write">INSERT/UPDATE → offer_letters (status='Generated')</div><div class="db-write">INSERT → candidate_logs (action: "offer_letter_generated")</div></div></div>
+</div>
+<div class="module-marker">6</div>
+</div>
+<div class="module-arrow"><span>&#8595;</span></div>
+
+<!-- MODULE 7 -->
+<div class="module mod-response" id="df-mod7">
+<div class="module-content">
+<div class="module-title">Module 7 — Send Letter &amp; Candidate Response</div>
+<div class="module-subtitle">Email sent to candidate, response recorded</div>
+<div class="step connector"><div class="step-num">18</div><div class="step-header"><span class="step-title">HR Sends Offer Letter</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Send modal opens with email field (editable)</li></ul></div></div>
+<div class="step connector"><div class="step-num">19</div><div class="step-header"><span class="step-title">Email Sent &amp; Logged</span><span class="step-actor actor-system">System</span></div><div class="step-body"><ul><li>offer_letters.status → "Sent", offers.sent_at → NOW()</li></ul><div class="db-write">UPDATE → offer_letters SET status='Sent'</div><div class="db-write">UPDATE → offers SET sent_at=NOW()</div><div class="db-write">INSERT → offer_email_log</div><div class="db-write">INSERT → candidate_logs (action: "offer_sent")</div></div></div>
+<div class="step connector"><div class="step-num">20</div><div class="step-header"><span class="step-title">Candidate Receives &amp; Reviews</span><span class="step-actor actor-candidate">Candidate</span></div><div class="step-body"><ul><li>Candidate receives email, reviews salary and terms</li></ul></div></div>
+<div class="decision connector"><div class="step-num">21</div><div class="step-header"><span class="step-title">Candidate Responds</span><span class="step-actor actor-candidate">Candidate</span></div><div class="branch"><div class="branch-yes"><div class="branch-label">&#10003; Accept</div><div>response_status → "Accepted"<br><div class="db-write">UPDATE → offers SET response_status='Accepted'</div><div class="db-write">INSERT → candidate_logs (action: "offer_accepted")</div></div></div><div class="branch-no"><div class="branch-label">&#10007; Reject</div><div>response_status → "Rejected"<br><div class="db-write">UPDATE → offers SET response_status='Rejected'</div><div class="db-write">INSERT → candidate_logs (action: "offer_rejected_candidate")</div></div></div></div></div>
+</div>
+<div class="module-marker">7</div>
+</div>
+<div class="module-arrow"><span>&#8595;</span></div>
+
+<!-- MODULE 8 -->
+<div class="module mod-employee" id="df-mod8">
+<div class="module-content">
+<div class="module-title">Module 8 — Employee Creation (6-Step Wizard)</div>
+<div class="module-subtitle">Accepted candidates onboarded with full profile + salary setup</div>
+<div class="step connector"><div class="step-num">22</div><div class="step-header"><span class="step-title">HR Opens Employee List</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Shows accepted offers ready for employee creation</li></ul><div class="db-read">READ → offers (response_status=Accepted)</div></div></div>
+<div class="step connector"><div class="step-num">23</div><div class="step-header"><span class="step-title">HR Starts Create Employee Wizard</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Page: employee/create.php?offer_id=X — candidate data pre-fills</li></ul></div></div>
+<div class="step connector" style="border-left:3px solid var(--warn)"><div class="step-num">24</div><div class="step-header"><span class="step-title">Step 1: Personal Info</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Name, father/mother name, NID, phone, email, blood group, DOB, gender — auto-filled from candidate</li></ul></div></div>
+<div class="step connector" style="border-left:3px solid var(--warn)"><div class="step-num">25</div><div class="step-header"><span class="step-title">Step 2: Employment Details</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Department, designation, employment type (default: "Probationer"), joining date</li></ul></div></div>
+<div class="step connector" style="border-left:3px solid var(--warn)"><div class="step-num">26</div><div class="step-header"><span class="step-title">Step 3: Address</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Present + permanent address, district, area, branch</li></ul></div></div>
+<div class="step connector" style="border-left:3px solid var(--warn)"><div class="step-num">27</div><div class="step-header"><span class="step-title">Step 4: Family &amp; Nominee</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Spouse, children (up to 4), nominee, nominee relation</li></ul></div></div>
+<div class="step connector" style="border-left:3px solid var(--warn)"><div class="step-num">28</div><div class="step-header"><span class="step-title">Step 5: Other Details</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Location, working days, cost center, schedule type, notes</li></ul></div></div>
+<div class="step connector" style="border-left:3px solid var(--warn)"><div class="step-num">29</div><div class="step-header"><span class="step-title">Step 6: Salary Setup</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Interactive calculator: gross → auto-calc basic, house rent, medical, conveyance</li><li>Gender → AJAX tax → total payable. 50+ salary fields.</li></ul><div class="api-call">GET → get_taxinfo_ajx.php</div></div></div>
+<div class="step connector"><div class="step-num">30</div><div class="step-header"><span class="step-title">Save Employee</span><span class="step-actor actor-system">System</span></div><div class="step-body"><ul><li>Two-step save: personnel_basic_info first, then salary_info</li><li>PBI_CODE auto-generated (EMP-00001 format)</li></ul><div class="db-write">INSERT → personnel_basic_info (70+ fields)</div><div class="db-write">INSERT → salary_info (50+ fields)</div></div></div>
+</div>
+<div class="module-marker">8</div>
+</div>
+<div class="module-arrow"><span>&#8595;</span></div>
+
+<!-- MODULE 9 -->
+<div class="module mod-probation" id="df-mod9">
+<div class="module-content">
+<div class="module-title">Module 9 — Probation Appraisal</div>
+<div class="module-subtitle">Multi-level evaluation with weighted scoring system</div>
+<div class="step connector"><div class="step-num">31</div><div class="step-header"><span class="step-title">HR Opens Probation List</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Shows employees with EMPLOYMENT_TYPE = "Probationer"</li></ul><div class="db-read">READ → personnel_basic_info</div></div></div>
+<div class="step connector"><div class="step-num">32</div><div class="step-header"><span class="step-title">HR Starts Appraisal</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Creates appraisal + 6 workflow levels + empty scores</li></ul><div class="db-write">INSERT → probation_appraisals</div><div class="db-write">INSERT → probation_workflow (6 levels)</div><div class="db-write">INSERT → probation_scores</div></div></div>
+<div class="step connector"><div class="step-num">33</div><div class="step-header"><span class="step-title">Employee Self Assessment</span><span class="step-actor actor-candidate">Employee</span></div><div class="step-body"><ul><li>Scores each category (weighted %). Overall = Σ(score × weight) / Σ(weight)</li></ul><div class="db-write">UPDATE → probation_scores</div></div></div>
+<div class="step connector"><div class="step-num">34</div><div class="step-header"><span class="step-title">Supervisor Evaluation</span><span class="step-actor actor-mgr">Supervisor</span></div><div class="step-body"><ul><li>Reviews self-assessment, adds scores. Approve / Send Back / Reject</li></ul><div class="db-write">UPDATE → probation_workflow SET status='Approved'</div></div></div>
+<div class="step connector"><div class="step-num">35</div><div class="step-header"><span class="step-title">Dept Head Review</span><span class="step-actor actor-mgr">Dept Head</span></div><div class="step-body"><ul><li>Reviews all previous scores. Approve / Send Back / Reject</li></ul><div class="db-write">UPDATE → probation_workflow SET status='Approved'</div></div></div>
+<div class="step connector"><div class="step-num">36</div><div class="step-header"><span class="step-title">HR Review</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>HR department assessment. Approve / Send Back / Reject</li></ul><div class="db-write">UPDATE → probation_workflow SET status='Approved'</div></div></div>
+<div class="step connector"><div class="step-num">37</div><div class="step-header"><span class="step-title">GM Approval</span><span class="step-actor actor-gm">GM</span></div><div class="step-body"><ul><li>General Manager reviews. Approve / Send Back / Reject</li></ul><div class="db-write">UPDATE → probation_workflow SET status='Approved'</div></div></div>
+<div class="step connector"><div class="step-num">38</div><div class="step-header"><span class="step-title">Managing Director — Final Approval</span><span class="step-actor actor-gm">MD</span></div><div class="step-body"><ul><li>Final level — recommendation: Confirm / Extend / Terminate</li></ul><div class="db-write">UPDATE → probation_workflow SET status='Approved'</div></div></div>
+<div class="decision connector"><div class="step-num">39</div><div class="step-header"><span class="step-title">All Levels Approved?</span><span class="step-actor actor-system">System</span></div><div class="branch"><div class="branch-yes"><div class="branch-label">&#10003; Completed</div><div>appraisal.status → "Completed"<br><div class="db-write">UPDATE → probation_appraisals SET status='Completed'</div><div style="margin-top:6px;font-size:12px;color:#166534;font-weight:600">→ Employee now eligible for Confirmation</div></div></div><div class="branch-no"><div class="branch-label">&#10007; Rejected / Sent Back</div><div>Status reverts to Draft or Rejected<br><div class="db-write">UPDATE → probation_appraisals SET status='Rejected'</div></div></div></div></div>
+</div>
+<div class="module-marker">9</div>
+</div>
+<div class="module-arrow"><span>&#8595;</span></div>
+
+<!-- MODULE 10 -->
+<div class="module mod-confirm" id="df-mod10">
+<div class="module-content">
+<div class="module-title">Module 10 — Confirmation Letter</div>
+<div class="module-subtitle">Generate, approve, and send confirmation letter</div>
+<div class="step connector"><div class="step-num">40</div><div class="step-header"><span class="step-title">HR Opens Eligible Employees</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Shows employees with probation_appraisals.status = "Completed"</li></ul><div class="db-read">READ → probation_appraisals JOIN personnel_basic_info</div></div></div>
+<div class="step connector"><div class="step-num">41</div><div class="step-header"><span class="step-title">HR Opens Letter Generator</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Load templates (type = "Confirmation"), select employment type</li></ul><div class="db-read">READ → personnel_basic_info + offers + salary_info</div><div class="db-read">READ → letter_templates WHERE type='Confirmation'</div></div></div>
+<div class="step connector"><div class="step-num">42</div><div class="step-header"><span class="step-title">HR Selects Template &amp; Renders</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Resolves 15 {{TAGS}} via getConfirmationTagMap(): EMPLOYEE_NAME, EMPLOYEE_CODE, DESIGNATION, DEPARTMENT, SALARY, JOINING_DATE, CONFIRMATION_DATE, PROBATION_MONTHS, COMPANY_NAME, HR_NAME, DATE, PHONE, EMAIL, GENDER, SALARY_BREAKDOWN</li></ul><div class="api-call">POST → confirmation/ajax/render_template.php</div></div></div>
+<div class="step connector"><div class="step-num">43</div><div class="step-header"><span class="step-title">Edit in Quill &amp; Generate</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Rendered HTML in Quill → HR edits → Generate Letter</li></ul><div class="db-write">INSERT → confirmation_letters (status='Generated')</div></div></div>
+<div class="step connector"><div class="step-num">44</div><div class="step-header"><span class="step-title">HR Approves Letter</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Preview → Approve → status changes</li></ul><div class="db-write">UPDATE → confirmation_letters SET status='Approved'</div></div></div>
+<div class="step connector"><div class="step-num">45</div><div class="step-header"><span class="step-title">HR Sends Confirmation</span><span class="step-actor actor-hr">HR</span></div><div class="step-body"><ul><li>Send modal auto-fills email from PBI_EMAIL</li></ul><div class="db-write">UPDATE → confirmation_letters SET status='Sent'</div><div class="db-write">INSERT → offer_email_log</div></div></div>
+</div>
+<div class="module-marker">10</div>
+</div>
+
+</div><!-- end .flow -->
+
+<!-- DB WRITES SUMMARY -->
+<h2 id="db-summary">Database Writes Summary</h2>
+<p>All INSERT and UPDATE operations across the complete 45-step flow.</p>
+
+<div class="grid-2">
+<div class="card">
+<h4>Modules 1-2 — Recruitment &amp; Screening</h4>
+<table>
+<tr><th>Table</th><th>Ops</th></tr>
+<tr><td>requisitions</td><td>INSERT</td></tr>
+<tr><td>candidates</td><td>INSERT, UPDATE</td></tr>
+<tr><td>candidate_logs</td><td>INSERT ×5</td></tr>
+<tr><td>screenings</td><td>INSERT/UPDATE</td></tr>
+<tr><td>interview_log</td><td>INSERT</td></tr>
+</table>
+</div>
+<div class="card">
+<h4>Modules 3-4 — Salary &amp; Offer Approval</h4>
+<table>
+<tr><th>Table</th><th>Ops</th></tr>
+<tr><td>salary_proposals</td><td>INSERT, UPDATE ×2</td></tr>
+<tr><td>offers</td><td>INSERT, UPDATE</td></tr>
+<tr><td>offer_approvals</td><td>INSERT</td></tr>
+<tr><td>candidates</td><td>UPDATE</td></tr>
+</table>
+</div>
+<div class="card">
+<h4>Modules 5-7 — Letter, Send &amp; Response</h4>
+<table>
+<tr><th>Table</th><th>Ops</th></tr>
+<tr><td>offer_letters</td><td>INSERT/UPDATE ×2</td></tr>
+<tr><td>offer_email_log</td><td>INSERT</td></tr>
+<tr><td>offers</td><td>UPDATE ×3</td></tr>
+<tr><td>candidate_logs</td><td>INSERT ×3</td></tr>
+</table>
+</div>
+<div class="card">
+<h4>Modules 8-10 — Employee, Probation, Confirm</h4>
+<table>
+<tr><th>Table</th><th>Ops</th></tr>
+<tr><td>personnel_basic_info</td><td>INSERT</td></tr>
+<tr><td>salary_info</td><td>INSERT</td></tr>
+<tr><td>probation_appraisals</td><td>INSERT, UPDATE</td></tr>
+<tr><td>probation_workflow</td><td>INSERT ×6, UPDATE ×6</td></tr>
+<tr><td>probation_scores</td><td>INSERT, UPDATE</td></tr>
+<tr><td>confirmation_letters</td><td>INSERT, UPDATE ×2</td></tr>
+</table>
+</div>
+</div>
+
+<!-- ACTORS -->
+<h2 id="actors">Actors &amp; Roles</h2>
+<div class="grid-3">
+<div class="card"><h4 style="color:#5b21b6">HR</h4><p style="font-size:13px">Primary operator. Creates requisitions, screens candidates, manages offers, generates letters, creates employees, starts appraisals.</p></div>
+<div class="card"><h4 style="color:#065f46">Manager / Supervisor</h4><p style="font-size:13px">Approves proposals, evaluates employees during probation, reviews offer letters.</p></div>
+<div class="card"><h4 style="color:#92400e">Candidate / Employee</h4><p style="font-size:13px">Applies for jobs, responds to offers (accept/reject), completes self-assessment.</p></div>
+<div class="card"><h4 style="color:#991b1b">GM / Managing Director</h4><p style="font-size:13px">Senior approval levels. Final decision makers in offer and probation workflows.</p></div>
+<div class="card"><h4 style="color:#1e40af">System (Auto)</h4><p style="font-size:13px">Auto-creates offers, generates employee codes, resolves template tags, calculates salary.</p></div>
+</div>
+
+<!-- DECISION POINTS -->
+<h2 id="decision-points">Decision Points</h2>
+<p>All 6 points where the flow branches based on user action.</p>
+<div class="card">
+<table>
+<tr><th>#</th><th>Step</th><th>Decision</th><th>Yes Path</th><th>No Path</th></tr>
+<tr><td>1</td><td>Interview Decision</td><td>Selected / Rejected?</td><td>→ Salary Proposal</td><td>→ Status = Rejected</td></tr>
+<tr><td>2</td><td>Proposal Approval</td><td>Approve / Reject?</td><td>→ Finalized → Offer Created</td><td>→ Status = Rejected, HR revises</td></tr>
+<tr><td>3</td><td>Offer Approval</td><td>All levels approved?</td><td>→ Ready for letter</td><td>→ Status = Rejected</td></tr>
+<tr><td>4</td><td>Candidate Response</td><td>Accept / Reject?</td><td>→ Employee Creation eligible</td><td>→ Flow ends</td></tr>
+<tr><td>5</td><td>Probation Workflow</td><td>Approve / Send Back / Reject?</td><td>→ Next level</td><td>→ Previous level or Rejected</td></tr>
+<tr><td>6</td><td>All Levels Complete?</td><td>All 6 approved?</td><td>→ Confirmation eligible</td><td>→ Remains In_Review</td></tr>
+</table>
+</div>
+
+<hr>
+
+
 
 <!-- ═══════════════════════ MODULE 1: RECRUITMENT ═══════════════════════ -->
 <h2 id="mod-recruitment">Module 1: Recruitment &amp; Candidate Pipeline</h2>
@@ -544,28 +888,7 @@ Send modal (auto-filled with employee email from PBI_EMAIL)
     ↓
 letter_send.php → status='Sent', sent_at, sent_to_email</div>
 
-<h3>Template Merge Tags (Confirmation)</h3>
-<table>
-<tr><th>Tag</th><th>Source</th></tr>
-<tr><td><span class="tag">{{EMPLOYEE_NAME}}</span></td><td>pbi.PBI_NAME + last_name</td></tr>
-<tr><td><span class="tag">{{EMPLOYEE_CODE}}</span></td><td>pbi.PBI_CODE</td></tr>
-<tr><td><span class="tag">{{DESIGNATION}}</span></td><td>designations.name</td></tr>
-<tr><td><span class="tag">{{DEPARTMENT}}</span></td><td>departments.name</td></tr>
-<tr><td><span class="tag">{{SALARY}}</span></td><td>offers.salary or salary_info.gross_salary</td></tr>
-<tr><td><span class="tag">{{JOINING_DATE}}</span></td><td>offers.joining_date or PBI_DOJ</td></tr>
-<tr><td><span class="tag">{{CONFIRMATION_DATE}}</span></td><td>joining_date + probation_months</td></tr>
-<tr><td><span class="tag">{{PROBATION_MONTHS}}</span></td><td>offers.probation_months</td></tr>
-<tr><td><span class="tag">{{COMPANY_NAME}}</span></td><td>Hardcoded: TechCorp International</td></tr>
-<tr><td><span class="tag">{{HR_NAME}}</span></td><td>Hardcoded: HR Department</td></tr>
-<tr><td><span class="tag">{{DATE}}</span></td><td>Current date</td></tr>
-<tr><td><span class="tag">{{PHONE}}</span></td><td>pbi.PBI_MOBILE</td></tr>
-<tr><td><span class="tag">{{EMAIL}}</span></td><td>pbi.PBI_EMAIL</td></tr>
-<tr><td><span class="tag">{{GENDER}}</span></td><td>pbi.PBI_SEX</td></tr>
-<tr><td><span class="tag">{{SALARY_BREAKDOWN}}</span></td><td>HTML table from salary_info</td></tr>
-</table>
 
-<h3>Confirmation Status Flow</h3>
-<pre>Draft → Generated → Approved → Sent</pre>
 
 <h3>Key Files</h3>
 <table>
@@ -614,6 +937,27 @@ templates/ajax/render.php receives { module, record_id, content }
 <tr><td>Standard Offer Letter</td><td>Offer</td><td>templates/ajax/migrate.php</td></tr>
 <tr><td>Confirmation Letter Template</td><td>Confirmation</td><td>templates/ajax/seed_confirmation.php</td></tr>
 </table>
+
+<h3>Template Merge Tags (Confirmation)</h3>
+<table>
+<tr><th>Tag</th><th>Source</th></tr>
+<tr><td><span class="tag">{{EMPLOYEE_NAME}}</span></td><td>pbi.PBI_NAME + last_name</td></tr>
+<tr><td><span class="tag">{{EMPLOYEE_CODE}}</span></td><td>pbi.PBI_CODE</td></tr>
+<tr><td><span class="tag">{{DESIGNATION}}</span></td><td>designations.name</td></tr>
+<tr><td><span class="tag">{{DEPARTMENT}}</span></td><td>departments.name</td></tr>
+<tr><td><span class="tag">{{SALARY}}</span></td><td>offers.salary or salary_info.gross_salary</td></tr>
+<tr><td><span class="tag">{{JOINING_DATE}}</span></td><td>offers.joining_date or PBI_DOJ</td></tr>
+<tr><td><span class="tag">{{CONFIRMATION_DATE}}</span></td><td>joining_date + probation_months</td></tr>
+<tr><td><span class="tag">{{PROBATION_MONTHS}}</span></td><td>offers.probation_months</td></tr>
+<tr><td><span class="tag">{{COMPANY_NAME}}</span></td><td>Hardcoded: TechCorp International</td></tr>
+<tr><td><span class="tag">{{HR_NAME}}</span></td><td>Hardcoded: HR Department</td></tr>
+<tr><td><span class="tag">{{DATE}}</span></td><td>Current date</td></tr>
+<tr><td><span class="tag">{{PHONE}}</span></td><td>pbi.PBI_MOBILE</td></tr>
+<tr><td><span class="tag">{{EMAIL}}</span></td><td>pbi.PBI_EMAIL</td></tr>
+<tr><td><span class="tag">{{GENDER}}</span></td><td>pbi.PBI_SEX</td></tr>
+<tr><td><span class="tag">{{SALARY_BREAKDOWN}}</span></td><td>HTML table from salary_info</td></tr>
+</table>
+
 
 <!-- ═══════════════════════ SALARY CALCULATION ═══════════════════════ -->
 <h2 id="salary-calc">Salary Calculation Logic</h2>
@@ -771,6 +1115,7 @@ ELMS-final/
     ├── system-logic.md         # Phase-by-phase system logic
     ├── database-erd.md         # Full ERD + table schemas
     ├── elms-erd.dbml           # DBML format ERD
+    ├── data-flow.html          # Complete data flow diagram (45 steps)
     └── documentation.html      # This file
 </pre>
 
@@ -915,5 +1260,20 @@ ELMS-final/
 <p style="text-align:center;color:var(--muted);font-size:12px;margin-top:32px">ELMS Documentation — Generated July 2026</p>
 
 </div>
+<script>
+(function(){
+  var h=document.getElementById('hamburger'),
+      s=document.getElementById('sidebar'),
+      o=document.getElementById('sidebarOverlay');
+  if(h){h.addEventListener('click',function(){s.classList.toggle('open');o.classList.toggle('open')})}
+  if(o){o.addEventListener('click',function(){s.classList.remove('open');o.classList.remove('open')})}
+  var links=s.querySelectorAll('a');
+  for(var i=0;i<links.length;i++){
+    links[i].addEventListener('click',function(){
+      if(window.innerWidth<=768){s.classList.remove('open');o.classList.remove('open')}
+    });
+  }
+})();
+</script>
 </body>
 </html>

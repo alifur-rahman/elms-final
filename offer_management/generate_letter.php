@@ -42,12 +42,40 @@ $existingContentJson = json_encode($existingContent);
 
 $pageStyles  = '
 @import url("https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css");
-.form-section { margin-bottom:24px }
-.form-section-title { font-size:15px; font-weight:600; border-bottom:1px solid var(--gray-200); padding-bottom:8px; margin-bottom:16px; display:flex; align-items:center; gap:8px }
-#quillEditor { height:400px }
-.vc-item { margin-bottom:10px }
-.vc-item label { display:block; font-size:11px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:.4px; margin-bottom:2px }
-.vc-item span { font-size:14px; color:var(--gray-800); font-weight:500 }
+.rp-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.rp-top h1{font-size:20px;font-weight:700;color:var(--gray-900);margin:0;white-space:nowrap}
+.rp-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rp-card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);overflow:hidden;padding:24px}
+.rp-empty{text-align:center;padding:48px 24px;color:var(--gray-400)}
+.rp-empty-icon{font-size:40px;margin-bottom:8px}
+.rp-empty h3{font-size:15px;color:var(--gray-600);margin:0 0 4px}
+.rp-empty p{font-size:13px;margin:0}
+.sb-section{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--gray-100)}
+.sb-section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sb-section-title{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sb-section-title .sb-icon{width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sb-section-title .sb-icon.blue{background:#e8f0fe;color:var(--primary)}
+.sb-section-title .sb-icon.purple{background:#f0e6ff;color:#7c3aed}
+.vc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.vc-item{margin-bottom:8px}
+.vc-item label{display:block;font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.vc-item span{font-size:14px;color:var(--gray-800);font-weight:500}
+#quillEditor{height:400px}
+.sb-btn-row{display:flex;justify-content:flex-end;gap:10px;padding-top:20px;border-top:1px solid var(--gray-200)}
+@media(max-width:768px){
+ .page-content{padding:16px}
+ .rp-top{flex-direction:column;align-items:stretch;gap:12px}
+ .rp-top h1{font-size:18px}
+ .rp-card{padding:18px}
+ .vc-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+ .page-content{padding:12px}
+ .rp-card{padding:16px}
+ .vc-grid{grid-template-columns:1fr}
+ .sb-btn-row{flex-direction:column}
+ .sb-btn-row .btn{width:100%;justify-content:center}
+}
 ';
 
 $pageScripts = <<<EOSCRIPT
@@ -152,74 +180,52 @@ EOSCRIPT;
 
 ob_start();
 ?>
-<div class="card">
-    <div class="card-header">
-        <h2>Generate Offer Letter</h2>
+<div class="rp-top">
+    <h1>Generate Offer Letter</h1>
+    <div class="rp-actions">
         <a href="letter.php" class="btn btn-sm btn-outline">&larr; Back to List</a>
     </div>
-    <div class="card-body">
-        <?php if (!$offer): ?>
-            <div class="empty-state">
-                <div class="empty-icon">&#128196;</div>
-                <p>Offer not found. <a href="letter.php">Go back to offer list</a>.</p>
-            </div>
-        <?php else: ?>
-        <form autocomplete="off">
-            <div class="form-section">
-                <div class="form-section-title">
-                    <span class="section-icon">&#128100;</span> Offer Details
-                </div>
-                <div class="form-row-3">
-                    <div class="vc-item">
-                        <label>Candidate</label>
-                        <span><?= htmlspecialchars($candidateName) ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Position</label>
-                        <span><?= htmlspecialchars($offer['job_title'] ?? 'N/A') ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Offered Salary</label>
-                        <span><?= htmlspecialchars(number_format((float)($offer['salary'] ?? 0), 2)) ?> BDT</span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Department</label>
-                        <span><?= htmlspecialchars($offer['dept_name'] ?? 'N/A') ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Designation</label>
-                        <span><?= htmlspecialchars($offer['designation_name'] ?? 'N/A') ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Joining Date</label>
-                        <span><?= $offer['joining_date'] ? htmlspecialchars((new DateTime($offer['joining_date']))->format('F j, Y')) : 'N/A' ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Email</label>
-                        <span><?= htmlspecialchars($offer['email'] ?? '-') ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Probation</label>
-                        <span><?= (int)($offer['probation_months'] ?? 0) ?> months</span>
-                    </div>
-                </div>
-            </div>
+</div>
 
-            <div class="form-section">
-                <div class="form-section-title">
-                    <span class="section-icon">&#128203;</span> Template
-                </div>
-                <select class="form-control" id="templateSelect" onchange="applyTemplate()" style="margin-bottom:14px"></select>
-                <div id="quillEditor"></div>
+<div class="rp-card">
+    <?php if (!$offer): ?>
+        <div class="rp-empty">
+            <div class="rp-empty-icon">&#x1F4C4;</div>
+            <h3>Offer not found</h3>
+            <p><a href="letter.php">Go back to offer list</a>.</p>
+        </div>
+    <?php else: ?>
+    <form autocomplete="off">
+        <div class="sb-section">
+            <div class="sb-section-title">
+                <span class="sb-icon blue">&#x1F464;</span> Offer Details
             </div>
+            <div class="vc-grid">
+                <div class="vc-item"><label>Candidate</label><span><?= htmlspecialchars($candidateName) ?></span></div>
+                <div class="vc-item"><label>Position</label><span><?= htmlspecialchars($offer['job_title'] ?? 'N/A') ?></span></div>
+                <div class="vc-item"><label>Offered Salary</label><span><?= htmlspecialchars(number_format((float)($offer['salary'] ?? 0), 2)) ?> BDT</span></div>
+                <div class="vc-item"><label>Department</label><span><?= htmlspecialchars($offer['dept_name'] ?? 'N/A') ?></span></div>
+                <div class="vc-item"><label>Designation</label><span><?= htmlspecialchars($offer['designation_name'] ?? 'N/A') ?></span></div>
+                <div class="vc-item"><label>Joining Date</label><span><?= $offer['joining_date'] ? htmlspecialchars((new DateTime($offer['joining_date']))->format('F j, Y')) : 'N/A' ?></span></div>
+                <div class="vc-item"><label>Email</label><span><?= htmlspecialchars($offer['email'] ?? '-') ?></span></div>
+                <div class="vc-item"><label>Probation</label><span><?= (int)($offer['probation_months'] ?? 0) ?> months</span></div>
+            </div>
+        </div>
 
-            <div class="btn-group" style="padding-top:20px;border-top:1px solid var(--gray-200)">
-                <a href="letter.php" class="btn btn-outline">Cancel</a>
-                <button type="button" class="btn btn-primary" onclick="saveLetter()">Generate Letter</button>
+        <div class="sb-section">
+            <div class="sb-section-title">
+                <span class="sb-icon purple">&#x1F4C3;</span> Template & Editor
             </div>
-        </form>
-        <?php endif; ?>
-    </div>
+            <select class="form-control" id="templateSelect" onchange="applyTemplate()" style="margin-bottom:14px"></select>
+            <div id="quillEditor"></div>
+        </div>
+
+        <div class="sb-btn-row">
+            <a href="letter.php" class="btn btn-outline">Cancel</a>
+            <button type="button" class="btn btn-primary" onclick="saveLetter()">Generate Letter</button>
+        </div>
+    </form>
+    <?php endif; ?>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>

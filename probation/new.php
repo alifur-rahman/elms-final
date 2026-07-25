@@ -4,47 +4,165 @@ $pageTitle  = 'New Probation Appraisal';
 $activePage = 'probation';
 $breadcrumb = 'Home / Probation / New Appraisal';
 $pageStyles = '
-.profile-card { display: flex; gap: 24px; align-items: center; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+.profile-card { display: flex; gap: 24px; align-items: center; background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
 .profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #1565c0); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; flex-shrink: 0; }
 .profile-details { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 .detail-item label { display: block; font-size: 11px; color: var(--gray-500); margin-bottom: 2px; }
-.detail-item span { font-size: 13px; font-weight: 500; }
-.workflow-steps { display: flex; align-items: center; gap: 0; margin-bottom: 24px; padding: 20px; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; overflow-x: auto; }
+.detail-item span { font-size: 13px; font-weight: 500; word-break: break-word; }
+.workflow-steps { display: flex; align-items: center; gap: 0; margin-bottom: 24px; padding: 20px; background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+.workflow-steps::-webkit-scrollbar { height: 4px; }
+.workflow-steps::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 2px; }
 .workflow-step { display: flex; align-items: center; gap: 8px; position: relative; flex-shrink: 0; cursor: pointer; }
-.workflow-step .step-circle { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--gray-300); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--gray-400); background: #fff; transition: all .2s; }
+.workflow-step .step-circle { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--gray-300); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--gray-400); background: #fff; transition: all .2s; flex-shrink: 0; }
 .workflow-step.active .step-circle { border-color: var(--primary); background: var(--primary); color: #fff; }
 .workflow-step.done .step-circle { border-color: var(--success); background: var(--success); color: #fff; }
-.workflow-step .step-info { display: flex; flex-direction: column; }
+.workflow-step .step-info { display: flex; flex-direction: column; min-width: 0; }
 .workflow-step .step-label { font-size: 12px; font-weight: 500; white-space: nowrap; }
 .workflow-step .step-user { font-size: 10px; color: var(--gray-500); }
 .workflow-connector { width: 40px; height: 2px; background: var(--gray-300); flex-shrink: 0; margin: 0 8px; }
 .workflow-connector.done { background: var(--success); }
-.appraisal-section { background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+.appraisal-section { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
 .appraisal-section .section-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; font-weight: 600; font-size: 14px; background: #e8f0fe; }
-.appraisal-section .section-body { padding: 16px; }
+.appraisal-section .section-body { padding: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .appraisal-table { width: 100%; border-collapse: collapse; }
-.appraisal-table th { text-align: left; font-size: 12px; color: var(--gray-500); padding: 8px 12px; border-bottom: 1px solid var(--gray-200); }
+.appraisal-table th { text-align: left; font-size: 12px; color: var(--gray-500); padding: 8px 12px; border-bottom: 1px solid var(--gray-200); background: var(--gray-50); position: sticky; top: 0; z-index: 1; }
 .appraisal-table td { padding: 12px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; font-size: 13px; }
-.rating-group { display: flex; flex-direction: row-reverse; gap: 4px; justify-content: flex-end; }
+.appraisal-table td[data-label] { position: relative; }
+.rating-group { display: flex; flex-direction: row-reverse; gap: 4px; justify-content: flex-end; flex-wrap: wrap; }
 .rating-group input[type="radio"] { display: none; }
-.rating-group label { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--gray-300); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; color: var(--gray-400); }
+.rating-group label { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--gray-300); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; color: var(--gray-400); flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
 .rating-group label:hover { border-color: var(--primary); color: var(--primary); }
 .rating-group input:checked ~ label { border-color: var(--primary); background: var(--primary); color: #fff; }
 .meter-bar { display: flex; align-items: center; gap: 12px; }
 .bar-track { flex: 1; height: 12px; background: var(--gray-200); border-radius: 6px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #f44336, #ff9800, #ffc107, #4caf50, #1b5e20); transition: width 0.5s ease; }
 .bar-label { font-size: 14px; font-weight: 600; color: var(--primary); white-space: nowrap; }
-.rec-option { display: flex; align-items: center; gap: 8px; padding: 16px; border: 2px solid var(--gray-200); border-radius: 8px; cursor: pointer; transition: all .2s; }
+.rec-option { display: flex; align-items: center; gap: 10px; padding: 16px; border: 2px solid var(--gray-200); border-radius: var(--radius); cursor: pointer; transition: all .2s; }
 .rec-option:hover { border-color: var(--primary); }
-.rec-option input[type="radio"] { width: 18px; height: 18px; accent-color: var(--primary); }
+.rec-option input[type="radio"] { width: 18px; height: 18px; accent-color: var(--primary); flex-shrink: 0; }
 .weight-badge { font-size: 11px; color: var(--gray-500); font-weight: 400; }
 .form-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-.employee-selector { padding: 16px; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; }
+.employee-selector { padding: 16px; background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); margin-bottom: 24px; display: flex; align-items: center; gap: 16px; }
 .employee-selector label { font-weight: 500; font-size: 14px; white-space: nowrap; }
-.employee-selector select { min-width: 280px; }
+.employee-selector select { min-width: 0; flex: 1; }
 .alert-info { background: #e8f0fe; border: 1px solid #c6dafc; color: #1a73e8; }
+.integrated-stats { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 4px; font-size: 12px; color: var(--gray-600); }
+.integrated-stats span { white-space: nowrap; }
+.bottom-actions { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; }
+.score-labels { display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; color: var(--gray-500); }
 .mb-24 { margin-bottom: 24px; }
 .mb-16 { margin-bottom: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.card .card-body .form-group { margin-bottom: 16px; }
+.card .card-body .form-group:last-child { margin-bottom: 0; }
+
+@media(max-width:900px){
+ .profile-details{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+ .form-row-4{grid-template-columns:1fr 1fr}
+ .rec-option{padding:14px 12px}
+}
+
+@media(max-width:768px){
+ .page-content{padding:16px}
+ .employee-selector{flex-direction:column;align-items:stretch;gap:10px}
+ .employee-selector label{white-space:normal}
+ .employee-selector span{font-size:11px}
+ .profile-card{flex-direction:column;align-items:center;text-align:center;gap:16px;padding:20px}
+ .profile-avatar{width:56px;height:56px;font-size:18px}
+ .profile-details{grid-template-columns:1fr 1fr;gap:10px}
+ .detail-item label{font-size:10px}
+ .detail-item span{font-size:12px}
+ .workflow-steps{padding:14px;gap:0}
+ .workflow-step .step-circle{width:30px;height:30px;font-size:12px}
+ .workflow-step .step-info{min-width:0}
+ .workflow-step .step-label{font-size:11px}
+ .workflow-step .step-user{font-size:9px}
+ .workflow-connector{width:20px;margin:0 4px}
+ .appraisal-section .section-header{flex-direction:column;align-items:flex-start;gap:4px;padding:10px 14px;font-size:13px}
+ .appraisal-section .section-body{padding:12px}
+ .appraisal-table{min-width:420px}
+ .appraisal-table th{font-size:11px;padding:6px 10px}
+ .appraisal-table td{padding:10px;font-size:12px}
+ .rating-group label{width:30px;height:30px;font-size:11px}
+ .meter-bar{gap:8px}
+ .bar-track{height:10px}
+ .bar-label{font-size:12px}
+ .score-labels{font-size:10px}
+ .form-row-4{grid-template-columns:1fr 1fr}
+ .rec-option{padding:12px;gap:8px}
+ .rec-option input[type="radio"]{width:16px;height:16px}
+ .rec-option > div > div:first-child{font-size:13px}
+ .rec-option > div > div:last-child{font-size:10px}
+ .form-row{grid-template-columns:1fr!important}
+ .form-group{margin-bottom:14px}
+ textarea.form-control{min-height:80px}
+ .card .card-header{flex-direction:column;align-items:flex-start;gap:8px;padding:14px 16px}
+ .card .card-header h2{font-size:14px}
+ .card .card-body{padding:14px 16px}
+ .mb-24{margin-bottom:16px}
+ .bottom-actions{flex-direction:column;gap:12px;align-items:stretch}
+ .bottom-actions > div:first-child{text-align:center}
+ .bottom-actions .btn-group{flex-direction:row;gap:10px}
+ .bottom-actions .btn-group .btn{flex:1}
+ .bottom-actions a.btn{display:block;text-align:center}
+ .integrated-stats{flex-direction:column;gap:4px}
+ .integrated-stats span{text-align:center}
+}
+
+@media(max-width:480px){
+ .page-content{padding:12px}
+ .employee-selector{padding:12px}
+ .profile-card{padding:14px;border-radius:6px}
+ .profile-avatar{width:48px;height:48px;font-size:16px}
+ .profile-details{grid-template-columns:1fr 1fr;gap:8px}
+ .detail-item label{font-size:9px}
+ .detail-item span{font-size:11px}
+ .workflow-steps{padding:12px}
+ .workflow-step .step-circle{width:26px;height:26px;font-size:11px;border-width:1.5px}
+ .workflow-step .step-label{font-size:10px}
+ .workflow-step .step-user{display:none}
+ .workflow-step .step-info{display:none}
+ .workflow-connector{width:14px;margin:0 3px}
+ .appraisal-section .section-header{padding:8px 12px;font-size:12px}
+ .appraisal-section .section-body{padding:10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+ .appraisal-table thead{display:none}
+ .appraisal-table,
+ .appraisal-table tbody,
+ .appraisal-table tr,
+ .appraisal-table td{display:block;width:100%}
+ .appraisal-table tr{border:1px solid var(--gray-200);border-radius:6px;padding:10px 12px;margin-bottom:10px;background:#fff}
+ .appraisal-table td{padding:6px 0;border-bottom:none;position:relative;padding-left:0}
+ .appraisal-table td[data-label]::before{
+ content:attr(data-label);
+ display:block;
+ font-size:10px;
+ font-weight:600;
+ color:var(--gray-500);
+ text-transform:uppercase;
+ letter-spacing:.5px;
+ margin-bottom:4px;
+ }
+ .rating-group{justify-content:flex-start!important;flex-wrap:wrap;gap:6px}
+ .rating-group label{width:36px;height:36px;font-size:13px}
+ .appraisal-table td input[type="text"]{width:100%;margin-top:4px}
+ .form-row-4{grid-template-columns:1fr}
+ .rec-option{padding:10px;gap:6px}
+ .rec-option > div > div:first-child{font-size:12px}
+ .rec-option > div > div:last-child{font-size:9px}
+ .bottom-actions .btn-group{flex-direction:column}
+ .bottom-actions .btn-group .btn{width:100%;justify-content:center}
+ .bottom-actions a.btn{width:100%}
+ .card{border-radius:6px}
+ .mb-24{margin-bottom:14px}
+ .alert{padding:10px 12px;font-size:12px;border-radius:6px}
+ .meter-bar{flex-direction:column;align-items:stretch;gap:6px}
+ .bar-label{text-align:right}
+ .score-labels span:nth-child(2),
+ .score-labels span:nth-child(3){display:none}
+ .card .card-header{padding:12px 14px}
+ .card .card-header h2{font-size:13px}
+ .card .card-body{padding:12px 14px}
+}
 ';
 $pageScripts = <<<'EOSCRIPT'
 var employees = [];
@@ -99,8 +217,8 @@ function renderCategories() {
             var qid = cat.id + "_" + q;
             var tr = document.createElement("tr");
             tr.innerHTML =
-                '<td>' + sampleQs[q] + '</td>' +
-                '<td>' +
+                '<td data-label="Question">' + sampleQs[q] + '</td>' +
+                '<td data-label="Rating">' +
                     '<div class="rating-group">' +
                         '<input type="radio" name="rating_' + qid + '" id="r_' + qid + '_5" value="5" onchange="recalcScore()"><label for="r_' + qid + '_5">5</label>' +
                         '<input type="radio" name="rating_' + qid + '" id="r_' + qid + '_4" value="4" onchange="recalcScore()"><label for="r_' + qid + '_4">4</label>' +
@@ -109,7 +227,7 @@ function renderCategories() {
                         '<input type="radio" name="rating_' + qid + '" id="r_' + qid + '_1" value="1" onchange="recalcScore()"><label for="r_' + qid + '_1">1</label>' +
                     '</div>' +
                 '</td>' +
-                '<td><input type="text" class="form-control" data-q-comment="' + qid + '" placeholder="Optional comments..." style="min-width:120px"></td>';
+                '<td data-label="Comments"><input type="text" class="form-control" data-q-comment="' + qid + '" placeholder="Optional comments..."></td>';
             tbody.appendChild(tr);
         }
     }
@@ -367,9 +485,12 @@ ob_start();
     <div class="alert alert-info mb-24" id="integratedDataAlert">
         <div>
             <strong>&#128202; Integrated Data</strong> &mdash; Attendance, leave, and KPI data pulled automatically from Employee Master, Attendance &amp; Leave modules.
-            <span style="display:block;margin-top:4px;font-size:12px;color:var(--gray-600)">
-                &#10003; Attendance: <span id="attPct">94</span>% &nbsp;|&nbsp; &#10003; Late Marks: <span id="lateMarks">2</span> &nbsp;|&nbsp; &#10003; Leave Balance: <span id="leaveBal">11.5</span> days &nbsp;|&nbsp; &#10003; Training: <span id="trainPct">85</span>% Complete
-            </span>
+            <div class="integrated-stats">
+                <span>&#10003; Attendance: <strong id="attPct">94</strong>%</span>
+                <span>&#10003; Late Marks: <strong id="lateMarks">2</strong></span>
+                <span>&#10003; Leave Balance: <strong id="leaveBal">11.5</strong> days</span>
+                <span>&#10003; Training: <strong id="trainPct">85</strong>% Complete</span>
+            </div>
         </div>
     </div>
 
@@ -417,7 +538,7 @@ ob_start();
                 </div>
                 <span class="bar-label" id="scoreLabel">0 / 5</span>
             </div>
-            <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--gray-500)">
+            <div class="score-labels">
                 <span>Poor</span><span>Average</span><span>Good</span><span>Excellent</span>
             </div>
         </div>
@@ -541,7 +662,7 @@ ob_start();
         </div>
     </div>
 
-    <div style="display:flex;justify-content:space-between;align-items:center">
+    <div class="bottom-actions">
         <div>
             <a href="list.php" class="btn btn-outline">&#8592; Back to List</a>
         </div>

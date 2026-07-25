@@ -45,12 +45,76 @@ $existingContentJson = json_encode($existingContent);
 
 $pageStyles  = '
 @import url("https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css");
-.form-section { margin-bottom:24px }
-.form-section-title { font-size:15px; font-weight:600; border-bottom:1px solid var(--gray-200); padding-bottom:8px; margin-bottom:16px; display:flex; align-items:center; gap:8px }
-#quillEditor { height:400px }
-.vc-item { margin-bottom:10px }
-.vc-item label { display:block; font-size:11px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:.4px; margin-bottom:2px }
-.vc-item span { font-size:14px; color:var(--gray-800); font-weight:500 }
+
+/* ===== HEADER ===== */
+.rp-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.rp-top h1{font-size:20px;font-weight:700;color:var(--gray-900);margin:0;white-space:nowrap}
+.rp-top h1 small{font-size:13px;font-weight:400;color:var(--gray-400);margin-left:8px}
+.rp-top .rp-back{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(--gray-200);border-radius:8px;background:#fff;font-size:13px;font-weight:500;color:var(--gray-600);text-decoration:none;transition:all .15s;font-family:inherit}
+.rp-top .rp-back:hover{border-color:var(--primary);color:var(--primary)}
+
+/* ===== CARD ===== */
+.rp-card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);overflow:hidden;padding:24px}
+
+/* ===== SECTION ===== */
+.sb-section{margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--gray-100)}
+.sb-section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sb-section-title{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sb-section-title .sb-icon{width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sb-section-title .sb-icon.blue{background:#e8f0fe;color:var(--primary)}
+.sb-section-title .sb-icon.green{background:#e6f4ea;color:var(--success)}
+.sb-section-title .sb-icon.purple{background:#f0e6ff;color:#7c3aed}
+.sb-section-title .sb-icon.orange{background:#fef3e2;color:#e67e22}
+
+/* ===== INFO GRID ===== */
+.vc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.vc-item{padding:12px 14px;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-100)}
+.vc-item label{display:block;font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.vc-item span{font-size:13px;color:var(--gray-800);font-weight:500;word-break:break-word}
+
+/* ===== EDITOR ===== */
+#quillEditor{height:400px;border-radius:0 0 8px 8px}
+.ql-toolbar.ql-snow{border-radius:8px 8px 0 0;border-color:var(--gray-300)}
+.ql-container.ql-snow{border-color:var(--gray-300)}
+.template-row{display:flex;gap:12px;align-items:end;margin-bottom:14px}
+.template-row .form-group{flex:1;margin-bottom:0}
+
+/* ===== ACTION BAR ===== */
+.bottom-actions{display:flex;justify-content:space-between;align-items:center;padding-top:20px;border-top:1px solid var(--gray-200)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+ .vc-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+}
+@media(max-width:768px){
+ .page-content{padding:16px}
+ .rp-top{flex-direction:column;align-items:stretch;gap:12px}
+ .rp-top h1{font-size:18px}
+ .rp-top h1 small{display:block;margin:4px 0 0;font-size:12px}
+ .rp-top .rp-back{align-self:flex-start}
+ .rp-card{padding:18px}
+ .sb-section{margin-bottom:20px;padding-bottom:16px}
+ .vc-grid{grid-template-columns:1fr 1fr;gap:10px}
+ .template-row{flex-direction:column;align-items:stretch}
+ #quillEditor{height:300px}
+ .bottom-actions{flex-direction:column;gap:12px;align-items:stretch}
+ .bottom-actions .rp-back{display:block;text-align:center}
+ .bottom-actions .btn{width:100%;justify-content:center}
+}
+@media(max-width:480px){
+ .page-content{padding:12px}
+ .rp-card{padding:14px;border-radius:8px}
+ .sb-section-title{font-size:13px;gap:6px}
+ .sb-section-title .sb-icon{width:24px;height:24px;font-size:12px;border-radius:6px}
+ .vc-grid{grid-template-columns:1fr;gap:8px}
+ .vc-item{padding:10px 12px}
+ .vc-item label{font-size:9px}
+ .vc-item span{font-size:12px}
+ #quillEditor{height:250px}
+ .ql-toolbar.ql-snow .ql-formats{margin-right:6px}
+ .form-control{font-size:13px;padding:8px 10px}
+ .bottom-actions .btn{font-size:13px;padding:10px}
+}
 ';
 
 $pageScripts = <<<EOSCRIPT
@@ -159,96 +223,101 @@ EOSCRIPT;
 
 ob_start();
 ?>
-<div class="card">
-    <div class="card-header">
-        <h2>Generate Confirmation Letter</h2>
-        <a href="list.php" class="btn btn-sm btn-outline">&larr; Back to List</a>
-    </div>
-    <div class="card-body">
-        <?php if (!$emp): ?>
-            <div class="empty-state">
-                <div class="empty-icon">&#128100;</div>
-                <p>Employee not found. <a href="list.php">Go back</a>.</p>
-            </div>
-        <?php else: ?>
-        <form autocomplete="off">
-            <div class="form-section">
-                <div class="form-section-title">
-                    <span class="section-icon">&#128100;</span> Employee Details
-                </div>
-                <div class="form-row form-row-3">
-                    <div class="vc-item">
-                        <label>Employee</label>
-                        <span><?= htmlspecialchars($empName) ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Code</label>
-                        <span><?= htmlspecialchars($emp['PBI_CODE'] ?? 'N/A') ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Position</label>
-                        <span><?= htmlspecialchars($emp['job_title'] ?? 'N/A') ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Department</label>
-                        <span><?= htmlspecialchars($emp['dept_name'] ?? 'N/A') ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Designation</label>
-                        <span><?= htmlspecialchars($emp['designation_name'] ?? 'N/A') ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Salary</label>
-                        <span><?= number_format((float)($emp['salary'] ?? 0), 2) ?> BDT</span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Current Type</label>
-                        <span><?= htmlspecialchars($emp['EMPLOYMENT_TYPE'] ?? 'Probationer') ?></span>
-                    </div>
-                    <div class="vc-item">
-                        <label>Probation</label>
-                        <span><?= (int)($emp['probation_months'] ?? 0) ?> months</span>
-                    </div>
-                </div>
-            </div>
+<div class="rp-top">
+    <h1>Generate Confirmation Letter</h1>
+    <a href="list.php" class="rp-back">&larr; Back to List</a>
+</div>
 
-            <div class="form-section">
-                <div class="form-section-title">
-                    <span class="section-icon">&#128196;</span> Employment Type
-                </div>
-                <div class="form-row" style="max-width:300px">
-                    <div class="form-group">
-                        <label>Employee Type After Confirmation</label>
-                        <select class="form-control" id="employmentType">
-                            <?php
-                            $types = ['Casual','Apprentice','Probationer','Temporary','Replace','Permanent','Seasonal','Contractual','Regular'];
-                            foreach ($types as $t):
-                                $sel = ($t === $existingType) ? 'selected' : '';
-                                $defaultSel = ($t === 'Permanent' && $existingType === 'Probationer') ? 'selected' : '';
-                            ?>
-                            <option value="<?= $t ?>" <?= $t === 'Permanent' && $existingType === 'Probationer' ? 'selected' : $sel ?>><?= $t ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <div class="form-section-title">
-                    <span class="section-icon">&#128203;</span> Letter Template
-                </div>
-                <select class="form-control" id="templateSelect" onchange="applyTemplate()" style="margin-bottom:14px"></select>
-                <div id="quillEditor"></div>
-            </div>
-
-            <div class="btn-group" style="padding-top:20px;border-top:1px solid var(--gray-200)">
-                <a href="list.php" class="btn btn-outline">Cancel</a>
-                <button type="button" class="btn btn-primary" onclick="saveLetter()">Generate Letter</button>
-            </div>
-        </form>
-        <?php endif; ?>
+<?php if (!$emp): ?>
+<div class="rp-card">
+    <div class="rp-empty">
+        <div class="rp-empty-icon">&#128100;</div>
+        <h3>Employee not found</h3>
+        <p><a href="list.php" style="color:var(--primary)">Go back to list</a></p>
     </div>
 </div>
+<?php else: ?>
+<div class="rp-card">
+    <div class="sb-section">
+        <div class="sb-section-title">
+            <span class="sb-icon blue">&#128100;</span> Employee Details
+        </div>
+        <div class="vc-grid">
+            <div class="vc-item">
+                <label>Employee Name</label>
+                <span><?= htmlspecialchars($empName) ?></span>
+            </div>
+            <div class="vc-item">
+                <label>Employee Code</label>
+                <span><?= htmlspecialchars($emp['PBI_CODE'] ?? 'N/A') ?></span>
+            </div>
+            <div class="vc-item">
+                <label>Job Title</label>
+                <span><?= htmlspecialchars($emp['job_title'] ?? 'N/A') ?></span>
+            </div>
+            <div class="vc-item">
+                <label>Department</label>
+                <span><?= htmlspecialchars($emp['dept_name'] ?? 'N/A') ?></span>
+            </div>
+            <div class="vc-item">
+                <label>Designation</label>
+                <span><?= htmlspecialchars($emp['designation_name'] ?? 'N/A') ?></span>
+            </div>
+            <div class="vc-item">
+                <label>Salary</label>
+                <span><?= number_format((float)($emp['salary'] ?? 0), 2) ?> BDT</span>
+            </div>
+            <div class="vc-item">
+                <label>Current Type</label>
+                <span><?= htmlspecialchars($emp['EMPLOYMENT_TYPE'] ?? 'Probationer') ?></span>
+            </div>
+            <div class="vc-item">
+                <label>Probation Period</label>
+                <span><?= (int)($emp['probation_months'] ?? 0) ?> months</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="sb-section">
+        <div class="sb-section-title">
+            <span class="sb-icon green">&#128196;</span> Employment Type
+        </div>
+        <div style="max-width:300px">
+            <div class="form-group">
+                <label>Employee Type After Confirmation</label>
+                <select class="form-control" id="employmentType">
+                    <?php
+                    $types = ['Casual','Apprentice','Probationer','Temporary','Replace','Permanent','Seasonal','Contractual','Regular'];
+                    foreach ($types as $t):
+                        $sel = ($t === $existingType) ? 'selected' : '';
+                        $defaultSel = ($t === 'Permanent' && $existingType === 'Probationer') ? 'selected' : '';
+                    ?>
+                    <option value="<?= $t ?>" <?= $t === 'Permanent' && $existingType === 'Probationer' ? 'selected' : $sel ?>><?= $t ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="sb-section">
+        <div class="sb-section-title">
+            <span class="sb-icon purple">&#128203;</span> Letter Template
+        </div>
+        <div class="template-row">
+            <div class="form-group">
+                <label>Choose Template</label>
+                <select class="form-control" id="templateSelect" onchange="applyTemplate()"></select>
+            </div>
+        </div>
+        <div id="quillEditor"></div>
+    </div>
+
+    <div class="bottom-actions">
+        <a href="list.php" class="rp-back">&larr; Back to List</a>
+        <button type="button" class="btn btn-primary" onclick="saveLetter()">Generate Letter</button>
+    </div>
+</div>
+<?php endif; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 <?php

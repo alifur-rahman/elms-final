@@ -21,6 +21,11 @@ $pageStyles  = '
 .rp-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .rp-table{width:100%;border-collapse:collapse}
 .rp-table thead th{background:var(--gray-50);padding:12px 16px;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px;text-align:left;border-bottom:1px solid var(--gray-100);white-space:nowrap;position:sticky;top:0;z-index:1}
+.rp-table thead th.rp-sortable{cursor:pointer;user-select:none;transition:color .15s}
+.rp-table thead th.rp-sortable:hover{color:var(--primary)}
+.rp-table thead th.rp-sorted{color:var(--primary)}
+.rp-sort-arrow{font-size:10px;margin-left:4px;opacity:.5}
+.rp-sorted .rp-sort-arrow{opacity:1}
 .rp-table tbody tr{border-bottom:1px solid var(--gray-50);transition:background .15s}
 .rp-table tbody tr:last-child{border-bottom:none}
 .rp-table tbody tr:hover{background:var(--gray-50)}
@@ -101,13 +106,66 @@ var jobsData = [];
 var editingJobId = null;
 var currentPage = 1;
 var perPage = 10;
+var sortCol = -1;
+var sortDir = "asc";
+
+function sortBy(col) {
+    if (sortCol === col) {
+        sortDir = sortDir === "asc" ? "desc" : "asc";
+    } else {
+        sortCol = col;
+        sortDir = "asc";
+    }
+    currentPage = 1;
+    renderTable();
+}
+
+function getSortVal(j) {
+    switch (sortCol) {
+        case 0: return (j.title || "").toLowerCase();
+        case 1: return (j.dept_name || getDeptName(j.dept_id) || "").toLowerCase();
+        case 2: return (j.location || "").toLowerCase();
+        case 3: return parseInt(j.vacancies) || 0;
+        case 4: return parseInt(j.filled) || 0;
+        case 5: return (j.status || "").toLowerCase();
+        case 6: return (j.priority || "").toLowerCase();
+        case 7: return j.deadline || "";
+        default: return "";
+    }
+}
+
+function sortData(arr) {
+    if (sortCol < 0) return arr;
+    return arr.slice().sort(function(a, b) {
+        var va = getSortVal(a);
+        var vb = getSortVal(b);
+        if (va < vb) return sortDir === "asc" ? -1 : 1;
+        if (va > vb) return sortDir === "asc" ? 1 : -1;
+        return 0;
+    });
+}
 
 function getFilteredData() {
     var q = document.getElementById("searchJobs").value.trim().toLowerCase();
-    return jobsData.filter(function(j) {
+    var list = jobsData.filter(function(j) {
         var text = (j.title + " " + (j.dept_name || getDeptName(j.dept_id)) + " " + j.location + " " + (j.status || "")).toLowerCase();
         return !q || text.indexOf(q) !== -1;
     });
+    return sortData(list);
+}
+
+function updateSortArrows() {
+    for (var i = 0; i <= 7; i++) {
+        var el = document.getElementById("sortArrow" + i);
+        if (!el) continue;
+        if (i === sortCol) {
+            el.textContent = sortDir === "asc" ? "\u25B2" : "\u25BC";
+            el.parentNode.classList.add("rp-sorted");
+        } else {
+            el.textContent = "\u2195";
+            el.parentNode.classList.remove("rp-sorted");
+        }
+    }
 }
 
 function renderPaginationBar(total, totalPages) {
@@ -390,6 +448,7 @@ function renderTable() {
     renderMobileCards(pageData);
 
     renderPaginationBar(filtered.length, totalPages);
+    updateSortArrows();
 }
 
 function initDeptSelect() {
@@ -456,15 +515,15 @@ ob_start();
         <table class="rp-table" id="jobsTable">
             <thead>
                 <tr>
-                    <th>Job Title</th>
-                    <th>Department</th>
-                    <th>Location</th>
-                    <th>Vacancies</th>
-                    <th>Filled</th>
-                    <th>Status</th>
-                    <th>Priority</th>
-                    <th>Deadline</th>
-                    <th></th>
+                    <th class="rp-sortable" onclick="sortBy(0)">Job Title <span class="rp-sort-arrow" id="sortArrow0"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(1)">Department <span class="rp-sort-arrow" id="sortArrow1"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(2)">Location <span class="rp-sort-arrow" id="sortArrow2"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(3)">Vacancies <span class="rp-sort-arrow" id="sortArrow3"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(4)">Filled <span class="rp-sort-arrow" id="sortArrow4"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(5)">Status <span class="rp-sort-arrow" id="sortArrow5"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(6)">Priority <span class="rp-sort-arrow" id="sortArrow6"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(7)">Deadline <span class="rp-sort-arrow" id="sortArrow7"></span></th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="jobsBody"></tbody>

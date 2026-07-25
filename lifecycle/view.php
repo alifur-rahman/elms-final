@@ -6,7 +6,26 @@ $breadcrumb  = 'Home / Lifecycle / Timeline';
 $pageStyles  = '
 .selector-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
 .selector-bar label { font-weight: 500; font-size: 13px; color: var(--gray-700); flex-shrink: 0; }
-.selector-bar select { min-width: 360px; }
+.search-wrap { position: relative; width: 100%; max-width: 500px; }
+.search-wrap input { width: 100%; padding: 10px 14px 10px 36px; border: 1px solid var(--gray-300); border-radius: 8px; font-size: 14px; background: #fff; outline: none; transition: border-color .2s; }
+.search-wrap input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+.search-wrap .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: 14px; pointer-events: none; }
+.search-wrap .search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; color: var(--gray-400); cursor: pointer; display: none; padding: 2px 4px; line-height: 1; }
+.search-wrap .search-clear:hover { color: var(--gray-700); }
+.search-results { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.12); max-height: 320px; overflow-y: auto; z-index: 50; display: none; margin-top: 4px; }
+.search-results.open { display: block; }
+.search-results .sr-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--gray-100); transition: background .15s; }
+.search-results .sr-item:last-child { border-bottom: none; }
+.search-results .sr-item:hover, .search-results .sr-item.active { background: var(--gray-50); }
+.search-results .sr-item .sr-name { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+.search-results .sr-item .sr-meta { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+.search-results .sr-item .sr-badge { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 4px; margin-left: 6px; }
+.search-results .sr-empty { padding: 16px; text-align: center; color: var(--gray-500); font-size: 13px; }
+.search-results .sr-count { padding: 6px 14px; font-size: 11px; color: var(--gray-400); border-bottom: 1px solid var(--gray-100); background: var(--gray-50); position: sticky; top: 0; }
+.selected-display { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; color: var(--gray-700); }
+.selected-display strong { color: var(--gray-900); }
+.selected-display .sd-clear { background: none; border: none; color: var(--gray-400); cursor: pointer; font-size: 14px; padding: 0 2px; }
+.selected-display .sd-clear:hover { color: #dc2626; }
 .lifecycle-timeline { position: relative; padding-left: 40px; margin: 32px 0; }
 .lifecycle-timeline::before { content: ""; position: absolute; left: 20px; top: 0; bottom: 0; width: 3px; background: var(--gray-200); border-radius: 2px; }
 .lt-event { position: relative; padding-bottom: 32px; }
@@ -27,16 +46,120 @@ $pageStyles  = '
 .no-data .nd-icon { font-size: 48px; margin-bottom: 12px; }
 .no-data h3 { font-size: 16px; color: var(--gray-700); margin-bottom: 4px; }
 .action-icon { margin-right: 6px; font-size: 14px; }
-@media (max-width:768px){ .selector-bar select { min-width: 0; width: 100%; } .lifecycle-timeline { padding-left: 32px; } .lt-event .lt-icon { width: 34px; height: 34px; left: -28px; font-size: 13px; } .lt-event .lt-card { padding: 12px 14px; margin-left: 12px; } .lt-event .lt-label { font-size: 13px; } .summary-card { grid-template-columns: 1fr; text-align: center; } .summary-card .sc-avatar { margin: 0 auto; } .summary-card .sc-details { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); } }
-@media (max-width:480px){ .lt-event { padding-bottom: 24px; } .lt-event .lt-card { padding: 10px 12px; } .summary-card { padding: 16px; } .summary-card .sc-details { grid-template-columns: 1fr 1fr; gap: 8px; } .no-data { padding: 32px 16px; } .no-data .nd-icon { font-size: 36px; } }
+.loading-msg { padding: 24px; text-align: center; color: var(--gray-400); font-size: 13px; }
+@media (max-width:768px){ .selector-bar { flex-direction: column; align-items: stretch; } .selector-bar label { margin-bottom: 4px; } .search-wrap { max-width: 100%; } .lifecycle-timeline { padding-left: 32px; } .lt-event .lt-icon { width: 34px; height: 34px; left: -28px; font-size: 13px; } .lt-event .lt-card { padding: 12px 14px; margin-left: 12px; } .lt-event .lt-label { font-size: 13px; } .summary-card { grid-template-columns: 1fr; text-align: center; } .summary-card .sc-avatar { margin: 0 auto; } .summary-card .sc-details { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); } }
+@media (max-width:480px){ .lt-event { padding-bottom: 24px; } .lt-event .lt-card { padding: 10px 12px; } .summary-card { padding: 16px; } .summary-card .sc-details { grid-template-columns: 1fr 1fr; gap: 8px; } .no-data { padding: 32px 16px; } .no-data .nd-icon { font-size: 36px; } .search-results { max-height: 260px; } }
 ';
 $pageScripts = '
 var candidatesData = [];
+var selectedCand = null;
+var activeIndex = -1;
+var filteredResults = [];
+
+function getBadgeClass(status) {
+    if (!status) return "badge-pending";
+    var s = status.toLowerCase();
+    if (s === "hired" || s === "selected" || s === "shortlisted") return "badge-completed";
+    if (s === "rejected") return "badge-rejected";
+    if (s === "offered") return "badge-approved";
+    return "badge-pending";
+}
+
+function formatDateTime(dt) {
+    if (!dt) return "-";
+    var d = new Date(dt);
+    if (isNaN(d)) return dt;
+    var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear() + ", " +
+           ("0"+d.getHours()).slice(-2) + ":" + ("0"+d.getMinutes()).slice(-2);
+}
+
+function filterCandidates(query) {
+    if (!query || query.length < 1) return candidatesData;
+    var q = query.toLowerCase();
+    return candidatesData.filter(function(c) {
+        return (c.first_name + " " + c.last_name).toLowerCase().indexOf(q) !== -1 ||
+               (c.code || "").toLowerCase().indexOf(q) !== -1 ||
+               (c.job_title || "").toLowerCase().indexOf(q) !== -1 ||
+               (c.status_name || "").toLowerCase().indexOf(q) !== -1;
+    });
+}
+
+function renderDropdown(results) {
+    var box = document.getElementById("searchResults");
+    filteredResults = results;
+    activeIndex = -1;
+
+    if (results.length === 0) {
+        box.innerHTML = "<div class=\"sr-empty\">No candidates found</div>";
+        box.classList.add("open");
+        return;
+    }
+
+    var html = "<div class=\"sr-count\">" + results.length + " candidate" + (results.length !== 1 ? "s" : "") + " found</div>";
+    for (var i = 0; i < results.length; i++) {
+        var c = results[i];
+        var name = c.first_name + " " + c.last_name;
+        var badgeCls = getBadgeClass(c.status_name);
+        html += "<div class=\"sr-item\" data-id=\"" + c.id + "\" data-idx=\"" + i + "\">";
+        html += "<div class=\"sr-name\">" + name + " <span style=\"font-weight:400;color:var(--gray-400)\">(" + (c.code || "N/A") + ")</span>";
+        html += " <span class=\"sr-badge " + badgeCls + "\">" + (c.status_name || "") + "</span></div>";
+        html += "<div class=\"sr-meta\">" + (c.job_title || "N/A") + " &middot; Applied " + formatDateTime(c.applied_at) + "</div>";
+        html += "</div>";
+    }
+    box.innerHTML = html;
+    box.classList.add("open");
+
+    var items = box.querySelectorAll(".sr-item");
+    for (var j = 0; j < items.length; j++) {
+        items[j].addEventListener("mousedown", function(e) {
+            e.preventDefault();
+            var id = parseInt(this.getAttribute("data-id"));
+            selectCandidate(id);
+        });
+    }
+}
+
+function selectCandidate(id) {
+    var cand = null;
+    for (var i = 0; i < candidatesData.length; i++) {
+        if (candidatesData[i].id === id) { cand = candidatesData[i]; break; }
+    }
+    if (!cand) return;
+
+    selectedCand = cand;
+    var name = cand.first_name + " " + cand.last_name;
+    var input = document.getElementById("candSearch");
+    var clearBtn = document.getElementById("searchClear");
+    var box = document.getElementById("searchResults");
+
+    input.value = name + " (" + (cand.code || "N/A") + ")";
+    clearBtn.style.display = "inline";
+    box.classList.remove("open");
+
+    document.getElementById("selectedInfo").innerHTML =
+        "<div class=\"selected-display\">" +
+        "<strong>" + name + "</strong> &mdash; " + (cand.job_title || "N/A") +
+        " <span class=\"badge " + getBadgeClass(cand.status_name) + "\">" + (cand.status_name || "") + "</span>" +
+        " <button class=\"sd-clear\" onclick=\"clearSearch()\" title=\"Clear\">&times;</button>" +
+        "</div>";
+
+    window.renderTimeline(id);
+}
+
+function clearSearch() {
+    selectedCand = null;
+    document.getElementById("candSearch").value = "";
+    document.getElementById("searchClear").style.display = "none";
+    document.getElementById("selectedInfo").innerHTML = "";
+    document.getElementById("timelineContainer").innerHTML =
+        "<div class=\"no-data\"><div class=\"nd-icon\">&#x1F50D;</div><h3>Select a Candidate</h3><p>Type a name, code, or job title to search</p></div>";
+}
 
 window.renderTimeline = function(candId) {
     var container = document.getElementById("timelineContainer");
     if (!candId) {
-        container.innerHTML = "<div class=\"no-data\"><div class=\"nd-icon\">&#x1F50D;</div><h3>Select a Candidate</h3><p>Choose a candidate from the dropdown above to view their lifecycle timeline</p></div>";
+        container.innerHTML = "<div class=\"no-data\"><div class=\"nd-icon\">&#x1F50D;</div><h3>Select a Candidate</h3><p>Type a name, code, or job title to search</p></div>";
         return;
     }
     candId = parseInt(candId);
@@ -47,10 +170,10 @@ window.renderTimeline = function(candId) {
         return;
     }
 
+    container.innerHTML = "<div class=\"loading-msg\">Loading timeline...</div>";
+
     apiGet("ajax/logs.php?candidate_id=" + candId, null, function(res) {
         var logs = res.success && res.data ? res.data : [];
-
-        // Status event icons
         var icons = {
             candidate_created: "\uD83D\uDC64", candidate_updated: "\u270F\uFE0F", candidate_deleted: "\uD83D\uDDD1\uFE0F",
             screening_shortlist: "\uD83D\uDD0D", screening_reject: "\u2715", screening_hold: "\u23F3",
@@ -100,10 +223,8 @@ window.renderTimeline = function(candId) {
         }
         html += "</div>";
 
-        // Summary card
         var name = cand.first_name + " " + cand.last_name;
         var initials = cand.first_name.charAt(0) + cand.last_name.charAt(0);
-        var statusBadge = "badge-" + (cand.status_name ? cand.status_name.toLowerCase() : "pending");
         html += "<div class=\"summary-card mt-24\">";
         html += "<div class=\"sc-avatar\">" + initials + "</div>";
         html += "<div class=\"sc-details\">";
@@ -120,39 +241,110 @@ window.renderTimeline = function(candId) {
     });
 };
 
-function loadCandidateSelect() {
-    var sel = document.getElementById("candSelect");
-    sel.innerHTML = "<option value=\"\">-- Select Candidate --</option>";
+(function() {
+    var input = document.getElementById("candSearch");
+    var box = document.getElementById("searchResults");
+    var clearBtn = document.getElementById("searchClear");
+    var debounceTimer = null;
+
+    input.addEventListener("input", function() {
+        var val = this.value.trim();
+        clearBtn.style.display = val.length > 0 ? "inline" : "none";
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function() {
+            var results = filterCandidates(val);
+            renderDropdown(results);
+        }, 150);
+    });
+
+    input.addEventListener("focus", function() {
+        var val = this.value.trim();
+        var results = filterCandidates(val);
+        renderDropdown(results);
+    });
+
+    input.addEventListener("keydown", function(e) {
+        var items = box.querySelectorAll(".sr-item");
+        if (!items.length) return;
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            activeIndex = Math.min(activeIndex + 1, items.length - 1);
+            updateActive(items);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            activeIndex = Math.max(activeIndex - 1, 0);
+            updateActive(items);
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (activeIndex >= 0 && activeIndex < filteredResults.length) {
+                selectCandidate(filteredResults[activeIndex].id);
+            } else if (filteredResults.length === 1) {
+                selectCandidate(filteredResults[0].id);
+            }
+        } else if (e.key === "Escape") {
+            box.classList.remove("open");
+            input.blur();
+        }
+    });
+
+    function updateActive(items) {
+        for (var i = 0; i < items.length; i++) {
+            items[i].classList.toggle("active", i === activeIndex);
+        }
+        if (activeIndex >= 0 && items[activeIndex]) {
+            items[activeIndex].scrollIntoView({ block: "nearest" });
+        }
+    }
+
+    document.addEventListener("click", function(e) {
+        if (!e.target.closest(".search-wrap")) {
+            box.classList.remove("open");
+        }
+    });
+
+    document.getElementById("searchClear").addEventListener("click", function() {
+        clearSearch();
+        input.focus();
+    });
+})();
+
+function loadCandidates() {
+    var box = document.getElementById("searchResults");
+    box.innerHTML = "<div class=\"sr-empty\">Loading candidates...</div>";
+    box.classList.add("open");
+
     apiGet("ajax/candidates.php", null, function(res) {
         if (res.success && res.data) {
             candidatesData = res.data;
-            candidatesData.forEach(function(c) {
-                var opt = document.createElement("option");
-                opt.value = c.id;
-                opt.textContent = c.first_name + " " + c.last_name + " (" + (c.code || "N/A") + ") - " + (c.job_title || "") + " [" + (c.status_name || "") + "]";
-                sel.appendChild(opt);
-            });
+            box.classList.remove("open");
         }
-    }, function() {});
+    }, function() {
+        box.innerHTML = "<div class=\"sr-empty\">Failed to load candidates</div>";
+    });
 }
 
-loadCandidateSelect();
+loadCandidates();
 ';
 
 ob_start();
 ?>
 <div class="selector-bar card" style="padding:16px 24px;margin-bottom:24px">
-    <label for="candSelect">Select Candidate:</label>
-    <select class="form-control" id="candSelect" onchange="window.renderTimeline(this.value)" style="max-width:500px">
-        <option value="">-- Select Candidate --</option>
-    </select>
+    <label for="candSearch">Search Candidate:</label>
+    <div class="search-wrap">
+        <span class="search-icon">&#x1F50D;</span>
+        <input type="text" id="candSearch" placeholder="Type name, code, job title, or status..." autocomplete="off">
+        <button class="search-clear" id="searchClear" title="Clear">&times;</button>
+        <div class="search-results" id="searchResults"></div>
+    </div>
 </div>
+<div id="selectedInfo"></div>
 
 <div id="timelineContainer">
     <div class="no-data">
         <div class="nd-icon">&#x1F50D;</div>
         <h3>Select a Candidate</h3>
-        <p>Choose a candidate from the dropdown above to view their lifecycle timeline</p>
+        <p>Type a name, code, or job title to search</p>
     </div>
 </div>
 <?php

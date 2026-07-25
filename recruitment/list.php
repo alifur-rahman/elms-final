@@ -4,80 +4,95 @@ $pageTitle   = 'Recruitment Pipeline';
 $activePage  = 'recruitment';
 $breadcrumb  = 'Home / Recruitment / Pipeline';
 $pageStyles  = '
-.pipeline-flow { display: flex; align-items: center; gap: 0; margin-bottom: 24px; overflow-x: auto; padding: 16px 20px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); -webkit-overflow-scrolling: touch; }
-.pf-step { display: flex; flex-direction: column; align-items: center; min-width: 80px; padding: 8px 12px; text-align: center; }
-.pf-step .pf-count { font-size: 22px; font-weight: 700; color: var(--primary); }
-.pf-step .pf-icon { font-size: 18px; margin: 4px 0; }
-.pf-step .pf-label { font-size: 11px; color: var(--gray-500); white-space: nowrap; }
-.pf-connector { width: 40px; height: 2px; background: var(--gray-300); flex-shrink: 0; }
-.quick-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.qs-card { background: #fff; border-radius: 8px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.08); display: flex; align-items: center; gap: 14px; }
-.qs-card .qs-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-.qs-card .qs-icon.blue { background: #e8f0fe; color: var(--primary); }
-.qs-card .qs-icon.green { background: #e6f4ea; color: var(--success); }
-.qs-card .qs-icon.yellow { background: #fef7e0; color: var(--warning); }
-.qs-card .qs-icon.red { background: #fce8e6; color: var(--danger); }
-.qs-card .qs-info h4 { font-size: 22px; font-weight: 700; line-height: 1.2; }
-.qs-card .qs-info p { font-size: 12px; color: var(--gray-500); }
-.view-job-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; }
-.view-job-details .vj-item label { display: block; font-size: 11px; color: var(--gray-500); text-transform: uppercase; font-weight: 600; letter-spacing: .4px; }
-.view-job-details .vj-item span { font-size: 14px; font-weight: 500; color: var(--gray-900); }
-.view-job-desc { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200); }
-.view-job-desc h4 { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-.view-job-desc p { font-size: 13px; color: var(--gray-600); line-height: 1.6; white-space: pre-line; }
-.pagination-bar { display:flex; align-items:center; justify-content:space-between; margin-top:16px; flex-wrap:wrap; gap:10px; }
-.pagination-bar .page-info { font-size:13px; color:var(--gray-500); }
-.pagination-bar .page-btns { display:flex; gap:4px; align-items:center; }
-.pagination-bar .page-btn { min-width:32px; height:32px; padding:0 10px; border:1px solid var(--gray-200); border-radius:6px; background:#fff; font-size:13px; cursor:pointer; color:var(--gray-700); transition:var(--transition); font-family:inherit; }
-.pagination-bar .page-btn:hover { border-color:var(--primary); color:var(--primary); }
-.pagination-bar .page-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
-.pagination-bar .page-btn:disabled { opacity:.4; cursor:default; }
-.pagination-bar .per-page { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-500); }
-.pagination-bar .per-page select { padding:4px 8px; border:1px solid var(--gray-200); border-radius:4px; font-size:13px; font-family:inherit; }
-@media (max-width:768px){
- html, body { overflow-x: hidden; width: 100%; }
- .page-content { overflow-x: hidden; }
- .quick-stats { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
- .qs-card { padding: 14px 16px; gap: 10px; }
- .qs-card .qs-icon { width: 36px; height: 36px; font-size: 16px; }
- .qs-card .qs-info h4 { font-size: 18px; }
- .pipeline-flow { padding: 12px 14px; }
- .pf-step { min-width: 64px; padding: 6px 8px; }
- .pf-step .pf-count { font-size: 18px; }
- .pf-step .pf-icon { font-size: 15px; }
- .pf-connector { width: 24px; }
- .view-job-details { grid-template-columns: 1fr; gap: 8px 16px; }
+/* ===== RECRUIT PAGE ===== */
+.rp-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.rp-top h1{font-size:20px;font-weight:700;color:var(--gray-900);margin:0;white-space:nowrap}
+.rp-top h1 small{font-size:13px;font-weight:400;color:var(--gray-400);margin-left:8px}
+.rp-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rp-search{position:relative}
+.rp-search input{width:240px;padding:9px 12px 9px 36px;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;background:#fff;outline:none;transition:border-color .2s,box-shadow .2s;font-family:inherit}
+.rp-search input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.rp-search .rp-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:14px;pointer-events:none}
+.rp-search .rp-search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:16px;display:none;padding:2px;line-height:1}
+.rp-search .rp-search-clear:hover{color:var(--gray-700)}
+.rp-count{font-size:13px;color:var(--gray-500);white-space:nowrap}
+/* Table card */
+.rp-card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);overflow:hidden}
+.rp-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.rp-table{width:100%;border-collapse:collapse}
+.rp-table thead th{background:var(--gray-50);padding:12px 16px;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px;text-align:left;border-bottom:1px solid var(--gray-100);white-space:nowrap;position:sticky;top:0;z-index:1}
+.rp-table tbody tr{border-bottom:1px solid var(--gray-50);transition:background .15s}
+.rp-table tbody tr:last-child{border-bottom:none}
+.rp-table tbody tr:hover{background:var(--gray-50)}
+.rp-table td{padding:14px 16px;font-size:13px;color:var(--gray-700);vertical-align:middle}
+.rp-table td strong{color:var(--gray-900);font-weight:600}
+.rp-table .rp-actions-cell{display:flex;gap:6px;white-space:nowrap}
+.rp-table .rp-btn-text{padding:6px 12px;border-radius:6px;border:1px solid var(--gray-200);background:#fff;cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;color:var(--gray-600);font-family:inherit}
+.rp-table .rp-btn-text:hover{border-color:var(--primary);color:var(--primary);background:rgba(37,99,235,.04)}
+.rp-table .rp-btn-text.rp-btn-view{border-color:var(--primary);color:var(--primary);background:rgba(37,99,235,.04)}
+.rp-table .rp-btn-text.rp-btn-view:hover{background:var(--primary);color:#fff}
+.rp-empty{text-align:center;padding:48px 24px;color:var(--gray-400)}
+.rp-empty-icon{font-size:40px;margin-bottom:8px}
+.rp-empty h3{font-size:15px;color:var(--gray-600);margin:0 0 4px}
+.rp-empty p{font-size:13px;margin:0}
+/* Pagination */
+.rp-pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-top:1px solid var(--gray-100);flex-wrap:wrap;gap:10px}
+.rp-pg-info{font-size:13px;color:var(--gray-500)}
+.rp-pg-center{display:flex;align-items:center;gap:6px}
+.rp-pg-btn{min-width:32px;height:32px;padding:0 10px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;font-size:13px;cursor:pointer;color:var(--gray-600);transition:all .15s;font-family:inherit;display:inline-flex;align-items:center;justify-content:center}
+.rp-pg-btn:hover:not(:disabled){border-color:var(--primary);color:var(--primary)}
+.rp-pg-btn.rp-active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.rp-pg-btn:disabled{opacity:.35;cursor:default}
+.rp-pg-rows{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--gray-500)}
+.rp-pg-rows select{padding:5px 8px;border:1px solid var(--gray-200);border-radius:6px;font-size:13px;font-family:inherit;background:#fff;cursor:pointer}
+/* Mobile cards */
+.rp-mobile-list{display:none}
+/* ===== MODAL OVERRIDES ===== */
+.view-job-details{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px}
+.view-job-details .vj-item label{display:block;font-size:11px;color:var(--gray-400);text-transform:uppercase;font-weight:600;letter-spacing:.4px;margin-bottom:2px}
+.view-job-details .vj-item span{font-size:14px;font-weight:500;color:var(--gray-900)}
+.view-job-desc{margin-top:20px;padding-top:16px;border-top:1px solid var(--gray-200)}
+.view-job-desc h4{font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:8px}
+.view-job-desc p{font-size:13px;color:var(--gray-600);line-height:1.6;white-space:pre-line}
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+ .rp-top h1{font-size:18px}
+ .rp-search input{width:200px}
 }
-@media (max-width:480px){
- html, body { overflow-x: hidden; width: 100%; }
- .page-content { overflow-x: hidden; }
- .quick-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
- .qs-card { padding: 12px; gap: 8px; flex-direction: column; text-align: center; }
- .qs-card .qs-icon { width: 32px; height: 32px; font-size: 14px; }
- .qs-card .qs-info h4 { font-size: 16px; }
- .qs-card .qs-info p { font-size: 11px; }
- .pipeline-flow { padding: 10px 12px; }
- .pf-step { min-width: 52px; padding: 4px 6px; }
- .pf-step .pf-count { font-size: 16px; }
- .pf-step .pf-icon { font-size: 13px; }
- .pf-step .pf-label { font-size: 10px; }
- .pf-connector { width: 16px; }
- .card-header { flex-direction: column; align-items: stretch; gap: 10px; }
- .card-header .btn-group { width: 100%; }
- .card-header .btn-group .search-box { width: 100%; }
- .card-header .btn-group .search-box input { width: 100% !important; }
- .card-header .btn-group .btn { width: 100%; justify-content: center; }
- .card-header[style*="border-radius"] { border-radius: 8px 8px 0 0 !important; }
- .card[style*="border-radius"] { border-radius: 0 0 8px 8px !important; }
- .view-job-details { gap: 6px 12px; }
- .view-job-details .vj-item span { font-size: 13px; word-break: break-word; }
- .view-job-desc p { font-size: 12px; }
- .modal-body { padding: 16px; }
- .modal-footer .btn { flex: 1; text-align: center; justify-content: center; }
- .requisition-section { margin-bottom: 20px; }
- .requisition-section .section-title { font-size: 14px; margin-bottom: 14px; padding-bottom: 8px; }
- .form-row-2 { gap: 10px; }
- .textarea-full, .textarea-full-lg { min-height: 80px; }
+@media(max-width:768px){
+ .page-content{padding:16px}
+ .rp-top{flex-direction:column;align-items:stretch;gap:12px}
+ .rp-top h1{font-size:18px}
+ .rp-top h1 small{display:block;margin:4px 0 0;font-size:12px}
+ .rp-actions{width:100%}
+ .rp-search{flex:1}
+ .rp-search input{width:100%!important}
+ .rp-count{width:100%;text-align:center}
+ /* Hide table, show cards */
+ .rp-table-wrap{display:none}
+ .rp-mobile-list{display:block}
+ .rp-mob-card{background:#fff;border-radius:10px;padding:16px;margin:8px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid var(--gray-100)}
+ .rp-mob-card:last-child{margin-bottom:16px}
+ .rp-mob-top{display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:10px}
+ .rp-mob-title{font-size:15px;font-weight:600;color:var(--gray-900);margin:0}
+ .rp-mob-title small{font-size:12px;font-weight:400;color:var(--gray-400);display:block;margin-top:2px}
+ .rp-mob-badges{display:flex;gap:6px;flex-shrink:0}
+ .rp-mob-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:12px}
+ .rp-mob-field label{display:block;font-size:11px;color:var(--gray-400);text-transform:uppercase;font-weight:600;letter-spacing:.3px}
+ .rp-mob-field span{font-size:13px;color:var(--gray-700);font-weight:500}
+ .rp-mob-footer{display:flex;gap:8px;padding-top:10px;border-top:1px solid var(--gray-100)}
+ .rp-mob-footer .btn{flex:1;justify-content:center;font-size:12px;padding:7px 12px}
+ .view-job-details{grid-template-columns:1fr;gap:10px 16px}
+}
+@media(max-width:480px){
+ .page-content{padding:12px}
+ .rp-top h1{font-size:16px}
+ .rp-mob-card{padding:14px;margin:6px 12px}
+ .rp-mob-grid{grid-template-columns:1fr;gap:8px}
+ .rp-mob-top{flex-direction:column}
+ .rp-pagination{flex-direction:column;align-items:center;gap:8px}
+ .rp-pg-center{flex-wrap:wrap;justify-content:center}
+ .rp-pg-rows{width:100%;justify-content:center}
 }
 ';
 $pageScripts = '
@@ -98,19 +113,19 @@ function getFilteredData() {
 function renderPaginationBar(total, totalPages) {
     if (totalPages <= 1) { document.getElementById("paginationBar").innerHTML = ""; return; }
     var html = "";
-    html += "<div class=\"page-info\">Showing page " + currentPage + " of " + totalPages + " (" + total + " total)</div>";
-    html += "<div class=\"page-btns\">";
-    html += "<button class=\"page-btn\" onclick=\"goToPage(1)\" " + (currentPage <= 1 ? "disabled" : "") + ">&#xAB;</button>";
-    html += "<button class=\"page-btn\" onclick=\"goToPage(" + (currentPage - 1) + ")\" " + (currentPage <= 1 ? "disabled" : "") + ">&#x2039;</button>";
+    html += "<div class=\"rp-pg-info\">Page " + currentPage + " of " + totalPages + " &middot; " + total + " total</div>";
+    html += "<div class=\"rp-pg-center\">";
+    html += "<button class=\"rp-pg-btn\" onclick=\"goToPage(1)\" " + (currentPage <= 1 ? "disabled" : "") + " title=\"First\">&#xAB;</button>";
+    html += "<button class=\"rp-pg-btn\" onclick=\"goToPage(" + (currentPage - 1) + ")\" " + (currentPage <= 1 ? "disabled" : "") + " title=\"Prev\">&#x2039;</button>";
     var start = Math.max(1, currentPage - 2);
     var end = Math.min(totalPages, currentPage + 2);
     for (var p = start; p <= end; p++) {
-        html += "<button class=\"page-btn" + (p === currentPage ? " active" : "") + "\" onclick=\"goToPage(" + p + ")\">" + p + "</button>";
+        html += "<button class=\"rp-pg-btn" + (p === currentPage ? " rp-active" : "") + "\" onclick=\"goToPage(" + p + ")\">" + p + "</button>";
     }
-    html += "<button class=\"page-btn\" onclick=\"goToPage(" + (currentPage + 1) + ")\" " + (currentPage >= totalPages ? "disabled" : "") + ">&#x203A;</button>";
-    html += "<button class=\"page-btn\" onclick=\"goToPage(" + totalPages + ")\" " + (currentPage >= totalPages ? "disabled" : "") + ">&#xBB;</button>";
+    html += "<button class=\"rp-pg-btn\" onclick=\"goToPage(" + (currentPage + 1) + ")\" " + (currentPage >= totalPages ? "disabled" : "") + " title=\"Next\">&#x203A;</button>";
+    html += "<button class=\"rp-pg-btn\" onclick=\"goToPage(" + totalPages + ")\" " + (currentPage >= totalPages ? "disabled" : "") + " title=\"Last\">&#xBB;</button>";
     html += "</div>";
-    html += "<div class=\"per-page\">Rows: <select onchange=\"changePerPage(this.value)\">";
+    html += "<div class=\"rp-pg-rows\">Show <select onchange=\"changePerPage(this.value)\">";
     [10, 20, 50, 100].forEach(function(n) {
         html += "<option value=\"" + n + "\"" + (n === perPage ? " selected" : "") + ">" + n + "</option>";
     });
@@ -135,6 +150,15 @@ function changePerPage(n) {
 }
 
 function applyFilters() {
+    var val = document.getElementById("searchJobs").value;
+    document.getElementById("searchClear").style.display = val.length > 0 ? "block" : "none";
+    currentPage = 1;
+    renderTable();
+}
+
+function clearSearch() {
+    document.getElementById("searchJobs").value = "";
+    document.getElementById("searchClear").style.display = "none";
     currentPage = 1;
     renderTable();
 }
@@ -234,7 +258,9 @@ window.viewJob = function(jobId) {
     var job = null;
     for (var i = 0; i < jobsData.length; i++) { if (jobsData[i].id === jobId) { job = jobsData[i]; break; } }
     if (!job) {
-        for (var i = 0; i < DATA.jobs.length; i++) { if (DATA.jobs[i].id === jobId) { job = DATA.jobs[i]; break; } }
+        if (typeof DATA !== "undefined" && DATA.jobs) {
+            for (var i = 0; i < DATA.jobs.length; i++) { if (DATA.jobs[i].id === jobId) { job = DATA.jobs[i]; break; } }
+        }
     }
     if (!job) return;
     document.getElementById("viewJobTitle").textContent = job.title;
@@ -295,6 +321,37 @@ window.editJob = function(jobId) {
     openModal("createRequisitionModal");
 };
 
+function renderMobileCards(pageData) {
+    var container = document.getElementById("mobileList");
+    if (pageData.length === 0) {
+        container.innerHTML = "<div class=\"rp-empty\"><div class=\"rp-empty-icon\">&#x1F50D;</div><h3>No positions found</h3><p>Try adjusting your search</p></div>";
+        return;
+    }
+    var html = "";
+    pageData.forEach(function(job) {
+        var deptName = job.dept_name || getDeptName(job.dept_id);
+        var statusBadge = "<span class=\"badge " + getBadgeClass(job.status) + "\">" + job.status + "</span>";
+        var priorityBadge = "<span class=\"badge " + getBadgeClass(job.priority) + "\">" + job.priority + "</span>";
+        html += "<div class=\"rp-mob-card\">";
+        html += "<div class=\"rp-mob-top\">";
+        html += "<div class=\"rp-mob-title\">" + job.title + "<small>" + deptName + " &middot; " + job.location + "</small></div>";
+        html += "<div class=\"rp-mob-badges\">" + statusBadge + "</div>";
+        html += "</div>";
+        html += "<div class=\"rp-mob-grid\">";
+        html += "<div class=\"rp-mob-field\"><label>Vacancies</label><span>" + job.vacancies + "</span></div>";
+        html += "<div class=\"rp-mob-field\"><label>Filled</label><span>" + (job.filled || 0) + "</span></div>";
+        html += "<div class=\"rp-mob-field\"><label>Deadline</label><span>" + formatDate(job.deadline) + "</span></div>";
+        html += "<div class=\"rp-mob-field\"><label>Priority</label><span>" + priorityBadge + "</span></div>";
+        html += "</div>";
+        html += "<div class=\"rp-mob-footer\">";
+        html += "<button class=\"btn btn-outline btn-sm\" onclick=\"window.editJob(" + job.id + ")\">Edit</button>";
+        html += "<button class=\"btn btn-primary btn-sm\" onclick=\"window.viewJob(" + job.id + ")\">View Details</button>";
+        html += "</div>";
+        html += "</div>";
+    });
+    container.innerHTML = html;
+}
+
 function renderTable() {
     var filtered = getFilteredData();
     var totalPages = Math.ceil(filtered.length / perPage) || 1;
@@ -302,72 +359,37 @@ function renderTable() {
     var start = (currentPage - 1) * perPage;
     var pageData = filtered.slice(start, start + perPage);
 
+    document.getElementById("resultCount").textContent = filtered.length + " position" + (filtered.length !== 1 ? "s" : "");
+
+    // Desktop table
     var tbody = document.getElementById("jobsBody");
     tbody.innerHTML = "";
-    pageData.forEach(function(job) {
-        var deptName = job.dept_name || getDeptName(job.dept_id);
-        var statusBadge = "<span class=\"badge " + getBadgeClass(job.status) + "\">" + job.status + "</span>";
-        var priorityBadge = "<span class=\"badge " + getBadgeClass(job.priority) + "\">" + job.priority + "</span>";
-        var row = document.createElement("tr");
-        row.innerHTML =
-            "<td><strong>" + job.title + "</strong></td>" +
-            "<td>" + deptName + "</td>" +
-            "<td>" + job.location + "</td>" +
-            "<td>" + job.vacancies + "</td>" +
-            "<td>" + (job.filled || 0) + "</td>" +
-            "<td>" + statusBadge + "</td>" +
-            "<td>" + priorityBadge + "</td>" +
-            "<td>" + formatDate(job.deadline) + "</td>" +
-            "<td><button class=\"btn btn-sm btn-outline\" onclick=\"window.editJob(" + job.id + ")\" style=\"margin-right:4px\">Edit</button><button class=\"btn btn-sm btn-primary\" onclick=\"window.viewJob(" + job.id + ")\">View</button></td>";
-        tbody.appendChild(row);
-    });
     if (pageData.length === 0) {
-        var cols = document.querySelectorAll("#jobsTable thead th").length;
-        tbody.innerHTML = "<tr><td colspan=\"" + cols + "\" style=\"text-align:center;padding:32px;color:var(--gray-400)\">No positions found</td></tr>";
+        tbody.innerHTML = "<tr><td colspan=\"9\"><div class=\"rp-empty\"><div class=\"rp-empty-icon\">&#x1F4ED;</div><h3>No positions found</h3><p>Try adjusting your search or create a new requisition</p></div></td></tr>";
+    } else {
+        pageData.forEach(function(job) {
+            var deptName = job.dept_name || getDeptName(job.dept_id);
+            var statusBadge = "<span class=\"badge " + getBadgeClass(job.status) + "\">" + job.status + "</span>";
+            var priorityBadge = "<span class=\"badge " + getBadgeClass(job.priority) + "\">" + job.priority + "</span>";
+            var row = document.createElement("tr");
+            row.innerHTML =
+                "<td><strong>" + job.title + "</strong></td>" +
+                "<td>" + deptName + "</td>" +
+                "<td>" + job.location + "</td>" +
+                "<td>" + job.vacancies + "</td>" +
+                "<td>" + (job.filled || 0) + "</td>" +
+                "<td>" + statusBadge + "</td>" +
+                "<td>" + priorityBadge + "</td>" +
+                "<td>" + formatDate(job.deadline) + "</td>" +
+                "<td><div class=\"rp-actions-cell\"><button class=\"rp-btn-text\" onclick=\"window.editJob(" + job.id + ")\">Edit</button><button class=\"rp-btn-text rp-btn-view\" onclick=\"window.viewJob(" + job.id + ")\">View</button></div></td>";
+            tbody.appendChild(row);
+        });
     }
+
+    // Mobile cards
+    renderMobileCards(pageData);
+
     renderPaginationBar(filtered.length, totalPages);
-}
-
-function renderPipeline() {
-    var pipelineStages = [
-        { key: "Applied", icon: "\uD83D\uDC64", filter: function(c) { return c.status === "Applied"; } },
-        { key: "Shortlisted", icon: "\uD83D\uDCCB", filter: function(c) { return c.status === "Shortlisted"; } },
-        { key: "Interview", icon: "\uD83E\uDD1D", filter: function(c) { return c.status === "Interview"; } },
-        { key: "Selected", icon: "\u2705", filter: function(c) { return c.status === "Selected"; } },
-        { key: "Offered", icon: "\uD83D\uDCC4", filter: function(c) { return c.status === "Offered"; } },
-        { key: "Joined", icon: "\uD83D\uDEAA", filter: function(c) { return c.status === "Joined"; } }
-    ];
-    var pipeHtml = "";
-    for (var i = 0; i < pipelineStages.length; i++) {
-        var stage = pipelineStages[i];
-        var count = typeof DATA !== "undefined" && DATA.candidates ? DATA.candidates.filter(stage.filter).length : 0;
-        pipeHtml += "<div class=\"pf-step\"><div class=\"pf-count\">" + count + "</div><div class=\"pf-icon\">" + stage.icon + "</div><div class=\"pf-label\">" + stage.key + "</div></div>";
-        if (i < pipelineStages.length - 1) pipeHtml += "<div class=\"pf-connector\"></div>";
-    }
-    document.getElementById("pipelineFlow").innerHTML = pipeHtml;
-}
-
-function renderStats() {
-    var totalPos = jobsData.length;
-    var activePos = 0;
-    var remaining = 0;
-    jobsData.forEach(function(j) {
-        if (j.status === "Active") activePos++;
-        remaining += j.vacancies - (j.filled || 0);
-    });
-    var stats = [
-        { icon: "\uD83C\uDFAF", color: "blue", count: totalPos, label: "Total Positions" },
-        { icon: "\u2705", color: "green", count: activePos, label: "Active" },
-        { icon: "\uD83D\uDC65", color: "blue", count: typeof DATA !== "undefined" && DATA.candidates ? DATA.candidates.length : 0, label: "Total Candidates" },
-        { icon: "\uD83D\uDCC4", color: "yellow", count: typeof DATA !== "undefined" && DATA.offers ? DATA.offers.filter(function(o){ return o.status === "Pending"; }).length : 0, label: "Pending Offers" },
-        { icon: "\uD83D\uDEAA", color: "green", count: typeof DATA !== "undefined" && DATA.candidates ? DATA.candidates.filter(function(c){ return c.status === "Joined"; }).length : 0, label: "Joined" },
-        { icon: "\uD83D\uDCCA", color: "red", count: remaining, label: "Remaining Vacancies" }
-    ];
-    var statsHtml = "";
-    stats.forEach(function(s) {
-        statsHtml += "<div class=\"qs-card\"><div class=\"qs-icon " + s.color + "\">" + s.icon + "</div><div class=\"qs-info\"><h4>" + s.count + "</h4><p>" + s.label + "</p></div></div>";
-    });
-    document.getElementById("quickStats").innerHTML = statsHtml;
 }
 
 function initDeptSelect() {
@@ -394,15 +416,11 @@ function renderPage(callback) {
         }
         currentPage = 1;
         renderTable();
-        renderPipeline();
-        renderStats();
         initDeptSelect();
         if (callback) callback();
     }, function() {
         currentPage = 1;
         renderTable();
-        renderPipeline();
-        renderStats();
         initDeptSelect();
         if (callback) callback();
     });
@@ -421,54 +439,39 @@ renderPage(function() {
 
 ob_start();
 ?>
-<div class="card-header" style="background:#fff;border-radius:8px 8px 0 0;margin-bottom:0">
-    <h2>Open Positions</h2>
-    <div class="btn-group">
-        <div class="search-box">
-            <span class="search-icon">&#x1F50D;</span>
-            <input type="text" id="searchJobs" placeholder="Search positions..." onkeyup="applyFilters()" style="border:none;padding:7px 8px;font-size:13px;outline:none;width:200px;max-width:100%;font-family:inherit">
+<div class="rp-top">
+    <h1>Open Positions <small id="resultCount"></small></h1>
+    <div class="rp-actions">
+        <div class="rp-search">
+            <span class="rp-search-icon">&#x1F50D;</span>
+            <input type="text" id="searchJobs" placeholder="Search by title, department, location..." oninput="applyFilters()" autocomplete="off">
+            <button class="rp-search-clear" id="searchClear" onclick="clearSearch()">&times;</button>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="resetRequisitionForm();openModal('createRequisitionModal')">+ Create Requisition</button>
-    </div>
-</div>
-<div class="card mb-24" style="border-radius:0 0 8px 8px;margin-top:0">
-    <div class="card-body" style="padding:0">
-        <div class="table-container">
-            <table id="jobsTable">
-                <thead>
-                    <tr>
-                        <th>Job Title</th>
-                        <th>Department</th>
-                        <th>Location</th>
-                        <th>Vacancies</th>
-                        <th>Filled</th>
-                        <th>Status</th>
-                        <th>Priority</th>
-                        <th>Deadline</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="jobsBody"></tbody>
-            </table>
-            <div id="paginationBar" class="pagination-bar"></div>
-        </div>
+        <button class="btn btn-primary" onclick="resetRequisitionForm();openModal('createRequisitionModal')">+ New Requisition</button>
     </div>
 </div>
 
-<div class="card-header" style="background:#fff;border-radius:8px 8px 0 0;margin-bottom:0">
-    <h2>Candidate Pipeline</h2>
-</div>
-<div class="card mb-24" style="border-radius:0 0 8px 8px;margin-top:0">
-    <div class="card-body">
-        <div class="pipeline-flow" id="pipelineFlow"></div>
+<div class="rp-card">
+    <div class="rp-table-wrap">
+        <table class="rp-table" id="jobsTable">
+            <thead>
+                <tr>
+                    <th>Job Title</th>
+                    <th>Department</th>
+                    <th>Location</th>
+                    <th>Vacancies</th>
+                    <th>Filled</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Deadline</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="jobsBody"></tbody>
+        </table>
     </div>
-</div>
-
-<div class="card">
-    <div class="card-header"><h2>Quick Stats</h2></div>
-    <div class="card-body">
-        <div class="quick-stats" id="quickStats"></div>
-    </div>
+    <div class="rp-mobile-list" id="mobileList"></div>
+    <div id="paginationBar" class="rp-pagination"></div>
 </div>
 
 <div class="modal-overlay" id="viewJobModal" onclick="if(event.target===this)closeModal('viewJobModal')">

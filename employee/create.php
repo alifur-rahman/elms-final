@@ -6,49 +6,150 @@ $activePage  = 'create_employee';
 $breadcrumb  = 'Home / Employee / Create Employee';
 $offerId     = (int)($_GET['offer_id'] ?? 0);
 $pageStyles  = '
-.step-top-bar { margin-bottom:28px }
-.step-indicators { display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:20px; flex-wrap:wrap }
-.step-dot-wrap { display:flex; align-items:center }
-.step-dot { display:flex; align-items:center; gap:8px; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; color:var(--gray-400); transition:all .3s; white-space:nowrap; position:relative }
-.step-dot .dot-circle { width:10px; height:10px; border-radius:50%; background:var(--gray-300); transition:all .3s; flex-shrink:0 }
-.step-dot.done { color:var(--success) }
-.step-dot.done .dot-circle { background:var(--success) }
-.step-dot.active { color:var(--primary); background:rgba(26,115,232,.07) }
-.step-dot.active .dot-circle { background:var(--primary); width:12px; height:12px; box-shadow:0 0 0 4px rgba(26,115,232,.15) }
-.step-dot-line { width:28px; height:2px; background:var(--gray-200); flex-shrink:0 }
-.step-dot-line.done { background:var(--success) }
-.step-active-bar { display:flex; align-items:center; justify-content:center; gap:16px; padding:16px 24px; background:#fff; border:1px solid var(--gray-200); border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.04) }
-.step-active-num { width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg, var(--primary), #60a5fa); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0; box-shadow:0 4px 12px rgba(26,115,232,.3) }
-.step-active-info { text-align:center; flex:1 }
-.step-active-info .step-title { font-size:17px; font-weight:700; color:var(--gray-800) }
-.step-active-info .step-sub { font-size:12px; color:var(--gray-400); margin-top:2px }
-.step-active-nav { display:flex; gap:8px }
-.step-active-nav .nav-btn { width:40px; height:40px; border-radius:10px; border:1px solid var(--gray-200); background:#fff; color:var(--gray-600); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s }
-.step-active-nav .nav-btn:hover:not(:disabled) { border-color:var(--primary); color:var(--primary); background:rgba(26,115,232,.04) }
-.step-active-nav .nav-btn:active:not(:disabled) { transform:scale(.95) }
-.step-active-nav .nav-btn:disabled { opacity:.3; cursor:default }
-.step-panel { display:none; animation:stepSlide .35s ease }
-.step-panel.active { display:block }
-@keyframes stepSlide { from { opacity:0; transform:translateY(6px) } to { opacity:1; transform:translateY(0) } }
-.section-box { background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:20px 24px; margin-bottom:20px }
-.section-box-title { font-size:14px; font-weight:700; color:var(--gray-800); margin-bottom:16px; display:flex; align-items:center; gap:8px }
-.section-box-title::before { content:""; display:inline-block; width:4px; height:18px; background:var(--primary); border-radius:2px }
-.form-row { display:grid; gap:14px 16px; margin-bottom:0 }
-.form-row-2 { grid-template-columns:1fr 1fr }
-.form-row-3 { grid-template-columns:1fr 1fr 1fr }
-.form-row-4 { grid-template-columns:1fr 1fr 1fr 1fr }
-.form-group { margin-bottom:0 }
-.form-group label { display:block; font-size:12px; font-weight:600; color:var(--gray-600); margin-bottom:4px; letter-spacing:.2px }
-.form-group label .req { color:var(--danger) }
-.form-control { width:100%; padding:9px 12px; border:1px solid var(--gray-300); border-radius:6px; font-size:13px; background:#fff; transition:all .2s; color:var(--gray-800) }
-.form-control:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(26,115,232,.1) }
-.form-control.auto-filled { border-color:var(--success); background:#f0fdf4 }
-select.form-control { appearance:auto; cursor:pointer }
-textarea.form-control { resize:vertical; min-height:60px }
-.step-nav { display:flex; justify-content:space-between; padding:20px 0 0; border-top:1px solid var(--gray-200); margin-top:8px }
-.empty-state { text-align:center; padding:48px 24px; color:var(--gray-500) }
-.empty-state .empty-icon { font-size:48px; margin-bottom:12px }
-.empty-state p { font-size:14px }
+/* ===== HEADER ===== */
+.rp-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.rp-top h1{font-size:20px;font-weight:700;color:var(--gray-900);margin:0;white-space:nowrap}
+.rp-top h1 small{font-size:13px;font-weight:400;color:var(--gray-400);margin-left:8px}
+.rp-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rp-card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);overflow:hidden;padding:24px}
+.rp-empty{text-align:center;padding:48px 24px;color:var(--gray-400)}
+.rp-empty-icon{font-size:40px;margin-bottom:8px}
+.rp-empty h3{font-size:15px;color:var(--gray-600);margin:0 0 4px}
+.rp-empty p{font-size:13px;margin:0}
+
+/* ===== STEP INDICATORS ===== */
+.step-top-bar{margin-bottom:28px}
+.step-indicators{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:20px;flex-wrap:wrap}
+.step-dot-wrap{display:flex;align-items:center}
+.step-dot{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;color:var(--gray-400);transition:all .3s;white-space:nowrap;position:relative;cursor:pointer}
+.step-dot .dot-circle{width:10px;height:10px;border-radius:50%;background:var(--gray-300);transition:all .3s;flex-shrink:0}
+.step-dot.done{color:var(--success)}
+.step-dot.done .dot-circle{background:var(--success)}
+.step-dot.active{color:var(--primary);background:rgba(37,99,235,.07)}
+.step-dot.active .dot-circle{background:var(--primary);width:12px;height:12px;box-shadow:0 0 0 4px rgba(37,99,235,.15)}
+.step-dot-line{width:28px;height:2px;background:var(--gray-200);flex-shrink:0}
+.step-dot-line.done{background:var(--success)}
+.step-active-bar{display:flex;align-items:center;justify-content:center;gap:16px;padding:16px 24px;background:#fff;border:1px solid var(--gray-200);border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.step-active-num{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--primary),#60a5fa);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0;box-shadow:0 4px 12px rgba(37,99,235,.3)}
+.step-active-info{text-align:center;flex:1}
+.step-active-info .step-title{font-size:17px;font-weight:700;color:var(--gray-800)}
+.step-active-info .step-sub{font-size:12px;color:var(--gray-400);margin-top:2px}
+.step-active-nav{display:flex;gap:8px}
+.step-active-nav .nav-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--gray-200);background:#fff;color:var(--gray-600);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.step-active-nav .nav-btn:hover:not(:disabled){border-color:var(--primary);color:var(--primary);background:rgba(37,99,235,.04)}
+.step-active-nav .nav-btn:active:not(:disabled){transform:scale(.95)}
+.step-active-nav .nav-btn:disabled{opacity:.3;cursor:default}
+
+/* ===== STEP PANELS ===== */
+.step-panel{display:none;animation:stepSlide .35s ease}
+.step-panel.active{display:block}
+@keyframes stepSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== SECTION BOXES ===== */
+.sb-section{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--gray-100)}
+.sb-section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sb-section-title{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sb-section-title .sb-icon{width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sb-section-title .sb-icon.blue{background:#e8f0fe;color:var(--primary)}
+.sb-section-title .sb-icon.green{background:#e6f4ea;color:var(--success)}
+.sb-section-title .sb-icon.orange{background:#fef3e2;color:#e67e22}
+.sb-section-title .sb-icon.purple{background:#f0e6ff;color:#7c3aed}
+.sb-section-title .sb-icon.red{background:#fde8e8;color:var(--danger)}
+.sb-section-title .sb-icon.teal{background:#e0f7fa;color:#0d9488}
+
+/* ===== FORMS ===== */
+.form-row{display:grid;gap:14px 16px;margin-bottom:0}
+.form-row-2{grid-template-columns:1fr 1fr}
+.form-row-3{grid-template-columns:1fr 1fr 1fr}
+.form-row-4{grid-template-columns:1fr 1fr 1fr 1fr}
+.form-group{margin-bottom:0}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:4px;letter-spacing:.2px}
+.form-group label .req{color:var(--danger)}
+.form-control{width:100%;padding:9px 12px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;background:#fff;transition:all .2s;color:var(--gray-800)}
+.form-control:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.form-control.auto-filled{border-color:var(--success);background:#f0fdf4}
+select.form-control{appearance:auto;cursor:pointer}
+textarea.form-control{resize:vertical;min-height:60px}
+
+/* ===== NAV ===== */
+.step-nav{display:flex;justify-content:space-between;padding:20px 0 0;border-top:1px solid var(--gray-200);margin-top:8px}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+ .step-indicators{gap:0}
+ .step-dot{padding:6px 10px;font-size:11px}
+ .step-dot-line{width:16px}
+ .form-row-3{grid-template-columns:1fr 1fr}
+ .form-row-4{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+ .page-content{padding:16px}
+ .rp-top{flex-direction:column;align-items:stretch;gap:12px}
+ .rp-top h1{font-size:18px}
+ .rp-actions{width:100%}
+ .rp-card{padding:18px}
+ .step-indicators{flex-wrap:wrap;justify-content:center}
+ .step-dot{padding:5px 8px;font-size:10px;gap:4px}
+ .step-dot .dot-circle{width:8px;height:8px}
+ .step-dot.active .dot-circle{width:10px;height:10px}
+ .step-dot-line{width:10px}
+ .step-active-bar{padding:12px 16px;gap:12px}
+ .step-active-num{width:40px;height:40px;font-size:15px;border-radius:12px}
+ .step-active-info .step-title{font-size:15px}
+ .form-row-2,.form-row-3,.form-row-4{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+ .page-content{padding:12px}
+ .rp-card{padding:16px}
+ .step-top-bar{margin-bottom:20px}
+ .step-indicators{gap:0}
+ .step-dot{padding:3px 5px;font-size:8px;gap:2px}
+ .step-dot .dot-circle{width:6px;height:6px}
+ .step-dot.active .dot-circle{width:8px;height:8px}
+ .step-dot-line{width:4px}
+ .step-active-bar{flex-direction:column;gap:10px;padding:12px}
+ .step-active-nav{width:100%;justify-content:center}
+ .step-active-info{text-align:center}
+ .step-active-info .step-title{font-size:14px}
+ .step-active-info .step-sub{font-size:11px}
+ .step-active-num{width:42px;height:42px;font-size:16px}
+ .nav-btn{width:36px!important;height:36px!important;font-size:16px!important}
+}
+@media(max-width:360px){
+ .page-content{padding:8px}
+ .rp-card{padding:12px}
+ .step-top-bar{margin-bottom:16px}
+ .step-indicators{gap:0}
+ .step-dot{padding:2px 4px;font-size:7px;gap:1px}
+ .step-dot .dot-circle{width:5px;height:5px}
+ .step-dot.active .dot-circle{width:7px;height:7px;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+ .step-dot-line{width:3px}
+ .step-active-bar{gap:8px;padding:10px}
+ .step-active-num{width:36px;height:36px;font-size:14px;border-radius:10px}
+ .step-active-info .step-title{font-size:13px}
+ .step-active-info .step-sub{font-size:10px}
+ .step-active-nav{width:100%;justify-content:center}
+ .nav-btn{width:34px!important;height:34px!important;font-size:15px!important;border-radius:8px!important}
+}
+@media(max-width:360px){
+ .page-content{padding:8px}
+ .rp-card{padding:12px}
+ .step-top-bar{margin-bottom:16px}
+ .step-indicators{gap:0}
+ .step-dot{padding:2px 4px;font-size:7px;gap:1px}
+ .step-dot .dot-circle{width:5px;height:5px}
+ .step-dot.active .dot-circle{width:7px;height:7px;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+ .step-dot-line{width:3px}
+ .step-active-bar{gap:8px;padding:10px}
+ .step-active-num{width:36px;height:36px;font-size:14px;border-radius:10px}
+ .step-active-info .step-title{font-size:13px}
+ .step-active-info .step-sub{font-size:10px}
+ .step-active-nav{width:100%;justify-content:center}
+ .nav-btn{width:34px!important;height:34px!important;font-size:15px!important;border-radius:8px!important}
+}
+ .step-nav{flex-direction:column;gap:8px}
+ .step-nav .btn{width:100%;justify-content:center}
+}
 ';
 $pageScripts = <<<'EOSCRIPT'
 var offerData = null;
@@ -61,12 +162,12 @@ var autoFilledFields = [];
 
 function loadCandidate() {
     if (!offerId) {
-        document.getElementById("formContent").innerHTML = "<div class='empty-state'><div class='empty-icon'>&#9888;</div><p>No offer ID provided. <a href='list.php'>Go back</a></p></div>";
+        document.getElementById("formContent").innerHTML = "<div class=\"rp-empty\"><div class=\"rp-empty-icon\">&#x26A0;</div><h3>No offer ID provided</h3><p><a href=\"list.php\">Go back to list</a></p></div>";
         return;
     }
     apiGet("ajax/get_candidate.php?offer_id=" + offerId, null, function(res) {
         if (!res.success || !res.data) {
-            document.getElementById("formContent").innerHTML = "<div class='empty-state'><div class='empty-icon'>&#10060;</div><p>Offer not found. <a href='list.php'>Go back</a></p></div>";
+            document.getElementById("formContent").innerHTML = "<div class=\"rp-empty\"><div class=\"rp-empty-icon\">&#x274C;</div><h3>Offer not found</h3><p><a href=\"list.php\">Go back to list</a></p></div>";
             return;
         }
         if (res.data.employee_exists) {
@@ -326,324 +427,354 @@ $pageScripts = str_replace('__OFFER_ID__', $offerId, $pageScripts);
 ob_start();
 ?>
 <div id="formContent">
-    <div class="card">
-        <div class="card-header" style="border-bottom:none;padding-bottom:0">
-            <h2>Create Employee</h2>
-            <a href="list.php" class="btn btn-sm btn-outline">&larr; Back to List</a>
+    <div class="rp-top">
+        <h1>Create Employee</h1>
+        <div class="rp-actions">
+            <a href="list.php" class="btn btn-outline btn-sm">&larr; Back to List</a>
         </div>
-        <div class="card-body" style="padding-top:0">
+    </div>
 
-            <div class="step-top-bar">
-                <div class="step-indicators">
-                    <div class="step-dot-wrap"><div class="step-dot active" id="dot0"><div class="dot-circle"></div>Personal</div></div>
-                    <div class="step-dot-line" id="line0"></div>
-                    <div class="step-dot-wrap"><div class="step-dot" id="dot1"><div class="dot-circle"></div>Employment</div></div>
-                    <div class="step-dot-line" id="line1"></div>
-                    <div class="step-dot-wrap"><div class="step-dot" id="dot2"><div class="dot-circle"></div>Address</div></div>
-                    <div class="step-dot-line" id="line2"></div>
-                    <div class="step-dot-wrap"><div class="step-dot" id="dot3"><div class="dot-circle"></div>Family</div></div>
-                    <div class="step-dot-line" id="line3"></div>
-                    <div class="step-dot-wrap"><div class="step-dot" id="dot4"><div class="dot-circle"></div>Other</div></div>
-                    <div class="step-dot-line" id="line4"></div>
-                    <div class="step-dot-wrap"><div class="step-dot" id="dot5"><div class="dot-circle"></div>Salary</div></div>
+    <div class="rp-card">
+        <div class="step-top-bar">
+            <div class="step-indicators">
+                <div class="step-dot-wrap"><div class="step-dot active" id="dot0" onclick="goToStep(0)"><div class="dot-circle"></div>Personal</div></div>
+                <div class="step-dot-line" id="line0"></div>
+                <div class="step-dot-wrap"><div class="step-dot" id="dot1" onclick="goToStep(1)"><div class="dot-circle"></div>Employment</div></div>
+                <div class="step-dot-line" id="line1"></div>
+                <div class="step-dot-wrap"><div class="step-dot" id="dot2" onclick="goToStep(2)"><div class="dot-circle"></div>Address</div></div>
+                <div class="step-dot-line" id="line2"></div>
+                <div class="step-dot-wrap"><div class="step-dot" id="dot3" onclick="goToStep(3)"><div class="dot-circle"></div>Family</div></div>
+                <div class="step-dot-line" id="line3"></div>
+                <div class="step-dot-wrap"><div class="step-dot" id="dot4" onclick="goToStep(4)"><div class="dot-circle"></div>Other</div></div>
+                <div class="step-dot-line" id="line4"></div>
+                <div class="step-dot-wrap"><div class="step-dot" id="dot5" onclick="goToStep(5)"><div class="dot-circle"></div>Salary</div></div>
+            </div>
+
+            <div class="step-active-bar">
+                <div class="step-active-nav">
+                    <button type="button" class="nav-btn" id="navPrev" onclick="prevStep()" disabled>&lsaquo;</button>
                 </div>
+                <div class="step-active-num" id="activeStepNum">1</div>
+                <div class="step-active-info">
+                    <div class="step-title" id="activeStepTitle">Personal Info</div>
+                    <div class="step-sub" id="activeStepSub">Basic details & identity</div>
+                </div>
+                <div class="step-active-nav">
+                    <button type="button" class="nav-btn" id="navNext" onclick="nextStep()">&#8250;</button>
+                </div>
+            </div>
+        </div>
 
-                <div class="step-active-bar">
-                    <div class="step-active-nav">
-                        <button type="button" class="nav-btn" id="navPrev" onclick="prevStep()" disabled>&lsaquo;</button>
-                    </div>
-                    <div class="step-active-num" id="activeStepNum">1</div>
-                    <div class="step-active-info">
-                        <div class="step-title" id="activeStepTitle">Personal Info</div>
-                        <div class="step-sub" id="activeStepSub">Basic details & identity</div>
-                    </div>
-                    <div class="step-active-nav">
-                        <button type="button" class="nav-btn" id="navNext" onclick="nextStep()">&#8250;</button>
-                    </div>
+        <form id="employeeForm" autocomplete="off">
+
+        <!-- ===== STEP 1: Personal Info ===== -->
+        <div class="step-panel active" id="step0">
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon blue">&#x1F464;</span> Basic Information</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>First Name <span class="req">*</span></label><input type="text" class="form-control" name="PBI_NAME" id="PBI_NAME" required></div>
+                    <div class="form-group"><label>Last Name</label><input type="text" class="form-control" name="last_name" id="last_name"></div>
+                    <div class="form-group"><label>Father's Name</label><input type="text" class="form-control" name="PBI_FATHER_NAME" id="PBI_FATHER_NAME"></div>
+                    <div class="form-group"><label>Mother's Name</label><input type="text" class="form-control" name="PBI_MOTHER_NAME" id="PBI_MOTHER_NAME"></div>
+                    <div class="form-group"><label>Date of Birth</label><input type="date" class="form-control" name="PBI_DOB" id="PBI_DOB"></div>
+                    <div class="form-group"><label>Gender</label><select class="form-control" name="PBI_SEX" id="PBI_SEX"><option value="">-- Select --</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+                    <div class="form-group"><label>Marital Status</label><select class="form-control" name="PBI_MARITAL_STA" id="PBI_MARITAL_STA"><option value="">-- Select --</option><option value="Single">Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option><option value="Widowed">Widowed</option></select></div>
+                    <div class="form-group"><label>Religion</label><select class="form-control" name="PBI_RELIGION" id="PBI_RELIGION"><option value="">-- Select --</option><option value="Islam">Islam</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option><option value="Christian">Christian</option><option value="Other">Other</option></select></div>
+                    <div class="form-group"><label>Nationality</label><input type="text" class="form-control" name="PBI_NATIONALITY" id="PBI_NATIONALITY" value="Bangladeshi"></div>
+                </div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon green">&#x1F4CB;</span> Identity & Contact</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>NID Number</label><input type="text" class="form-control" name="nid" id="nid"></div>
+                    <div class="form-group"><label>Blood Group</label><select class="form-control" name="PBI_BLOOD_GROUP" id="PBI_BLOOD_GROUP"><option value="">-- Select --</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="O+">O+</option><option value="O-">O-</option><option value="AB+">AB+</option><option value="AB-">AB-</option></select></div>
+                    <div class="form-group"><label>Mobile Number</label><input type="text" class="form-control" name="PBI_MOBILE" id="PBI_MOBILE"></div>
+                    <div class="form-group"><label>Phone (Office)</label><input type="text" class="form-control" name="PBI_PHONE" id="PBI_PHONE"></div>
+                    <div class="form-group"><label>Email</label><input type="email" class="form-control" name="PBI_EMAIL" id="PBI_EMAIL"></div>
+                    <div class="form-group"><label>Alternate Email</label><input type="email" class="form-control" name="PBI_EMAIL_ALT" id="PBI_EMAIL_ALT"></div>
+                </div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon purple">&#x1F3CB;</span> Physical & Personal</div>
+                <div class="form-row form-row-4">
+                    <div class="form-group"><label>Height</label><input type="text" class="form-control" name="highte" id="highte" placeholder="e.g. 5'8&quot;"></div>
+                    <div class="form-group"><label>Weight</label><input type="text" class="form-control" name="weight" id="weight" placeholder="e.g. 70 kg"></div>
+                    <div class="form-group"><label>Birth Reg No</label><input type="text" class="form-control" name="birth_reg_no" id="birth_reg_no"></div>
+                    <div class="form-group"><label>Hobbies</label><input type="text" class="form-control" name="hobbies" id="hobbies"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== STEP 2: Employment ===== -->
+        <div class="step-panel" id="step1">
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon blue">&#x1F4BC;</span> Job Information</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>Department <span class="req">*</span></label><select class="form-control" name="DEPT_ID" id="DEPT_ID" required><option value="">-- Select --</option><?php $pdo = getDB(); foreach ($pdo->query("SELECT id, name FROM departments ORDER BY name")->fetchAll() as $d) echo '<option value="'.$d['id'].'">'.htmlspecialchars($d['name']).'</option>'; ?></select></div>
+                    <div class="form-group"><label>Designation <span class="req">*</span></label><select class="form-control" name="DESG_ID" id="DESG_ID"><option value="">-- Select --</option><?php foreach ($pdo->query("SELECT id, name FROM designations ORDER BY name")->fetchAll() as $ds) echo '<option value="'.$ds['id'].'">'.htmlspecialchars($ds['name']).'</option>'; ?></select></div>
+                    <div class="form-group"><label>Job Title</label><input type="text" class="form-control" name="job_title" id="job_title"></div>
+                    <div class="form-group"><label>Designation (Text)</label><input type="text" class="form-control" name="PBI_DESIGNATION" id="PBI_DESIGNATION"></div>
+                    <div class="form-group"><label>Joining Designation</label><input type="text" class="form-control" name="joining_designation" id="joining_designation"></div>
+                    <div class="form-group"><label>Payroll Designation</label><input type="text" class="form-control" name="payroll_designation" id="payroll_designation"></div>
+                    <div class="form-group"><label>Joining Date <span class="req">*</span></label><input type="date" class="form-control" name="PBI_DOJ" id="PBI_DOJ" required></div>
+                    <div class="form-group"><label>Due Date of Joining</label><input type="date" class="form-control" name="PBI_DUE_DOJ" id="PBI_DUE_DOJ"></div>
+                    <div class="form-group"><label>Confirmation Date</label><input type="date" class="form-control" name="PBI_DOC" id="PBI_DOC"></div>
+                    <div class="form-group"><label>Probation Duration (Months)</label><input type="number" class="form-control" name="PBI_DURATION" id="PBI_DURATION" value="6"></div>
+                    <div class="form-group"><label>Service Length</label><input type="text" class="form-control" name="PBI_SERVICE_LENGTH" id="PBI_SERVICE_LENGTH"></div>
+                    <div class="form-group"><label>Job Description</label><input type="text" class="form-control" name="job_description" id="job_description"></div>
+                </div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon green">&#x1F4CA;</span> Classification & Grade</div>
+                <div class="form-row form-row-4">
+                    <div class="form-group"><label>Employee Type</label><select class="form-control" name="employee_type" id="employee_type"><option value="Non Roster">Non Roster</option><option value="Roster">Roster</option></select></div>
+                    <div class="form-group"><label>Employment Type</label><select class="form-control" name="EMPLOYMENT_TYPE" id="EMPLOYMENT_TYPE"><option value="">-- Select --</option><option value="Casual">Casual</option><option value="Apprentice">Apprentice</option><option value="Probationer" selected>Probationer</option><option value="Temporary">Temporary</option><option value="Replace">Replace</option><option value="Permanent">Permanent</option><option value="Seasonal">Seasonal</option><option value="Contractual">Contractual</option><option value="Regular">Regular</option></select></div>
+                    <div class="form-group"><label>Contract Type</label><input type="text" class="form-control" name="PBI_CON_TYPE" id="PBI_CON_TYPE"></div>
+                    <div class="form-group"><label>Organization</label><input type="number" class="form-control" name="PBI_ORG" id="PBI_ORG" value="1"></div>
+                    <div class="form-group"><label>Grade</label><input type="number" class="form-control" name="grade" id="grade"></div>
+                    <div class="form-group"><label>Level</label><input type="text" class="form-control" name="level" id="level"></div>
+                    <div class="form-group"><label>Class</label><input type="text" class="form-control" name="class" id="class"></div>
+                    <div class="form-group"><label>Section</label><input type="text" class="form-control" name="section" id="section"></div>
+                    <div class="form-group"><label>Cost Center</label><input type="text" class="form-control" name="cost_center" id="cost_center"></div>
+                    <div class="form-group"><label>Cost Type</label><input type="text" class="form-control" name="cost_type" id="cost_type"></div>
+                    <div class="form-group"><label>Salary Schedule</label><input type="number" class="form-control" name="salary_schedule" id="salary_schedule"></div>
+                    <div class="form-group"><label>Leave Rule ID</label><input type="number" class="form-control" name="LEAVE_RULE_ID" id="LEAVE_RULE_ID"></div>
+                </div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon orange">&#x23F0;</span> Schedule & Attendance</div>
+                <div class="form-row form-row-4">
+                    <div class="form-group"><label>Schedule Type</label><select class="form-control" name="schedule_type" id="schedule_type"><option value="Regular">Regular</option><option value="Roster">Roster</option></select></div>
+                    <div class="form-group"><label>Punch Type</label><select class="form-control" name="punch_type" id="punch_type"><option value="Regular">Regular</option><option value="Single">Single</option><option value="No Punch">No Punch</option></select></div>
+                    <div class="form-group"><label>Define Schedule</label><input type="text" class="form-control" name="define_schedule" id="define_schedule" placeholder="e.g. 9:00 AM - 6:00 PM"></div>
+                    <div class="form-group"><label>Machine / Card ID</label><input type="text" class="form-control" name="MACHINE_ID" id="MACHINE_ID"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== STEP 3: Address ===== -->
+        <div class="step-panel" id="step2">
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon blue">&#x1F4CD;</span> Present Address</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>House No</label><input type="text" class="form-control" name="pre_house_no" id="pre_house_no"></div>
+                    <div class="form-group"><label>Flat</label><input type="text" class="form-control" name="pre_flat" id="pre_flat"></div>
+                    <div class="form-group"><label>Road No</label><input type="text" class="form-control" name="pre_road_no" id="pre_road_no"></div>
+                    <div class="form-group"><label>Block No</label><input type="text" class="form-control" name="pre_block_no" id="pre_block_no"></div>
+                    <div class="form-group"><label>Police Station</label><input type="text" class="form-control" name="pre_ps" id="pre_ps"></div>
+                    <div class="form-group"><label>District</label><input type="text" class="form-control" name="pre_district" id="pre_district"></div>
+                </div>
+                <div class="form-group" style="margin-top:14px"><label>Present Address (Full)</label><textarea class="form-control" name="PBI_PRESENT_ADD" id="PBI_PRESENT_ADD" rows="2"></textarea></div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon purple">&#x1F3E0;</span> Permanent Address</div>
+                <div class="form-group"><label>Permanent Address</label><textarea class="form-control" name="PBI_PERMANENT_ADD" id="PBI_PERMANENT_ADD" rows="2"></textarea></div>
+            </div>
+        </div>
+
+        <!-- ===== STEP 4: Family & Nominee ===== -->
+        <div class="step-panel" id="step3">
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon green">&#x1F468;</span> Spouse & Nominee</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>Spouse Name</label><input type="text" class="form-control" name="spouse_name" id="spouse_name"></div>
+                    <div class="form-group"><label>Nominee</label><input type="text" class="form-control" name="nominee" id="nominee"></div>
+                    <div class="form-group"><label>Nominee Relation</label><input type="text" class="form-control" name="nominee_relation" id="nominee_relation"></div>
+                </div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon orange">&#x1F476;</span> Child 1</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>Name</label><input type="text" class="form-control" name="child1_name" id="child1_name"></div>
+                    <div class="form-group"><label>DOB</label><input type="text" class="form-control" name="child1_dob" id="child1_dob" placeholder="YYYY-MM-DD"></div>
+                    <div class="form-group"><label>Details</label><input type="text" class="form-control" name="child1_details" id="child1_details"></div>
+                </div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon orange">&#x1F476;</span> Child 2</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>Name</label><input type="text" class="form-control" name="child2_name" id="child2_name"></div>
+                    <div class="form-group"><label>DOB</label><input type="text" class="form-control" name="child2_dob" id="child2_dob" placeholder="YYYY-MM-DD"></div>
+                    <div class="form-group"><label>Details</label><input type="text" class="form-control" name="child2_details" id="child2_details"></div>
+                </div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon orange">&#x1F476;</span> Child 3</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>Name</label><input type="text" class="form-control" name="child3_name" id="child3_name"></div>
+                    <div class="form-group"><label>DOB</label><input type="text" class="form-control" name="child3_dob" id="child3_dob" placeholder="YYYY-MM-DD"></div>
+                    <div class="form-group"><label>Details</label><input type="text" class="form-control" name="child3_details" id="child3_details"></div>
+                </div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon orange">&#x1F476;</span> Child 4</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>Name</label><input type="text" class="form-control" name="child4_name" id="child4_name"></div>
+                    <div class="form-group"><label>DOB</label><input type="text" class="form-control" name="child4_dob" id="child4_dob" placeholder="YYYY-MM-DD"></div>
+                    <div class="form-group"><label>Details</label><input type="text" class="form-control" name="child4_details" id="child4_details"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== STEP 5: Other Details ===== -->
+        <div class="step-panel" id="step4">
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon teal">&#x1F4CD;</span> Location & Workstation</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>Zone</label><input type="text" class="form-control" name="PBI_ZONE" id="PBI_ZONE"></div>
+                    <div class="form-group"><label>Area</label><input type="text" class="form-control" name="PBI_AREA" id="PBI_AREA"></div>
+                    <div class="form-group"><label>Branch</label><input type="text" class="form-control" name="PBI_BRANCH" id="PBI_BRANCH"></div>
+                    <div class="form-group"><label>Region</label><input type="number" class="form-control" name="PBI_REGION" id="PBI_REGION"></div>
+                    <div class="form-group"><label>Work Station</label><input type="text" class="form-control" name="PBI_WORK_STATION" id="PBI_WORK_STATION"></div>
+                    <div class="form-group"><label>Line</label><input type="text" class="form-control" name="line" id="line"></div>
+                    <div class="form-group"><label>Territory</label><input type="number" class="form-control" name="territory" id="territory"></div>
+                    <div class="form-group"><label>Function</label><input type="text" class="form-control" name="PBI_FUNCTION" id="PBI_FUNCTION"></div>
+                    <div class="form-group"><label>Job Location ID</label><input type="number" class="form-control" name="JOB_LOC_ID" id="JOB_LOC_ID"></div>
+                </div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon blue">&#x1F465;</span> Reporting & Incharge</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>Incharge ID</label><input type="number" class="form-control" name="incharge_id" id="incharge_id"></div>
+                    <div class="form-group"><label>Incharge ID 2</label><input type="number" class="form-control" name="incharge_id_2" id="incharge_id_2"></div>
+                    <div class="form-group"><label>Cell No Tracking</label><input type="text" class="form-control" name="cell_no_traking" id="cell_no_traking"></div>
+                </div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon green">&#x1F4C5;</span> Working Days</div>
+                <div class="form-row form-row-4">
+                    <div class="form-group"><label>Saturday</label><input type="text" class="form-control" name="Saturday" id="Saturday" placeholder="e.g. 9AM-6PM"></div>
+                    <div class="form-group"><label>Sunday</label><input type="text" class="form-control" name="Sunday" id="Sunday"></div>
+                    <div class="form-group"><label>Monday</label><input type="text" class="form-control" name="Monday" id="Monday"></div>
+                    <div class="form-group"><label>Tuesday</label><input type="text" class="form-control" name="Tuesday" id="Tuesday"></div>
+                    <div class="form-group"><label>Wednesday</label><input type="text" class="form-control" name="Wednesday" id="Wednesday"></div>
+                    <div class="form-group"><label>Thursday</label><input type="text" class="form-control" name="Thursday" id="Thursday"></div>
+                    <div class="form-group"><label>Friday</label><input type="text" class="form-control" name="Friday" id="Friday" value="Off"></div>
+                </div>
+            </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon purple">&#x1F4DD;</span> Notes</div>
+                <div class="form-group"><label>Note</label><textarea class="form-control" name="note" id="note" rows="3" placeholder="Any additional notes about this employee..."></textarea></div>
+            </div>
+        </div>
+
+        <!-- ===== STEP 6: Salary Setup ===== -->
+        <div class="step-panel" id="step5">
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon blue">&#x1F464;</span> Candidate Information</div>
+                <div class="form-row form-row-4">
+                    <div class="form-group"><label>Candidate</label><input type="text" class="form-control" id="sal_candidate_name" disabled></div>
+                    <div class="form-group"><label>Job Title</label><input type="text" class="form-control" id="sal_job_title" disabled></div>
+                    <div class="form-group"><label>Offered Salary</label><input type="text" class="form-control" id="sal_offered_salary" disabled></div>
+                    <div class="form-group"><label>Gender</label><select class="form-control" id="gender" onchange="calculateSalary()"><option value="male">Male</option><option value="female">Female</option></select></div>
                 </div>
             </div>
 
-            <form id="employeeForm" autocomplete="off">
-
-            <!-- ===== STEP 1: Personal Info ===== -->
-            <div class="step-panel active" id="step0">
-                <div class="section-box">
-                    <div class="section-box-title">Basic Information</div>
-                    <div class="form-row form-row-3">
-                        <div class="form-group"><label>First Name <span class="req">*</span></label><input type="text" class="form-control" name="PBI_NAME" id="PBI_NAME" required></div>
-                        <div class="form-group"><label>Last Name</label><input type="text" class="form-control" name="last_name" id="last_name"></div>
-                        <div class="form-group"><label>Father's Name</label><input type="text" class="form-control" name="PBI_FATHER_NAME" id="PBI_FATHER_NAME"></div>
-                        <div class="form-group"><label>Mother's Name</label><input type="text" class="form-control" name="PBI_MOTHER_NAME" id="PBI_MOTHER_NAME"></div>
-                        <div class="form-group"><label>Date of Birth</label><input type="date" class="form-control" name="PBI_DOB" id="PBI_DOB"></div>
-                        <div class="form-group"><label>Gender</label><select class="form-control" name="PBI_SEX" id="PBI_SEX"><option value="">-- Select --</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
-                        <div class="form-group"><label>Marital Status</label><select class="form-control" name="PBI_MARITAL_STA" id="PBI_MARITAL_STA"><option value="">-- Select --</option><option value="Single">Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option><option value="Widowed">Widowed</option></select></div>
-                        <div class="form-group"><label>Religion</label><select class="form-control" name="PBI_RELIGION" id="PBI_RELIGION"><option value="">-- Select --</option><option value="Islam">Islam</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option><option value="Christian">Christian</option><option value="Other">Other</option></select></div>
-                        <div class="form-group"><label>Nationality</label><input type="text" class="form-control" name="PBI_NATIONALITY" id="PBI_NATIONALITY" value="Bangladeshi"></div>
-                    </div>
-                </div>
-                <div class="section-box">
-                    <div class="section-box-title">Identity & Contact</div>
-                    <div class="form-row form-row-3">
-                        <div class="form-group"><label>NID Number</label><input type="text" class="form-control" name="nid" id="nid"></div>
-                        <div class="form-group"><label>Blood Group</label><select class="form-control" name="PBI_BLOOD_GROUP" id="PBI_BLOOD_GROUP"><option value="">-- Select --</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="O+">O+</option><option value="O-">O-</option><option value="AB+">AB+</option><option value="AB-">AB-</option></select></div>
-                        <div class="form-group"><label>Mobile Number</label><input type="text" class="form-control" name="PBI_MOBILE" id="PBI_MOBILE"></div>
-                        <div class="form-group"><label>Phone (Office)</label><input type="text" class="form-control" name="PBI_PHONE" id="PBI_PHONE"></div>
-                        <div class="form-group"><label>Email</label><input type="email" class="form-control" name="PBI_EMAIL" id="PBI_EMAIL"></div>
-                        <div class="form-group"><label>Alternate Email</label><input type="email" class="form-control" name="PBI_EMAIL_ALT" id="PBI_EMAIL_ALT"></div>
-                    </div>
-                </div>
-                <div class="section-box">
-                    <div class="section-box-title">Physical & Personal</div>
-                    <div class="form-row form-row-4">
-                        <div class="form-group"><label>Height</label><input type="text" class="form-control" name="highte" id="highte" placeholder="e.g. 5'8&quot;"></div>
-                        <div class="form-group"><label>Weight</label><input type="text" class="form-control" name="weight" id="weight" placeholder="e.g. 70 kg"></div>
-                        <div class="form-group"><label>Birth Reg No</label><input type="text" class="form-control" name="birth_reg_no" id="birth_reg_no"></div>
-                        <div class="form-group"><label>Hobbies</label><input type="text" class="form-control" name="hobbies" id="hobbies"></div>
-                    </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon green">&#x1F4B0;</span> Salary Breakdown</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group"><label>Gross Salary <span style="color:var(--danger)">*</span></label><input type="number" class="form-control" name="gross_salary" id="gross_salary" placeholder="Enter gross salary" oninput="calculateSalary()" style="font-weight:600;font-size:15px"></div>
+                    <div class="form-group"><label>Basic Salary</label><input type="number" class="form-control" name="basic_salary" id="basic_salary" placeholder="Auto-calculated" readonly></div>
+                    <div class="form-group"><label>House Rent</label><input type="number" class="form-control" name="house_rent" id="house_rent" placeholder="Auto-calculated" readonly></div>
+                    <div class="form-group"><label>Medical Allowance</label><input type="number" class="form-control" name="medical_allowance" id="medical_allowance" placeholder="Auto-calculated" readonly></div>
+                    <div class="form-group"><label>Conveyance Allowance</label><input type="number" class="form-control" name="convenience" id="convenience" placeholder="Auto-calculated" readonly></div>
+                    <div class="form-group"><label>Total Salary</label><input type="number" class="form-control" name="total_salary" id="total_salary" placeholder="Auto-calculated" readonly></div>
                 </div>
             </div>
 
-            <!-- ===== STEP 2: Employment ===== -->
-            <div class="step-panel" id="step1">
-                <div class="section-box">
-                    <div class="section-box-title">Job Information</div>
-                    <div class="form-row form-row-3">
-                        <div class="form-group"><label>Department <span class="req">*</span></label><select class="form-control" name="DEPT_ID" id="DEPT_ID" required><option value="">-- Select --</option><?php $pdo = getDB(); foreach ($pdo->query("SELECT id, name FROM departments ORDER BY name")->fetchAll() as $d) echo '<option value="'.$d['id'].'">'.htmlspecialchars($d['name']).'</option>'; ?></select></div>
-                        <div class="form-group"><label>Designation <span class="req">*</span></label><select class="form-control" name="DESG_ID" id="DESG_ID"><option value="">-- Select --</option><?php foreach ($pdo->query("SELECT id, name FROM designations ORDER BY name")->fetchAll() as $ds) echo '<option value="'.$ds['id'].'">'.htmlspecialchars($ds['name']).'</option>'; ?></select></div>
-                        <div class="form-group"><label>Job Title</label><input type="text" class="form-control" name="job_title" id="job_title"></div>
-                        <div class="form-group"><label>Designation (Text)</label><input type="text" class="form-control" name="PBI_DESIGNATION" id="PBI_DESIGNATION"></div>
-                        <div class="form-group"><label>Joining Designation</label><input type="text" class="form-control" name="joining_designation" id="joining_designation"></div>
-                        <div class="form-group"><label>Payroll Designation</label><input type="text" class="form-control" name="payroll_designation" id="payroll_designation"></div>
-                        <div class="form-group"><label>Joining Date <span class="req">*</span></label><input type="date" class="form-control" name="PBI_DOJ" id="PBI_DOJ" required></div>
-                        <div class="form-group"><label>Due Date of Joining</label><input type="date" class="form-control" name="PBI_DUE_DOJ" id="PBI_DUE_DOJ"></div>
-                        <div class="form-group"><label>Confirmation Date</label><input type="date" class="form-control" name="PBI_DOC" id="PBI_DOC"></div>
-                        <div class="form-group"><label>Probation Duration (Months)</label><input type="number" class="form-control" name="PBI_DURATION" id="PBI_DURATION" value="6"></div>
-                        <div class="form-group"><label>Service Length</label><input type="text" class="form-control" name="PBI_SERVICE_LENGTH" id="PBI_SERVICE_LENGTH"></div>
-                        <div class="form-group"><label>Job Description</label><input type="text" class="form-control" name="job_description" id="job_description"></div>
-                    </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon red">&#x1F4C9;</span> Deductions & Overtime</div>
+                <div class="form-row form-row-4">
+                    <div class="form-group"><label>Personal PF</label><input type="number" class="form-control" name="pf" id="pf" placeholder="0" oninput="calculateTotalPayable()"></div>
+                    <div class="form-group"><label>Company PF</label><input type="number" class="form-control" name="pf_company" id="pf_company" placeholder="0"></div>
+                    <div class="form-group"><label>PF Deductible</label><input type="number" class="form-control" name="pf_deductible" id="pf_deductible" placeholder="0" oninput="calculateTotalPayable()"></div>
+                    <div class="form-group"><label>Monthly Income Tax</label><input type="number" class="form-control" name="m_income_tex" id="m_income_tex" placeholder="Auto-calculated" readonly></div>
+                    <div class="form-group"><label>PF Applicable</label><select class="form-control" name="pf_applicable" id="pf_applicable"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+                    <div class="form-group"><label>PF Status</label><input type="text" class="form-control" name="pf_status" id="pf_status"></div>
+                    <div class="form-group"><label>Tax Status</label><input type="text" class="form-control" name="tax_status" id="tax_status"></div>
+                    <div class="form-group"><label>Income Tax</label><input type="number" class="form-control" name="income_tax" id="income_tax" step="0.01"></div>
+                    <div class="form-group"><label>Group Insurance</label><input type="number" class="form-control" name="group_insurance" id="group_insurance" step="0.01"></div>
+                    <div class="form-group"><label>C Fund</label><input type="number" class="form-control" name="cfund" id="cfund" step="0.01"></div>
+                    <div class="form-group"><label>SM Money</label><input type="number" class="form-control" name="sm_money" id="sm_money" step="0.01"></div>
+                    <div class="form-group"><label>Security Amount</label><input type="number" class="form-control" name="security_amount" id="security_amount" step="0.01"></div>
+                    <div class="form-group"><label>Cooperative Share</label><input type="number" class="form-control" name="cooperative_share" id="cooperative_share"></div>
+                    <div class="form-group"><label>Motorcycle Install</label><input type="number" class="form-control" name="motorcycle_install" id="motorcycle_install" step="0.01"></div>
+                    <div class="form-group"><label>Fixed TADA</label><input type="number" class="form-control" name="fixed_tada" id="fixed_tada" step="0.01"></div>
                 </div>
-                <div class="section-box">
-                    <div class="section-box-title">Classification & Grade</div>
-                    <div class="form-row form-row-4">
-                        <div class="form-group"><label>Employee Type</label><select class="form-control" name="employee_type" id="employee_type"><option value="Non Roster">Non Roster</option><option value="Roster">Roster</option></select></div>
-                        <div class="form-group"><label>Employment Type</label><select class="form-control" name="EMPLOYMENT_TYPE" id="EMPLOYMENT_TYPE"><option value="">-- Select --</option><option value="Casual">Casual</option><option value="Apprentice">Apprentice</option><option value="Probationer" selected>Probationer</option><option value="Temporary">Temporary</option><option value="Replace">Replace</option><option value="Permanent">Permanent</option><option value="Seasonal">Seasonal</option><option value="Contractual">Contractual</option><option value="Regular">Regular</option></select></div>
-                        <div class="form-group"><label>Contract Type</label><input type="text" class="form-control" name="PBI_CON_TYPE" id="PBI_CON_TYPE"></div>
-                        <div class="form-group"><label>Organization</label><input type="number" class="form-control" name="PBI_ORG" id="PBI_ORG" value="1"></div>
-                        <div class="form-group"><label>Grade</label><input type="number" class="form-control" name="grade" id="grade"></div>
-                        <div class="form-group"><label>Level</label><input type="text" class="form-control" name="level" id="level"></div>
-                        <div class="form-group"><label>Class</label><input type="text" class="form-control" name="class" id="class"></div>
-                        <div class="form-group"><label>Section</label><input type="text" class="form-control" name="section" id="section"></div>
-                        <div class="form-group"><label>Cost Center</label><input type="text" class="form-control" name="cost_center" id="cost_center"></div>
-                        <div class="form-group"><label>Cost Type</label><input type="text" class="form-control" name="cost_type" id="cost_type"></div>
-                        <div class="form-group"><label>Salary Schedule</label><input type="number" class="form-control" name="salary_schedule" id="salary_schedule"></div>
-                        <div class="form-group"><label>Leave Rule ID</label><input type="number" class="form-control" name="LEAVE_RULE_ID" id="LEAVE_RULE_ID"></div>
-                    </div>
-                </div>
-                <div class="section-box">
-                    <div class="section-box-title">Schedule & Attendance</div>
-                    <div class="form-row form-row-4">
-                        <div class="form-group"><label>Schedule Type</label><select class="form-control" name="schedule_type" id="schedule_type"><option value="Regular">Regular</option><option value="Roster">Roster</option></select></div>
-                        <div class="form-group"><label>Punch Type</label><select class="form-control" name="punch_type" id="punch_type"><option value="Regular">Regular</option><option value="Single">Single</option><option value="No Punch">No Punch</option></select></div>
-                        <div class="form-group"><label>Define Schedule</label><input type="text" class="form-control" name="define_schedule" id="define_schedule" placeholder="e.g. 9:00 AM - 6:00 PM"></div>
-                        <div class="form-group"><label>Machine / Card ID</label><input type="text" class="form-control" name="MACHINE_ID" id="MACHINE_ID"></div>
-                    </div>
+                <div class="form-row form-row-3" style="margin-top:14px">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="ot_out"> OT (Out)</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="ot_holiday"> OT Holiday</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="ot_weekend"> OT Weekend</label>
                 </div>
             </div>
 
-            <!-- ===== STEP 3: Address ===== -->
-            <div class="step-panel" id="step2">
-                <div class="section-box">
-                    <div class="section-box-title">Present Address</div>
-                    <div class="form-row form-row-3">
-                        <div class="form-group"><label>House No</label><input type="text" class="form-control" name="pre_house_no" id="pre_house_no"></div>
-                        <div class="form-group"><label>Flat</label><input type="text" class="form-control" name="pre_flat" id="pre_flat"></div>
-                        <div class="form-group"><label>Road No</label><input type="text" class="form-control" name="pre_road_no" id="pre_road_no"></div>
-                        <div class="form-group"><label>Block No</label><input type="text" class="form-control" name="pre_block_no" id="pre_block_no"></div>
-                        <div class="form-group"><label>Police Station</label><input type="text" class="form-control" name="pre_ps" id="pre_ps"></div>
-                        <div class="form-group"><label>District</label><input type="text" class="form-control" name="pre_district" id="pre_district"></div>
-                    </div>
-                    <div class="form-group" style="margin-top:14px"><label>Present Address (Full)</label><textarea class="form-control" name="PBI_PRESENT_ADD" id="PBI_PRESENT_ADD" rows="2"></textarea></div>
-                </div>
-                <div class="section-box">
-                    <div class="section-box-title">Permanent Address</div>
-                    <div class="form-group"><label>Permanent Address</label><textarea class="form-control" name="PBI_PERMANENT_ADD" id="PBI_PERMANENT_ADD" rows="2"></textarea></div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon teal">&#x1F4CA;</span> Summary</div>
+                <div class="form-row form-row-2">
+                    <div class="form-group"><label>Total Payable</label><input type="number" class="form-control" name="total_payable" id="total_payable" placeholder="0" readonly></div>
+                    <div class="form-group"><label>Salary Type</label><input type="text" class="form-control" name="salary_type" id="salary_type" placeholder="e.g. Consolidated"></div>
+                    <div class="form-group"><label>Consolidated Salary</label><input type="number" class="form-control" name="consolidated_salary" id="consolidated_salary" step="0.01"></div>
                 </div>
             </div>
 
-            <!-- ===== STEP 4: Family & Nominee ===== -->
-            <div class="step-panel" id="step3">
-                <div class="section-box">
-                    <div class="section-box-title">Spouse & Nominee</div>
-                    <div class="form-row form-row-3">
-                        <div class="form-group"><label>Spouse Name</label><input type="text" class="form-control" name="spouse_name" id="spouse_name"></div>
-                        <div class="form-group"><label>Nominee</label><input type="text" class="form-control" name="nominee" id="nominee"></div>
-                        <div class="form-group"><label>Nominee Relation</label><input type="text" class="form-control" name="nominee_relation" id="nominee_relation"></div>
-                    </div>
-                </div>
-                <div class="section-box"><div class="section-box-title">Child 1</div><div class="form-row form-row-3"><div class="form-group"><label>Name</label><input type="text" class="form-control" name="child1_name" id="child1_name"></div><div class="form-group"><label>DOB</label><input type="text" class="form-control" name="child1_dob" id="child1_dob" placeholder="YYYY-MM-DD"></div><div class="form-group"><label>Details</label><input type="text" class="form-control" name="child1_details" id="child1_details"></div></div></div>
-                <div class="section-box"><div class="section-box-title">Child 2</div><div class="form-row form-row-3"><div class="form-group"><label>Name</label><input type="text" class="form-control" name="child2_name" id="child2_name"></div><div class="form-group"><label>DOB</label><input type="text" class="form-control" name="child2_dob" id="child2_dob" placeholder="YYYY-MM-DD"></div><div class="form-group"><label>Details</label><input type="text" class="form-control" name="child2_details" id="child2_details"></div></div></div>
-                <div class="section-box"><div class="section-box-title">Child 3</div><div class="form-row form-row-3"><div class="form-group"><label>Name</label><input type="text" class="form-control" name="child3_name" id="child3_name"></div><div class="form-group"><label>DOB</label><input type="text" class="form-control" name="child3_dob" id="child3_dob" placeholder="YYYY-MM-DD"></div><div class="form-group"><label>Details</label><input type="text" class="form-control" name="child3_details" id="child3_details"></div></div></div>
-                <div class="section-box"><div class="section-box-title">Child 4</div><div class="form-row form-row-3"><div class="form-group"><label>Name</label><input type="text" class="form-control" name="child4_name" id="child4_name"></div><div class="form-group"><label>DOB</label><input type="text" class="form-control" name="child4_dob" id="child4_dob" placeholder="YYYY-MM-DD"></div><div class="form-group"><label>Details</label><input type="text" class="form-control" name="child4_details" id="child4_details"></div></div></div>
-            </div>
-
-            <!-- ===== STEP 5: Other Details ===== -->
-            <div class="step-panel" id="step4">
-                <div class="section-box">
-                    <div class="section-box-title">Location & Workstation</div>
-                    <div class="form-row form-row-3">
-                        <div class="form-group"><label>Zone</label><input type="text" class="form-control" name="PBI_ZONE" id="PBI_ZONE"></div>
-                        <div class="form-group"><label>Area</label><input type="text" class="form-control" name="PBI_AREA" id="PBI_AREA"></div>
-                        <div class="form-group"><label>Branch</label><input type="text" class="form-control" name="PBI_BRANCH" id="PBI_BRANCH"></div>
-                        <div class="form-group"><label>Region</label><input type="number" class="form-control" name="PBI_REGION" id="PBI_REGION"></div>
-                        <div class="form-group"><label>Work Station</label><input type="text" class="form-control" name="PBI_WORK_STATION" id="PBI_WORK_STATION"></div>
-                        <div class="form-group"><label>Line</label><input type="text" class="form-control" name="line" id="line"></div>
-                        <div class="form-group"><label>Territory</label><input type="number" class="form-control" name="territory" id="territory"></div>
-                        <div class="form-group"><label>Function</label><input type="text" class="form-control" name="PBI_FUNCTION" id="PBI_FUNCTION"></div>
-                        <div class="form-group"><label>Job Location ID</label><input type="number" class="form-control" name="JOB_LOC_ID" id="JOB_LOC_ID"></div>
-                    </div>
-                </div>
-                <div class="section-box">
-                    <div class="section-box-title">Reporting & Incharge</div>
-                    <div class="form-row form-row-3">
-                        <div class="form-group"><label>Incharge ID</label><input type="number" class="form-control" name="incharge_id" id="incharge_id"></div>
-                        <div class="form-group"><label>Incharge ID 2</label><input type="number" class="form-control" name="incharge_id_2" id="incharge_id_2"></div>
-                        <div class="form-group"><label>Cell No Tracking</label><input type="text" class="form-control" name="cell_no_traking" id="cell_no_traking"></div>
-                    </div>
-                </div>
-                <div class="section-box">
-                    <div class="section-box-title">Working Days</div>
-                    <div class="form-row form-row-4">
-                        <div class="form-group"><label>Saturday</label><input type="text" class="form-control" name="Saturday" id="Saturday" placeholder="e.g. 9AM-6PM"></div>
-                        <div class="form-group"><label>Sunday</label><input type="text" class="form-control" name="Sunday" id="Sunday"></div>
-                        <div class="form-group"><label>Monday</label><input type="text" class="form-control" name="Monday" id="Monday"></div>
-                        <div class="form-group"><label>Tuesday</label><input type="text" class="form-control" name="Tuesday" id="Tuesday"></div>
-                        <div class="form-group"><label>Wednesday</label><input type="text" class="form-control" name="Wednesday" id="Wednesday"></div>
-                        <div class="form-group"><label>Thursday</label><input type="text" class="form-control" name="Thursday" id="Thursday"></div>
-                        <div class="form-group"><label>Friday</label><input type="text" class="form-control" name="Friday" id="Friday" value="Off"></div>
-                    </div>
-                </div>
-                <div class="section-box"><div class="section-box-title">Notes</div><div class="form-group"><label>Note</label><textarea class="form-control" name="note" id="note" rows="3" placeholder="Any additional notes about this employee..."></textarea></div></div>
-            </div>
-
-            <!-- ===== STEP 6: Salary Setup ===== -->
-            <div class="step-panel" id="step5">
-
-                <div class="section-box">
-                    <div class="section-box-title">Candidate Information</div>
-                    <div class="form-row form-row-4">
-                        <div class="form-group"><label>Candidate</label><input type="text" class="form-control" id="sal_candidate_name" disabled></div>
-                        <div class="form-group"><label>Job Title</label><input type="text" class="form-control" id="sal_job_title" disabled></div>
-                        <div class="form-group"><label>Offered Salary</label><input type="text" class="form-control" id="sal_offered_salary" disabled></div>
-                        <div class="form-group"><label>Gender</label><select class="form-control" id="gender" onchange="calculateSalary()"><option value="male">Male</option><option value="female">Female</option></select></div>
-                    </div>
-                </div>
-
-                <div class="section-box">
-                    <div class="section-box-title">Salary Breakdown</div>
-                    <div class="form-row form-row-3">
-                        <div class="form-group"><label>Gross Salary <span style="color:var(--danger)">*</span></label><input type="number" class="form-control" name="gross_salary" id="gross_salary" placeholder="Enter gross salary" oninput="calculateSalary()" style="font-weight:600;font-size:15px"></div>
-                        <div class="form-group"><label>Basic Salary</label><input type="number" class="form-control" name="basic_salary" id="basic_salary" placeholder="Auto-calculated" readonly></div>
-                        <div class="form-group"><label>House Rent</label><input type="number" class="form-control" name="house_rent" id="house_rent" placeholder="Auto-calculated" readonly></div>
-                        <div class="form-group"><label>Medical Allowance</label><input type="number" class="form-control" name="medical_allowance" id="medical_allowance" placeholder="Auto-calculated" readonly></div>
-                        <div class="form-group"><label>Conveyance Allowance</label><input type="number" class="form-control" name="convenience" id="convenience" placeholder="Auto-calculated" readonly></div>
-                        <div class="form-group"><label>Total Salary</label><input type="number" class="form-control" name="total_salary" id="total_salary" placeholder="Auto-calculated" readonly></div>
-                    </div>
-                </div>
-
-                <div class="section-box">
-                    <div class="section-box-title">Deductions & Overtime</div>
-                    <div class="form-row form-row-4">
-                        <div class="form-group"><label>Personal PF</label><input type="number" class="form-control" name="pf" id="pf" placeholder="0" oninput="calculateTotalPayable()"></div>
-                        <div class="form-group"><label>Company PF</label><input type="number" class="form-control" name="pf_company" id="pf_company" placeholder="0"></div>
-                        <div class="form-group"><label>PF Deductible</label><input type="number" class="form-control" name="pf_deductible" id="pf_deductible" placeholder="0" oninput="calculateTotalPayable()"></div>
-                        <div class="form-group"><label>Monthly Income Tax</label><input type="number" class="form-control" name="m_income_tex" id="m_income_tex" placeholder="Auto-calculated" readonly></div>
-                        <div class="form-group"><label>PF Applicable</label><select class="form-control" name="pf_applicable" id="pf_applicable"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                        <div class="form-group"><label>PF Status</label><input type="text" class="form-control" name="pf_status" id="pf_status"></div>
-                        <div class="form-group"><label>Tax Status</label><input type="text" class="form-control" name="tax_status" id="tax_status"></div>
-                        <div class="form-group"><label>Income Tax</label><input type="number" class="form-control" name="income_tax" id="income_tax" step="0.01"></div>
-                        <div class="form-group"><label>Group Insurance</label><input type="number" class="form-control" name="group_insurance" id="group_insurance" step="0.01"></div>
-                        <div class="form-group"><label>C Fund</label><input type="number" class="form-control" name="cfund" id="cfund" step="0.01"></div>
-                        <div class="form-group"><label>SM Money</label><input type="number" class="form-control" name="sm_money" id="sm_money" step="0.01"></div>
-                        <div class="form-group"><label>Security Amount</label><input type="number" class="form-control" name="security_amount" id="security_amount" step="0.01"></div>
-                        <div class="form-group"><label>Cooperative Share</label><input type="number" class="form-control" name="cooperative_share" id="cooperative_share"></div>
-                        <div class="form-group"><label>Motorcycle Install</label><input type="number" class="form-control" name="motorcycle_install" id="motorcycle_install" step="0.01"></div>
-                        <div class="form-group"><label>Fixed TADA</label><input type="number" class="form-control" name="fixed_tada" id="fixed_tada" step="0.01"></div>
-                    </div>
-                    <div style="display:flex;gap:20px;flex-wrap:wrap;padding-top:4px">
-                        <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="ot_out"> OT (Out)</label>
-                        <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="ot_holiday"> OT Holiday</label>
-                        <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="ot_weekend"> OT Weekend</label>
-                    </div>
-                </div>
-
-                <div class="section-box">
-                    <div class="section-box-title">Summary</div>
-                    <div class="form-row form-row-2">
-                        <div class="form-group"><label>Total Payable</label><input type="number" class="form-control" name="total_payable" id="total_payable" placeholder="0" readonly></div>
-                        <div class="form-group"><label>Salary Type</label><input type="text" class="form-control" name="salary_type" id="salary_type" placeholder="e.g. Consolidated"></div>
-                        <div class="form-group"><label>Consolidated Salary</label><input type="number" class="form-control" name="consolidated_salary" id="consolidated_salary" step="0.01"></div>
-                    </div>
-                </div>
-
-                <div class="section-box">
-                    <div class="section-box-title">Other Allowances</div>
-                    <div class="form-row form-row-4">
-                        <div class="form-group"><label>Transport Allowance</label><input type="number" class="form-control" name="transport_allowance" id="transport_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Fuel Allowance</label><input type="number" class="form-control" name="fuel_allowance" id="fuel_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Food Allowance</label><input type="number" class="form-control" name="food_allowance" id="food_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Mobile Allowance</label><input type="number" class="form-control" name="mobile_allowance" id="mobile_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Mobile Ceiling</label><input type="number" class="form-control" name="mobile_ceiling" id="mobile_ceiling" step="0.01"></div>
-                        <div class="form-group"><label>Special Allowance</label><input type="number" class="form-control" name="special_allowance" id="special_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Utility Allowance</label><input type="number" class="form-control" name="utility_allowance" id="utility_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Entertainment</label><input type="number" class="form-control" name="entertainment" id="entertainment" step="0.01"></div>
-                        <div class="form-group"><label>Contribution</label><input type="number" class="form-control" name="contribution" id="contribution" step="0.01"></div>
-                        <div class="form-group"><label>Dearness Allowance</label><input type="number" class="form-control" name="dearness_allowance" id="dearness_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Commission</label><input type="number" class="form-control" name="commission" id="commission" step="0.01"></div>
-                        <div class="form-group"><label>Children Edu Allowance</label><input type="number" class="form-control" name="children_edu_allowance" id="children_edu_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Responsibility Allowance</label><input type="number" class="form-control" name="responsibility_allowance" id="responsibility_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Superintendent Allowance</label><input type="number" class="form-control" name="superintendent_allowance" id="superintendent_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Servant Allowance</label><input type="number" class="form-control" name="servant_allowance" id="servant_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Comstry Allowance</label><input type="number" class="form-control" name="comstry_allowance" id="comstry_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Marketing Allowance</label><input type="number" class="form-control" name="marketing_allowance" id="marketing_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Realestate Allowance</label><input type="number" class="form-control" name="realestate_allowance" id="realestate_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Car Driver Allowance</label><input type="number" class="form-control" name="car_driver_allowance" id="car_driver_allowance" step="0.01"></div>
-                        <div class="form-group"><label>TA</label><input type="number" class="form-control" name="ta" id="ta" step="0.01"></div>
-                        <div class="form-group"><label>DA</label><input type="number" class="form-control" name="da" id="da" step="0.01"></div>
-                        <div class="form-group"><label>Other Allowance</label><input type="number" class="form-control" name="other_allowance" id="other_allowance" step="0.01"></div>
-                        <div class="form-group"><label>Others</label><input type="number" class="form-control" name="others" id="others" step="0.01"></div>
-                    </div>
-                </div>
-
-                <div class="section-box">
-                    <div class="section-box-title">Totals & Overtime</div>
-                    <div class="form-row form-row-4">
-                        <div class="form-group"><label>Bonus Applicable</label><select class="form-control" name="bonus_applicable" id="bonus_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
-                        <div class="form-group"><label>Overtime Applicable</label><select class="form-control" name="overtime_applicable" id="overtime_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
-                        <div class="form-group"><label>OT Weekend</label><select class="form-control" name="ot_weekend_applicable" id="ot_weekend_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
-                        <div class="form-group"><label>OT Holiday</label><select class="form-control" name="ot_holiday_applicable" id="ot_holiday_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
-                    </div>
-                </div>
-
-                <div class="section-box">
-                    <div class="section-box-title">Bank & Payment</div>
-                    <div class="form-row form-row-4">
-                        <div class="form-group"><label>Cash / Bank</label><select class="form-control" name="cash_bank" id="cash_bank"><option value="">--</option><option value="Cash">Cash</option><option value="Bank">Bank</option><option value="Both">Both</option></select></div>
-                        <div class="form-group"><label>Bank Name</label><input type="number" class="form-control" name="bank_name" id="bank_name"></div>
-                        <div class="form-group"><label>Branch Info</label><input type="text" class="form-control" name="branch_info" id="branch_info"></div>
-                        <div class="form-group"><label>Account No</label><input type="text" class="form-control" name="ac_no" id="ac_no"></div>
-                        <div class="form-group"><label>Cash Amount</label><input type="number" class="form-control" name="cash_amt" id="cash_amt" step="0.01"></div>
-                        <div class="form-group"><label>Bank Amount</label><input type="number" class="form-control" name="bank_amt" id="bank_amt" step="0.01"></div>
-                        <div class="form-group"><label>Cash</label><input type="number" class="form-control" name="cash" id="cash"></div>
-                    </div>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon purple">&#x1F4B5;</span> Other Allowances</div>
+                <div class="form-row form-row-4">
+                    <div class="form-group"><label>Transport Allowance</label><input type="number" class="form-control" name="transport_allowance" id="transport_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Fuel Allowance</label><input type="number" class="form-control" name="fuel_allowance" id="fuel_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Food Allowance</label><input type="number" class="form-control" name="food_allowance" id="food_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Mobile Allowance</label><input type="number" class="form-control" name="mobile_allowance" id="mobile_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Mobile Ceiling</label><input type="number" class="form-control" name="mobile_ceiling" id="mobile_ceiling" step="0.01"></div>
+                    <div class="form-group"><label>Special Allowance</label><input type="number" class="form-control" name="special_allowance" id="special_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Utility Allowance</label><input type="number" class="form-control" name="utility_allowance" id="utility_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Entertainment</label><input type="number" class="form-control" name="entertainment" id="entertainment" step="0.01"></div>
+                    <div class="form-group"><label>Contribution</label><input type="number" class="form-control" name="contribution" id="contribution" step="0.01"></div>
+                    <div class="form-group"><label>Dearness Allowance</label><input type="number" class="form-control" name="dearness_allowance" id="dearness_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Commission</label><input type="number" class="form-control" name="commission" id="commission" step="0.01"></div>
+                    <div class="form-group"><label>Children Edu Allowance</label><input type="number" class="form-control" name="children_edu_allowance" id="children_edu_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Responsibility Allowance</label><input type="number" class="form-control" name="responsibility_allowance" id="responsibility_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Superintendent Allowance</label><input type="number" class="form-control" name="superintendent_allowance" id="superintendent_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Servant Allowance</label><input type="number" class="form-control" name="servant_allowance" id="servant_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Comstry Allowance</label><input type="number" class="form-control" name="comstry_allowance" id="comstry_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Marketing Allowance</label><input type="number" class="form-control" name="marketing_allowance" id="marketing_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Realestate Allowance</label><input type="number" class="form-control" name="realestate_allowance" id="realestate_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Car Driver Allowance</label><input type="number" class="form-control" name="car_driver_allowance" id="car_driver_allowance" step="0.01"></div>
+                    <div class="form-group"><label>TA</label><input type="number" class="form-control" name="ta" id="ta" step="0.01"></div>
+                    <div class="form-group"><label>DA</label><input type="number" class="form-control" name="da" id="da" step="0.01"></div>
+                    <div class="form-group"><label>Other Allowance</label><input type="number" class="form-control" name="other_allowance" id="other_allowance" step="0.01"></div>
+                    <div class="form-group"><label>Others</label><input type="number" class="form-control" name="others" id="others" step="0.01"></div>
                 </div>
             </div>
 
-            </form>
-
-            <div class="step-nav">
-                <button type="button" class="btn btn-outline" id="bottomPrev" onclick="prevStep()">&larr; Previous</button>
-                <button type="button" class="btn btn-primary" id="bottomNext" onclick="nextStep()">Next &rarr;</button>
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon orange">&#x2699;</span> Totals & Overtime</div>
+                <div class="form-row form-row-4">
+                    <div class="form-group"><label>Bonus Applicable</label><select class="form-control" name="bonus_applicable" id="bonus_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                    <div class="form-group"><label>Overtime Applicable</label><select class="form-control" name="overtime_applicable" id="overtime_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                    <div class="form-group"><label>OT Weekend</label><select class="form-control" name="ot_weekend_applicable" id="ot_weekend_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                    <div class="form-group"><label>OT Holiday</label><select class="form-control" name="ot_holiday_applicable" id="ot_holiday_applicable"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                </div>
             </div>
+
+            <div class="sb-section">
+                <div class="sb-section-title"><span class="sb-icon green">&#x1F3E6;</span> Bank & Payment</div>
+                <div class="form-row form-row-4">
+                    <div class="form-group"><label>Cash / Bank</label><select class="form-control" name="cash_bank" id="cash_bank"><option value="">--</option><option value="Cash">Cash</option><option value="Bank">Bank</option><option value="Both">Both</option></select></div>
+                    <div class="form-group"><label>Bank Name</label><input type="number" class="form-control" name="bank_name" id="bank_name"></div>
+                    <div class="form-group"><label>Branch Info</label><input type="text" class="form-control" name="branch_info" id="branch_info"></div>
+                    <div class="form-group"><label>Account No</label><input type="text" class="form-control" name="ac_no" id="ac_no"></div>
+                    <div class="form-group"><label>Cash Amount</label><input type="number" class="form-control" name="cash_amt" id="cash_amt" step="0.01"></div>
+                    <div class="form-group"><label>Bank Amount</label><input type="number" class="form-control" name="bank_amt" id="bank_amt" step="0.01"></div>
+                    <div class="form-group"><label>Cash</label><input type="number" class="form-control" name="cash" id="cash"></div>
+                </div>
+            </div>
+        </div>
+
+        </form>
+
+        <div class="step-nav">
+            <button type="button" class="btn btn-outline" id="bottomPrev" onclick="prevStep()">&larr; Previous</button>
+            <button type="button" class="btn btn-primary" id="bottomNext" onclick="nextStep()">Next &rarr;</button>
         </div>
     </div>
 </div>

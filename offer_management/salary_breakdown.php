@@ -36,7 +36,44 @@ if ($proposal && $proposal['salary_breakdown']) {
     if (is_array($bd)) $breakdown = $bd;
 }
 
-$pageStyles  = '';
+$pageStyles  = '
+/* ===== HEADER ===== */
+.rp-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.rp-top h1{font-size:20px;font-weight:700;color:var(--gray-900);margin:0;white-space:nowrap}
+.rp-top h1 small{font-size:13px;font-weight:400;color:var(--gray-400);margin-left:8px}
+.rp-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rp-card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);overflow:hidden;padding:24px}
+.rp-empty{text-align:center;padding:48px 24px;color:var(--gray-400)}
+.rp-empty-icon{font-size:40px;margin-bottom:8px}
+.rp-empty h3{font-size:15px;color:var(--gray-600);margin:0 0 4px}
+.rp-empty p{font-size:13px;margin:0}
+/* Form sections */
+.sb-section{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--gray-100)}
+.sb-section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sb-section-title{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sb-section-title .sb-icon{width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sb-section-title .sb-icon.blue{background:#e8f0fe;color:var(--primary)}
+.sb-section-title .sb-icon.green{background:#e6f4ea;color:var(--success)}
+.sb-section-title .sb-icon.orange{background:#fef3e2;color:#e67e22}
+.sb-section-title .sb-icon.purple{background:#f0e6ff;color:#7c3aed}
+.sb-checks{display:flex;gap:20px;flex-wrap:wrap;padding-top:4px}
+.sb-checks label{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer}
+.sb-btn-row{display:flex;justify-content:flex-end;gap:10px;padding-top:20px;border-top:1px solid var(--gray-200)}
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+ .page-content{padding:16px}
+ .rp-top{flex-direction:column;align-items:stretch;gap:12px}
+ .rp-top h1{font-size:18px}
+ .rp-actions{width:100%}
+ .rp-card{padding:18px}
+}
+@media(max-width:480px){
+ .page-content{padding:12px}
+ .rp-card{padding:16px}
+ .sb-btn-row{flex-direction:column}
+ .sb-btn-row .btn{width:100%;justify-content:center}
+}
+';
 $candidateIdJson = json_encode($candidateId);
 $breakdownJson   = json_encode($breakdown);
 $pageScripts = <<<EOSCRIPT
@@ -186,143 +223,135 @@ document.addEventListener("DOMContentLoaded", loadExistingData);
 EOSCRIPT;
 ob_start();
 ?>
-
-<div class="card">
-    <div class="card-header">
-        <h2><?= $isRevise ? 'Revise' : 'Create' ?> Salary Proposal</h2>
+<div class="rp-top">
+    <h1><?= $isRevise ? 'Revise' : 'Create' ?> Salary Proposal</h1>
+    <div class="rp-actions">
         <a href="proposal.php" class="btn btn-sm btn-outline">&larr; Back to List</a>
-    </div>
-    <div class="card-body">
-        <?php if (!$candidate && !$proposal): ?>
-            <div class="empty-state">
-                <div class="empty-icon">&#9888;&#65039;</div>
-                <p>No candidate selected. <a href="proposal.php">Go back to proposal list</a>.</p>
-            </div>
-        <?php else: ?>
-        <form id="proposalForm" autocomplete="off">
-
-            <div class="form-section">
-                <div class="form-section-title">
-                    <span class="section-icon">&#128100;</span> Candidate Information
-                </div>
-                <div class="form-row-4">
-                    <div class="form-group">
-                        <label>Candidate</label>
-                        <input type="text" class="form-control" value="<?= htmlspecialchars(($candidate['first_name'] ?? '') . ' ' . ($candidate['last_name'] ?? '')) ?>" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Job Title</label>
-                        <input type="text" class="form-control" value="<?= htmlspecialchars($candidate['job_title'] ?? 'N/A') ?>" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Expected Salary</label>
-                        <input type="text" class="form-control" value="<?= htmlspecialchars($candidate['expected_salary'] ?? '') ?>" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Gender</label>
-                        <select class="form-control" id="gender" onchange="calculateSalary()">
-                            <option value="male" <?= ($breakdown['gender'] ?? 'male') === 'male' ? 'selected' : '' ?>>Male</option>
-                            <option value="female" <?= ($breakdown['gender'] ?? '') === 'female' ? 'selected' : '' ?>>Female</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <div class="form-section-title">
-                    <span class="section-icon">&#128176;</span> Salary Breakdown
-                </div>
-                <div class="form-row-3">
-                    <div class="form-group">
-                        <label>Gross Salary <span class="required">*</span></label>
-                        <input type="number" class="form-control" id="gross-salary" placeholder="Enter gross salary" oninput="calculateSalary()" style="font-weight:600;font-size:15px" value="<?= htmlspecialchars($breakdown['gross_salary'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>Basic Salary</label>
-                        <input type="number" class="form-control" id="basic-salary" placeholder="Auto-calculated" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>House Rent</label>
-                        <input type="number" class="form-control" id="house_rent" placeholder="Auto-calculated" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Medical Allowance</label>
-                        <input type="number" class="form-control" id="medical_allowance" placeholder="Auto-calculated" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Conveyance Allowance</label>
-                        <input type="number" class="form-control" id="convenience" placeholder="Auto-calculated" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Total Salary</label>
-                        <input type="number" class="form-control" id="total_salary" placeholder="Auto-calculated" readonly>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <div class="form-section-title">
-                    <span class="section-icon">&#128200;</span> Deductions &amp; Overtime
-                </div>
-                <div class="form-row-3">
-                    <div class="form-group">
-                        <label>Personal PF</label>
-                        <input type="number" class="form-control" id="personal_pf" placeholder="0" oninput="calculateTotalPayable()" value="<?= htmlspecialchars($breakdown['personal_pf'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>Company PF</label>
-                        <input type="number" class="form-control" id="company_pf" placeholder="0" value="<?= htmlspecialchars($breakdown['company_pf'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>PF Deductible</label>
-                        <input type="number" class="form-control" id="pf_deductible" placeholder="0" oninput="calculateTotalPayable()" value="<?= htmlspecialchars($breakdown['pf_deductible'] ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>Monthly Income Tax</label>
-                        <input type="number" class="form-control" id="monthly_tax" placeholder="Auto-calculated" readonly>
-                    </div>
-                </div>
-                <div style="display:flex;gap:20px;flex-wrap:wrap;padding-top:4px">
-                    <label class="flex" style="align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer">
-                        <input type="checkbox" id="pf_applicable" <?= !empty($breakdown['pf_applicable']) ? 'checked' : '' ?>> PF Applicable
-                    </label>
-                    <label class="flex" style="align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer">
-                        <input type="checkbox" id="ot_out" <?= !empty($breakdown['ot_applicable_out']) ? 'checked' : '' ?>> OT (Out)
-                    </label>
-                    <label class="flex" style="align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer">
-                        <input type="checkbox" id="ot_holiday" <?= !empty($breakdown['ot_holiday']) ? 'checked' : '' ?>> OT Holiday
-                    </label>
-                    <label class="flex" style="align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer">
-                        <input type="checkbox" id="ot_weekend" <?= !empty($breakdown['ot_weekend']) ? 'checked' : '' ?>> OT Weekend
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <div class="form-section-title">
-                    <span class="section-icon">&#9989;</span> Summary
-                </div>
-                <div class="form-row-2">
-                    <div class="form-group">
-                        <label>Total Payable</label>
-                        <input type="number" class="form-control" id="total_payable" placeholder="0" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Negotiation Notes</label>
-                        <textarea class="form-control" id="negotiation_notes" rows="3" placeholder="Any notes on negotiation..."><?= htmlspecialchars($breakdown['negotiation_notes'] ?? $proposal['negotiation_notes'] ?? '') ?></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="btn-group" style="padding-top:20px;border-top:1px solid var(--gray-200)">
-                <a href="proposal.php" class="btn btn-outline">Cancel</a>
-                <button type="button" class="btn btn-primary" onclick="saveProposal()">Save Proposal</button>
-            </div>
-        </form>
-        <?php endif; ?>
     </div>
 </div>
 
+<div class="rp-card">
+    <?php if (!$candidate && !$proposal): ?>
+        <div class="rp-empty">
+            <div class="rp-empty-icon">&#9888;&#65039;</div>
+            <h3>No candidate selected</h3>
+            <p><a href="proposal.php">Go back to proposal list</a>.</p>
+        </div>
+    <?php else: ?>
+    <form id="proposalForm" autocomplete="off">
+
+        <div class="sb-section">
+            <div class="sb-section-title">
+                <span class="sb-icon blue">&#x1F464;</span> Candidate Information
+            </div>
+            <div class="form-row-4">
+                <div class="form-group">
+                    <label>Candidate</label>
+                    <input type="text" class="form-control" value="<?= htmlspecialchars(($candidate['first_name'] ?? '') . ' ' . ($candidate['last_name'] ?? '')) ?>" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Job Title</label>
+                    <input type="text" class="form-control" value="<?= htmlspecialchars($candidate['job_title'] ?? 'N/A') ?>" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Expected Salary</label>
+                    <input type="text" class="form-control" value="<?= htmlspecialchars($candidate['expected_salary'] ?? '') ?>" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select class="form-control" id="gender" onchange="calculateSalary()">
+                        <option value="male" <?= ($breakdown['gender'] ?? 'male') === 'male' ? 'selected' : '' ?>>Male</option>
+                        <option value="female" <?= ($breakdown['gender'] ?? '') === 'female' ? 'selected' : '' ?>>Female</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="sb-section">
+            <div class="sb-section-title">
+                <span class="sb-icon green">&#x1F4B0;</span> Salary Breakdown
+            </div>
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label>Gross Salary <span class="required">*</span></label>
+                    <input type="number" class="form-control" id="gross-salary" placeholder="Enter gross salary" oninput="calculateSalary()" style="font-weight:600;font-size:15px" value="<?= htmlspecialchars($breakdown['gross_salary'] ?? '') ?>">
+                </div>
+                <div class="form-group">
+                    <label>Basic Salary</label>
+                    <input type="number" class="form-control" id="basic-salary" placeholder="Auto-calculated" readonly>
+                </div>
+                <div class="form-group">
+                    <label>House Rent</label>
+                    <input type="number" class="form-control" id="house_rent" placeholder="Auto-calculated" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Medical Allowance</label>
+                    <input type="number" class="form-control" id="medical_allowance" placeholder="Auto-calculated" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Conveyance Allowance</label>
+                    <input type="number" class="form-control" id="convenience" placeholder="Auto-calculated" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Total Salary</label>
+                    <input type="number" class="form-control" id="total_salary" placeholder="Auto-calculated" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="sb-section">
+            <div class="sb-section-title">
+                <span class="sb-icon orange">&#x1F4C8;</span> Deductions &amp; Overtime
+            </div>
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label>Personal PF</label>
+                    <input type="number" class="form-control" id="personal_pf" placeholder="0" oninput="calculateTotalPayable()" value="<?= htmlspecialchars($breakdown['personal_pf'] ?? '') ?>">
+                </div>
+                <div class="form-group">
+                    <label>Company PF</label>
+                    <input type="number" class="form-control" id="company_pf" placeholder="0" value="<?= htmlspecialchars($breakdown['company_pf'] ?? '') ?>">
+                </div>
+                <div class="form-group">
+                    <label>PF Deductible</label>
+                    <input type="number" class="form-control" id="pf_deductible" placeholder="0" oninput="calculateTotalPayable()" value="<?= htmlspecialchars($breakdown['pf_deductible'] ?? '') ?>">
+                </div>
+                <div class="form-group">
+                    <label>Monthly Income Tax</label>
+                    <input type="number" class="form-control" id="monthly_tax" placeholder="Auto-calculated" readonly>
+                </div>
+            </div>
+            <div class="sb-checks">
+                <label><input type="checkbox" id="pf_applicable" <?= !empty($breakdown['pf_applicable']) ? 'checked' : '' ?>> PF Applicable</label>
+                <label><input type="checkbox" id="ot_out" <?= !empty($breakdown['ot_applicable_out']) ? 'checked' : '' ?>> OT (Out)</label>
+                <label><input type="checkbox" id="ot_holiday" <?= !empty($breakdown['ot_holiday']) ? 'checked' : '' ?>> OT Holiday</label>
+                <label><input type="checkbox" id="ot_weekend" <?= !empty($breakdown['ot_weekend']) ? 'checked' : '' ?>> OT Weekend</label>
+            </div>
+        </div>
+
+        <div class="sb-section">
+            <div class="sb-section-title">
+                <span class="sb-icon purple">&#x2705;</span> Summary
+            </div>
+            <div class="form-row-2">
+                <div class="form-group">
+                    <label>Total Payable</label>
+                    <input type="number" class="form-control" id="total_payable" placeholder="0" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Negotiation Notes</label>
+                    <textarea class="form-control" id="negotiation_notes" rows="3" placeholder="Any notes on negotiation..."><?= htmlspecialchars($breakdown['negotiation_notes'] ?? $proposal['negotiation_notes'] ?? '') ?></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="sb-btn-row">
+            <a href="proposal.php" class="btn btn-outline">Cancel</a>
+            <button type="button" class="btn btn-primary" onclick="saveProposal()">Save Proposal</button>
+        </div>
+    </form>
+    <?php endif; ?>
+</div>
 <?php
 $content = ob_get_clean();
 require_once __DIR__ . '/../includes/layout.php';

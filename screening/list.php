@@ -189,9 +189,9 @@ function sortData(arr, getter) {
     });
 }
 
-function updateSortArrows(count) {
+function updateSortArrows(count, prefix) {
     for (var i = 0; i < count; i++) {
-        var el = document.getElementById("sortArrow" + i);
+        var el = document.getElementById(prefix + "SortArrow" + i);
         if (!el) continue;
         if (i === sortCol) {
             el.textContent = sortDir === "asc" ? "\u25B2" : "\u25BC";
@@ -356,7 +356,7 @@ function renderUpcoming() {
 
     renderUpcomingMobileCards(pageData);
     renderPaginationBar("paginationUpcoming", filtered.length, totalPages);
-    updateSortArrows(4);
+    updateSortArrows(4, "upcoming");
 }
 
 function renderCompleteMobileCards(pageData) {
@@ -415,7 +415,7 @@ function renderComplete() {
 
     renderCompleteMobileCards(pageData);
     renderPaginationBar("paginationComplete", filtered.length, totalPages);
-    updateSortArrows(5);
+    updateSortArrows(5, "complete");
 }
 
 window.openScreening = function(candidateId, screeningId) {
@@ -549,10 +549,10 @@ ob_start();
             <table class="rp-table" id="upcomingTable">
                 <thead>
                     <tr>
-                        <th class="rp-sortable" onclick="sortBy(0)">Candidate <span class="rp-sort-arrow" id="sortArrow0"></span></th>
-                        <th class="rp-sortable" onclick="sortBy(1)">Job <span class="rp-sort-arrow" id="sortArrow1"></span></th>
-                        <th class="rp-sortable" onclick="sortBy(2)">Applied Date <span class="rp-sort-arrow" id="sortArrow2"></span></th>
-                        <th class="rp-sortable" onclick="sortBy(3)">Status <span class="rp-sort-arrow" id="sortArrow3"></span></th>
+                        <th class="rp-sortable" onclick="sortBy(0)">Candidate <span class="rp-sort-arrow" id="upcomingSortArrow0"></span></th>
+                        <th class="rp-sortable" onclick="sortBy(1)">Job <span class="rp-sort-arrow" id="upcomingSortArrow1"></span></th>
+                        <th class="rp-sortable" onclick="sortBy(2)">Applied Date <span class="rp-sort-arrow" id="upcomingSortArrow2"></span></th>
+                        <th class="rp-sortable" onclick="sortBy(3)">Status <span class="rp-sort-arrow" id="upcomingSortArrow3"></span></th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -580,11 +580,11 @@ ob_start();
             <table class="rp-table" id="completeTable">
                 <thead>
                     <tr>
-                        <th class="rp-sortable" onclick="sortBy(0)">Candidate <span class="rp-sort-arrow" id="sortArrow0"></span></th>
-                        <th class="rp-sortable" onclick="sortBy(1)">Job <span class="rp-sort-arrow" id="sortArrow1"></span></th>
-                        <th class="rp-sortable" onclick="sortBy(2)">Applied Date <span class="rp-sort-arrow" id="sortArrow2"></span></th>
-                        <th class="rp-sortable" onclick="sortBy(3)">Result <span class="rp-sort-arrow" id="sortArrow3"></span></th>
-                        <th class="rp-sortable" onclick="sortBy(4)">Screened On <span class="rp-sort-arrow" id="sortArrow4"></span></th>
+                        <th class="rp-sortable" onclick="sortBy(0)">Candidate <span class="rp-sort-arrow" id="completeSortArrow0"></span></th>
+                        <th class="rp-sortable" onclick="sortBy(1)">Job <span class="rp-sort-arrow" id="completeSortArrow1"></span></th>
+                        <th class="rp-sortable" onclick="sortBy(2)">Applied Date <span class="rp-sort-arrow" id="completeSortArrow2"></span></th>
+                        <th class="rp-sortable" onclick="sortBy(3)">Result <span class="rp-sort-arrow" id="completeSortArrow3"></span></th>
+                        <th class="rp-sortable" onclick="sortBy(4)">Screened On <span class="rp-sort-arrow" id="completeSortArrow4"></span></th>
                         <th>Actions</th>
                     </tr>
                 </thead>

@@ -4,34 +4,127 @@ $pageTitle   = 'Interview';
 $activePage  = 'interview';
 $breadcrumb  = 'Home / Recruitment / Interview';
 $pageStyles  = '
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
-.stat-card { background: #fff; border-radius: 8px; padding: 16px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.08); display: flex; align-items: center; gap: 12px; }
-.stat-card .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.stat-card .stat-icon.blue { background: #e8f0fe; color: var(--primary); }
-.stat-card .stat-icon.green { background: #e6f4ea; color: var(--success); }
-.stat-card .stat-icon.yellow { background: #fef7e0; color: var(--warning); }
-.stat-card .stat-icon.red { background: #fce8e6; color: var(--danger); }
-.stat-card .stat-icon.purple { background: #f3e8fd; color: #7c3aed; }
-.stat-card .stat-info h3 { font-size: 20px; font-weight: 700; line-height: 1.2; }
-.stat-card .stat-info p { font-size: 11px; color: var(--gray-500); }
-.filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.score-grid .form-group { margin-bottom: 0; }
-.overall-rating { text-align: center; padding: 12px; background:#f8f9fa; border-radius:8px; margin:12px 0; }
-.overall-rating .or-value { font-size: 28px; font-weight:700; color:var(--primary); }
-.overall-rating .or-label { font-size: 11px; color:var(--gray-500); text-transform:uppercase; letter-spacing:.5px; }
-.final-badge { font-size:10px; background:#e8f0fe; color:var(--primary); padding:2px 8px; border-radius:4px; font-weight:600; }
-.pagination-bar { display:flex; align-items:center; justify-content:space-between; margin-top:16px; flex-wrap:wrap; gap:10px; }
-.pagination-bar .page-info { font-size:13px; color:var(--gray-500); }
-.pagination-bar .page-btns { display:flex; gap:4px; align-items:center; }
-.pagination-bar .page-btn { min-width:32px; height:32px; padding:0 10px; border:1px solid var(--gray-200); border-radius:6px; background:#fff; font-size:13px; cursor:pointer; color:var(--gray-700); transition:var(--transition); font-family:inherit; }
-.pagination-bar .page-btn:hover { border-color:var(--primary); color:var(--primary); }
-.pagination-bar .page-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
-.pagination-bar .page-btn:disabled { opacity:.4; cursor:default; }
-.pagination-bar .per-page { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-500); }
-.pagination-bar .per-page select { padding:4px 8px; border:1px solid var(--gray-200); border-radius:4px; font-size:13px; font-family:inherit; }
-@media (max-width:768px){ .score-grid { grid-template-columns: 1fr; gap: 8px; } }
-@media (max-width:480px){ .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } .stat-card { padding: 12px; gap: 8px; } .stat-card .stat-icon { width: 34px; height: 34px; font-size: 15px; } .stat-card .stat-info h3 { font-size: 17px; } }
+/* ===== COUNT CARDS ===== */
+.cc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:24px}
+.cc-card{background:#fff;border-radius:10px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:14px;border-left:4px solid var(--gray-200);transition:box-shadow .2s,transform .15s}
+.cc-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08);transform:translateY(-1px)}
+.cc-card .cc-num{font-size:26px;font-weight:700;line-height:1;color:var(--gray-900)}
+.cc-card .cc-label{font-size:12px;color:var(--gray-500);font-weight:500;margin-top:2px}
+.cc-card.cc-schedule{border-left-color:var(--primary)}
+.cc-card.cc-schedule .cc-num{color:var(--primary)}
+.cc-card.cc-feedback{border-left-color:#f59e0b}
+.cc-card.cc-feedback .cc-num{color:#f59e0b}
+.cc-card.cc-next{border-left-color:#8b5cf6}
+.cc-card.cc-next .cc-num{color:#8b5cf6}
+.cc-card.cc-done{border-left-color:var(--success)}
+.cc-card.cc-done .cc-num{color:var(--success)}
+/* ===== HEADER ===== */
+.rp-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.rp-top h1{font-size:20px;font-weight:700;color:var(--gray-900);margin:0;white-space:nowrap}
+.rp-top h1 small{font-size:13px;font-weight:400;color:var(--gray-400);margin-left:8px}
+.rp-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rp-search{position:relative}
+.rp-search input{width:260px;padding:9px 12px 9px 36px;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;background:#fff;outline:none;transition:border-color .2s,box-shadow .2s;font-family:inherit}
+.rp-search input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.rp-search .rp-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:14px;pointer-events:none}
+.rp-search .rp-search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:16px;display:none;padding:2px;line-height:1}
+.rp-search .rp-search-clear:hover{color:var(--gray-700)}
+/* Table card */
+.rp-card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);overflow:hidden}
+.rp-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.rp-table{width:100%;border-collapse:collapse}
+.rp-table thead th{background:var(--gray-50);padding:12px 16px;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px;text-align:left;border-bottom:1px solid var(--gray-100);white-space:nowrap;position:sticky;top:0;z-index:1}
+.rp-table thead th.rp-sortable{cursor:pointer;user-select:none;transition:color .15s}
+.rp-table thead th.rp-sortable:hover{color:var(--primary)}
+.rp-table thead th.rp-sorted{color:var(--primary)}
+.rp-sort-arrow{font-size:10px;margin-left:4px;opacity:.5}
+.rp-sorted .rp-sort-arrow{opacity:1}
+.rp-table tbody tr{border-bottom:1px solid var(--gray-50);transition:background .15s}
+.rp-table tbody tr:last-child{border-bottom:none}
+.rp-table tbody tr:hover{background:var(--gray-50)}
+.rp-table td{padding:14px 16px;font-size:13px;color:var(--gray-700);vertical-align:middle}
+.rp-table td strong{color:var(--gray-900);font-weight:600}
+.rp-table .rp-actions-cell{display:flex;gap:6px;white-space:nowrap}
+.rp-table .rp-btn-text{padding:6px 12px;border-radius:6px;border:1px solid var(--gray-200);background:#fff;cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;color:var(--gray-600);font-family:inherit}
+.rp-table .rp-btn-text:hover{border-color:var(--primary);color:var(--primary);background:rgba(37,99,235,.04)}
+.rp-table .rp-btn-text.rp-btn-primary{border-color:var(--primary);color:var(--primary);background:rgba(37,99,235,.04)}
+.rp-table .rp-btn-text.rp-btn-primary:hover{background:var(--primary);color:#fff}
+.rp-empty{text-align:center;padding:48px 24px;color:var(--gray-400)}
+.rp-empty-icon{font-size:40px;margin-bottom:8px}
+.rp-empty h3{font-size:15px;color:var(--gray-600);margin:0 0 4px}
+.rp-empty p{font-size:13px;margin:0}
+/* Pagination */
+.rp-pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-top:1px solid var(--gray-100);flex-wrap:wrap;gap:10px}
+.rp-pg-info{font-size:13px;color:var(--gray-500)}
+.rp-pg-center{display:flex;align-items:center;gap:6px}
+.rp-pg-btn{min-width:32px;height:32px;padding:0 10px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;font-size:13px;cursor:pointer;color:var(--gray-600);transition:all .15s;font-family:inherit;display:inline-flex;align-items:center;justify-content:center}
+.rp-pg-btn:hover:not(:disabled){border-color:var(--primary);color:var(--primary)}
+.rp-pg-btn.rp-active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.rp-pg-btn:disabled{opacity:.35;cursor:default}
+.rp-pg-rows{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--gray-500)}
+.rp-pg-rows select{padding:5px 8px;border:1px solid var(--gray-200);border-radius:6px;font-size:13px;font-family:inherit;background:#fff;cursor:pointer}
+/* Mobile cards */
+.rp-mobile-list{display:none}
+/* Feedback modal */
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.score-grid .form-group{margin-bottom:0}
+.overall-rating{text-align:center;padding:12px;background:#f8f9fa;border-radius:8px;margin:12px 0}
+.overall-rating .or-value{font-size:28px;font-weight:700;color:var(--primary)}
+.overall-rating .or-label{font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px}
+.final-badge{font-size:10px;background:#e8f0fe;color:var(--primary);padding:2px 8px;border-radius:4px;font-weight:600}
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+ .rp-top h1{font-size:18px}
+ .rp-search input{width:200px}
+}
+@media(max-width:768px){
+ .page-content{padding:16px}
+ .cc-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+ .cc-card{padding:14px 14px;gap:10px}
+ .cc-card .cc-num{font-size:22px}
+ .rp-top{flex-direction:column;align-items:stretch;gap:12px}
+ .rp-top h1{font-size:18px}
+ .rp-top h1 small{display:block;margin:4px 0 0;font-size:12px}
+ .rp-actions{width:100%}
+ .rp-search{flex:1}
+ .rp-search input{width:100%!important}
+ .rp-table-wrap{display:none}
+ .rp-mobile-list{display:block}
+ .rp-mob-card{background:#fff;border-radius:10px;padding:16px;margin:8px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid var(--gray-100)}
+ .rp-mob-card:last-child{margin-bottom:16px}
+ .rp-mob-top{display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:10px}
+ .rp-mob-title{font-size:15px;font-weight:600;color:var(--gray-900);margin:0}
+ .rp-mob-title small{font-size:12px;font-weight:400;color:var(--gray-400);display:block;margin-top:2px}
+ .rp-mob-badges{display:flex;gap:6px;flex-shrink:0}
+ .rp-mob-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:12px}
+ .rp-mob-field label{display:block;font-size:11px;color:var(--gray-400);text-transform:uppercase;font-weight:600;letter-spacing:.3px}
+ .rp-mob-field span{font-size:13px;color:var(--gray-700);font-weight:500}
+ .rp-mob-footer{display:flex;gap:8px;padding-top:10px;border-top:1px solid var(--gray-100)}
+ .rp-mob-footer .btn{flex:1;justify-content:center;font-size:12px;padding:7px 12px}
+ .score-grid{grid-template-columns:1fr;gap:8px}
+ .iv-scores{grid-template-columns:1fr;gap:6px 12px}
+ .iv-meta{flex-direction:column;gap:6px}
+ .iv-score-item label{width:auto;flex-shrink:1}
+ .iv-score-item span{width:auto;flex-shrink:1}
+ .iv-card-header{flex-direction:column;align-items:flex-start;gap:4px}
+ .iv-card-header-right{width:100%;justify-content:space-between}
+ .iv-date{white-space:normal}
+ .iv-footer{flex-direction:column;align-items:flex-start;gap:8px}
+}
+@media(max-width:480px){
+ .page-content{padding:12px}
+ .cc-grid{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+ .cc-card{padding:12px;gap:8px;border-left-width:3px}
+ .cc-card .cc-num{font-size:20px}
+ .cc-card .cc-label{font-size:11px}
+ .rp-top h1{font-size:16px}
+ .rp-mob-card{padding:14px;margin:6px 12px}
+ .rp-mob-grid{grid-template-columns:1fr;gap:8px}
+ .rp-mob-top{flex-direction:column}
+ .rp-pagination{flex-direction:column;align-items:center;gap:8px}
+ .rp-pg-center{flex-wrap:wrap;justify-content:center}
+ .rp-pg-rows{width:100%;justify-content:center}
+}
 ';
 
 $pageScripts = '
@@ -39,31 +132,84 @@ var candidatesData = [];
 var eligibleCandidates = [];
 var currentPage = 1;
 var perPage = 10;
+var sortCol = -1;
+var sortDir = "asc";
+
+function sortBy(col) {
+    if (sortCol === col) {
+        sortDir = sortDir === "asc" ? "desc" : "asc";
+    } else {
+        sortCol = col;
+        sortDir = "asc";
+    }
+    currentPage = 1;
+    renderTable();
+}
+
+function getSortVal(c) {
+    switch (sortCol) {
+        case 0: return ((c.first_name || "") + " " + (c.last_name || "")).toLowerCase();
+        case 1: return (c.job_title || "").toLowerCase();
+        case 2: return (c.round_name || "").toLowerCase();
+        case 3: return (c.type || "").toLowerCase();
+        case 4: return (c.interviewer || "").toLowerCase();
+        case 5: return c.date || "";
+        case 6: return (c.action_state || "").toLowerCase();
+        case 7: return (c.decision || "").toLowerCase();
+        default: return "";
+    }
+}
+
+function sortData(arr) {
+    if (sortCol < 0) return arr;
+    return arr.slice().sort(function(a, b) {
+        var va = getSortVal(a);
+        var vb = getSortVal(b);
+        if (va < vb) return sortDir === "asc" ? -1 : 1;
+        if (va > vb) return sortDir === "asc" ? 1 : -1;
+        return 0;
+    });
+}
 
 function getFilteredData() {
     var q = document.getElementById("searchInput").value.trim().toLowerCase();
-    return candidatesData.filter(function(c) {
-        var name = (c.first_name + " " + c.last_name + " " + (c.job_title || "")).toLowerCase();
+    var list = candidatesData.filter(function(c) {
+        var name = ((c.first_name || "") + " " + (c.last_name || "") + " " + (c.job_title || "") + " " + (c.interviewer || "") + " " + (c.type || "") + " " + (c.round_name || "")).toLowerCase();
         return !q || name.indexOf(q) !== -1;
     });
+    return sortData(list);
+}
+
+function updateSortArrows() {
+    for (var i = 0; i <= 7; i++) {
+        var el = document.getElementById("sortArrow" + i);
+        if (!el) continue;
+        if (i === sortCol) {
+            el.textContent = sortDir === "asc" ? "\u25B2" : "\u25BC";
+            el.parentNode.classList.add("rp-sorted");
+        } else {
+            el.textContent = "\u2195";
+            el.parentNode.classList.remove("rp-sorted");
+        }
+    }
 }
 
 function renderPaginationBar(total, totalPages) {
     if (totalPages <= 1) { document.getElementById("paginationBar").innerHTML = ""; return; }
     var html = "";
-    html += "<div class=\"page-info\">Showing page " + currentPage + " of " + totalPages + " (" + total + " total)</div>";
-    html += "<div class=\"page-btns\">";
-    html += "<button class=\"page-btn\" onclick=\"goToPage(1)\" " + (currentPage <= 1 ? "disabled" : "") + ">&#xAB;</button>";
-    html += "<button class=\"page-btn\" onclick=\"goToPage(" + (currentPage - 1) + ")\" " + (currentPage <= 1 ? "disabled" : "") + ">&#x2039;</button>";
+    html += "<div class=\"rp-pg-info\">Page " + currentPage + " of " + totalPages + " &middot; " + total + " total</div>";
+    html += "<div class=\"rp-pg-center\">";
+    html += "<button class=\"rp-pg-btn\" onclick=\"goToPage(1)\" " + (currentPage <= 1 ? "disabled" : "") + " title=\"First\">&laquo;</button>";
+    html += "<button class=\"rp-pg-btn\" onclick=\"goToPage(" + (currentPage - 1) + ")\" " + (currentPage <= 1 ? "disabled" : "") + " title=\"Prev\">&lsaquo;</button>";
     var start = Math.max(1, currentPage - 2);
     var end = Math.min(totalPages, currentPage + 2);
     for (var p = start; p <= end; p++) {
-        html += "<button class=\"page-btn" + (p === currentPage ? " active" : "") + "\" onclick=\"goToPage(" + p + ")\">" + p + "</button>";
+        html += "<button class=\"rp-pg-btn" + (p === currentPage ? " rp-active" : "") + "\" onclick=\"goToPage(" + p + ")\">" + p + "</button>";
     }
-    html += "<button class=\"page-btn\" onclick=\"goToPage(" + (currentPage + 1) + ")\" " + (currentPage >= totalPages ? "disabled" : "") + ">&#x203A;</button>";
-    html += "<button class=\"page-btn\" onclick=\"goToPage(" + totalPages + ")\" " + (currentPage >= totalPages ? "disabled" : "") + ">&#xBB;</button>";
+    html += "<button class=\"rp-pg-btn\" onclick=\"goToPage(" + (currentPage + 1) + ")\" " + (currentPage >= totalPages ? "disabled" : "") + " title=\"Next\">&rsaquo;</button>";
+    html += "<button class=\"rp-pg-btn\" onclick=\"goToPage(" + totalPages + ")\" " + (currentPage >= totalPages ? "disabled" : "") + " title=\"Last\">&raquo;</button>";
     html += "</div>";
-    html += "<div class=\"per-page\">Rows: <select onchange=\"changePerPage(this.value)\">";
+    html += "<div class=\"rp-pg-rows\">Show <select onchange=\"changePerPage(this.value)\">";
     [10, 20, 50, 100].forEach(function(n) {
         html += "<option value=\"" + n + "\"" + (n === perPage ? " selected" : "") + ">" + n + "</option>";
     });
@@ -88,8 +234,98 @@ function changePerPage(n) {
 }
 
 function applyFilters() {
+    document.getElementById("searchClear").style.display = document.getElementById("searchInput").value.length > 0 ? "block" : "none";
     currentPage = 1;
     renderTable();
+}
+
+function clearSearch() {
+    document.getElementById("searchInput").value = "";
+    document.getElementById("searchClear").style.display = "none";
+    currentPage = 1;
+    renderTable();
+}
+
+function renderStats() {
+    var stats = { schedule: 0, feedback: 0, next_round: 0, done: 0 };
+    candidatesData.forEach(function(c) {
+        var st = c.action_state;
+        stats[st] = (stats[st] || 0) + 1;
+    });
+    document.getElementById("ccSchedule").textContent = stats.schedule || 0;
+    document.getElementById("ccFeedback").textContent = stats.feedback || 0;
+    document.getElementById("ccNext").textContent = stats.next_round || 0;
+    document.getElementById("ccDone").textContent = stats.done || 0;
+}
+
+function getStatusInfo(c) {
+    var statusLabel, statusBadgeClass;
+    if (!c.interview_id) {
+        statusLabel = "Not Scheduled";
+        statusBadgeClass = "badge-pending";
+    } else if (c.interview_status === "Waiting for Feedback") {
+        statusLabel = "Waiting for Feedback";
+        statusBadgeClass = "badge-pending";
+    } else if (c.interview_status === "Completed" && c.decision === "Pass") {
+        statusLabel = c.is_final_round ? "Selected" : "Passed";
+        statusBadgeClass = c.is_final_round ? "badge-success" : getBadgeClass("Pass");
+    } else if (c.interview_status === "Completed" && c.decision === "Fail") {
+        statusLabel = "Rejected";
+        statusBadgeClass = "badge-danger";
+    } else if (c.interview_status === "Completed" && c.decision === "Hold") {
+        statusLabel = "On Hold";
+        statusBadgeClass = "badge-warning";
+    } else {
+        statusLabel = c.interview_status || "-";
+        statusBadgeClass = getBadgeClass(statusLabel);
+    }
+    return { label: statusLabel, cls: statusBadgeClass };
+}
+
+function renderMobileCards(pageData) {
+    var container = document.getElementById("mobileList");
+    if (pageData.length === 0) {
+        container.innerHTML = "<div class=\"rp-empty\"><div class=\"rp-empty-icon\">&#x1F4C5;</div><h3>No candidates found</h3><p>Try adjusting your search</p></div>";
+        return;
+    }
+    var html = "";
+    pageData.forEach(function(c) {
+        var name = c.first_name + " " + c.last_name;
+        var roundLabel = c.round_name || (c.round ? "Round " + c.round : "-");
+        var finalLabel = c.is_final_round ? " <span class=\"final-badge\">FINAL</span>" : "";
+        var st = getStatusInfo(c);
+        var statusBadge = "<span class=\"badge " + st.cls + "\">" + st.label + "</span>";
+        var decisionHtml = c.decision ? "<span class=\"badge " + getBadgeClass(c.decision) + "\">" + c.decision + "</span>" : "-";
+
+        var actionsHtml = "";
+        if (c.action_state === "schedule") {
+            actionsHtml = "<button class=\"btn btn-primary btn-sm\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Schedule Interview\',false)\">Schedule</button>";
+        } else if (c.action_state === "feedback") {
+            actionsHtml = "<button class=\"btn btn-primary btn-sm\" onclick=\"window.openFeedback(" + c.interview_id + ")\">Feedback</button>";
+        } else if (c.action_state === "next_round") {
+            actionsHtml = "<button class=\"btn btn-primary btn-sm\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Next Round Interview\',false)\">Next Round</button>";
+        } else {
+            if (c.decision === "Fail" || c.decision === "Hold") {
+                actionsHtml = "<button class=\"btn btn-primary btn-sm\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Reschedule Interview\',true," + (c.interview_id || 0) + ")\">Reschedule</button>";
+            }
+        }
+        actionsHtml += "<button class=\"btn btn-outline btn-sm\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
+
+        html += "<div class=\"rp-mob-card\">";
+        html += "<div class=\"rp-mob-top\">";
+        html += "<div class=\"rp-mob-title\">" + name + "<small>" + (c.job_title || "N/A") + " &middot; " + roundLabel + finalLabel + "</small></div>";
+        html += "<div class=\"rp-mob-badges\">" + statusBadge + "</div>";
+        html += "</div>";
+        html += "<div class=\"rp-mob-grid\">";
+        html += "<div class=\"rp-mob-field\"><label>Type</label><span>" + (c.type || "-") + "</span></div>";
+        html += "<div class=\"rp-mob-field\"><label>Interviewer</label><span>" + (c.interviewer || "-") + "</span></div>";
+        html += "<div class=\"rp-mob-field\"><label>Date</label><span>" + (c.date ? formatDateTime(c.date) : "-") + "</span></div>";
+        html += "<div class=\"rp-mob-field\"><label>Decision</label><span>" + decisionHtml + "</span></div>";
+        html += "</div>";
+        html += "<div class=\"rp-mob-footer\">" + actionsHtml + "</div>";
+        html += "</div>";
+    });
+    container.innerHTML = html;
 }
 
 function renderTable() {
@@ -99,107 +335,66 @@ function renderTable() {
     var start = (currentPage - 1) * perPage;
     var pageData = filtered.slice(start, start + perPage);
 
+    document.getElementById("resultCount").textContent = filtered.length + " candidate" + (filtered.length !== 1 ? "s" : "");
+
     var tbody = document.getElementById("ivTableBody");
     tbody.innerHTML = "";
 
-    var stats = { schedule: 0, feedback: 0, next_round: 0, done: 0 };
-
-    candidatesData.forEach(function(c) {
-        var st = c.action_state;
-        stats[st] = (stats[st] || 0) + 1;
-    });
-
-    pageData.forEach(function(c) {
-        var name = c.first_name + " " + c.last_name;
-        var st = c.action_state;
-
-        var roundLabel = c.round_name || (c.round ? "Round " + c.round : "-");
-        var finalLabel = c.is_final_round ? " <span class=\"final-badge\">FINAL</span>" : "";
-        var dt = c.date ? formatDateTime(c.date) : "-";
-        var typeVal = c.type || "-";
-        var interviewerVal = c.interviewer || "-";
-
-        var statusLabel, statusBadgeClass;
-        if (!c.interview_id) {
-            statusLabel = "Not Scheduled";
-            statusBadgeClass = "badge-pending";
-        } else if (c.interview_status === "Waiting for Feedback") {
-            statusLabel = "Waiting for Feedback";
-            statusBadgeClass = "badge-pending";
-        } else if (c.interview_status === "Completed" && c.decision === "Pass") {
-            statusLabel = c.is_final_round ? "Selected" : "Passed";
-            statusBadgeClass = c.is_final_round ? "badge-success" : getBadgeClass("Pass");
-        } else if (c.interview_status === "Completed" && c.decision === "Fail") {
-            statusLabel = "Rejected";
-            statusBadgeClass = "badge-danger";
-        } else if (c.interview_status === "Completed" && c.decision === "Hold") {
-            statusLabel = "On Hold";
-            statusBadgeClass = "badge-warning";
-        } else {
-            statusLabel = c.interview_status || "-";
-            statusBadgeClass = getBadgeClass(statusLabel);
-        }
-
-        var decisionHtml = c.decision
-            ? "<span class=\"badge " + getBadgeClass(c.decision) + "\">" + c.decision + "</span>"
-            : "-";
-
-        var actionsHtml = "";
-        if (st === "schedule") {
-            actionsHtml =
-                "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Schedule Interview\',false)\" style=\"margin-right:4px\">Schedule</button>" +
-                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
-        } else if (st === "feedback") {
-            actionsHtml =
-                "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openFeedback(" + c.interview_id + ")\" style=\"margin-right:4px\">Feedback</button>" +
-                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.editInterview(" + c.interview_id + ")\" style=\"margin-right:4px\">Edit Schedule</button>" +
-                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
-        } else if (st === "next_round") {
-            actionsHtml =
-                "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Next Round Interview\',false)\" style=\"margin-right:4px\">Next Round</button>" +
-                "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
-        } else {
-            if (c.decision === "Fail" || c.decision === "Hold") {
-                actionsHtml =
-                    "<button class=\"btn btn-sm btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Reschedule Interview\',true," + (c.interview_id || 0) + ")\" style=\"margin-right:4px\">Reschedule</button>" +
-                    "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
-            } else {
-                actionsHtml = "<button class=\"btn btn-sm btn-outline\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
-            }
-        }
-
-        var tr = document.createElement("tr");
-        tr.innerHTML =
-            "<td><strong>" + name + "</strong></td>" +
-            "<td>" + (c.job_title || "N/A") + "</td>" +
-            "<td>" + roundLabel + finalLabel + "</td>" +
-            "<td>" + typeVal + "</td>" +
-            "<td>" + interviewerVal + "</td>" +
-            "<td>" + dt + "</td>" +
-            "<td><span class=\"badge " + statusBadgeClass + "\">" + statusLabel + "</span></td>" +
-            "<td>" + decisionHtml + "</td>" +
-            "<td style=\"white-space:nowrap\">" + actionsHtml + "</td>";
-        tbody.appendChild(tr);
-    });
-
     if (pageData.length === 0) {
-        var cols = document.querySelectorAll("#interviewTable thead th").length;
-        tbody.innerHTML = "<tr><td colspan=\"" + cols + "\" style=\"text-align:center;padding:32px;color:var(--gray-400)\">No candidates found</td></tr>";
+        tbody.innerHTML = "<tr><td colspan=\"9\"><div class=\"rp-empty\"><div class=\"rp-empty-icon\">&#x1F4C5;</div><h3>No candidates found</h3><p>Try adjusting your search or schedule a new interview</p></div></td></tr>";
+    } else {
+        pageData.forEach(function(c) {
+            var name = c.first_name + " " + c.last_name;
+            var roundLabel = c.round_name || (c.round ? "Round " + c.round : "-");
+            var finalLabel = c.is_final_round ? " <span class=\"final-badge\">FINAL</span>" : "";
+            var dt = c.date ? formatDateTime(c.date) : "-";
+            var st = getStatusInfo(c);
+            var decisionHtml = c.decision ? "<span class=\"badge " + getBadgeClass(c.decision) + "\">" + c.decision + "</span>" : "-";
+
+            var actionsHtml = "";
+            if (c.action_state === "schedule") {
+                actionsHtml = "<button class=\"rp-btn-text rp-btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Schedule Interview\',false)\">Schedule</button>";
+                actionsHtml += "<button class=\"rp-btn-text\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
+            } else if (c.action_state === "feedback") {
+                actionsHtml = "<button class=\"rp-btn-text rp-btn-primary\" onclick=\"window.openFeedback(" + c.interview_id + ")\">Feedback</button>";
+                actionsHtml += "<button class=\"rp-btn-text\" onclick=\"window.editInterview(" + c.interview_id + ")\">Edit</button>";
+                actionsHtml += "<button class=\"rp-btn-text\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
+            } else if (c.action_state === "next_round") {
+                actionsHtml = "<button class=\"rp-btn-text rp-btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Next Round Interview\',false)\">Next Round</button>";
+                actionsHtml += "<button class=\"rp-btn-text\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
+            } else {
+                if (c.decision === "Fail" || c.decision === "Hold") {
+                    actionsHtml = "<button class=\"rp-btn-text rp-btn-primary\" onclick=\"window.openScheduleForCandidate(" + c.candidate_id + ",\'Reschedule Interview\',true," + (c.interview_id || 0) + ")\">Reschedule</button>";
+                }
+                actionsHtml += "<button class=\"rp-btn-text\" onclick=\"window.openCombinedView(" + c.candidate_id + ")\">View</button>";
+            }
+
+            var tr = document.createElement("tr");
+            tr.innerHTML =
+                "<td><strong>" + name + "</strong></td>" +
+                "<td>" + (c.job_title || "N/A") + "</td>" +
+                "<td>" + roundLabel + finalLabel + "</td>" +
+                "<td>" + (c.type || "-") + "</td>" +
+                "<td>" + (c.interviewer || "-") + "</td>" +
+                "<td>" + dt + "</td>" +
+                "<td><span class=\"badge " + st.cls + "\">" + st.label + "</span></td>" +
+                "<td>" + decisionHtml + "</td>" +
+                "<td><div class=\"rp-actions-cell\">" + actionsHtml + "</div></td>";
+            tbody.appendChild(tr);
+        });
     }
 
-    document.getElementById("statSchedule").textContent = stats.schedule || 0;
-    document.getElementById("statFeedback").textContent = stats.feedback || 0;
-    document.getElementById("statNextRound").textContent = stats.next_round || 0;
-    document.getElementById("statDone").textContent = (stats.done || 0);
-
+    renderMobileCards(pageData);
     renderPaginationBar(filtered.length, totalPages);
+    updateSortArrows();
+    renderStats();
 }
 
 window.editInterview = function(interviewId) {
     document.getElementById("scheduleForm").reset();
     document.getElementById("siRescheduleId").value = interviewId;
     document.getElementById("scheduleModalTitle").textContent = "Edit Interview";
-    document.getElementById("siSubmitBtn").innerHTML = "&#x270F; Update";
+    document.getElementById("siSubmitBtn").innerHTML = "Update";
     loadCandidateSelect();
 
     for (var i = 0; i < candidatesData.length; i++) {
@@ -224,7 +419,7 @@ window.openScheduleModal = function() {
     document.getElementById("siCandidateId").disabled = false;
     document.getElementById("siIsFinalRound").checked = false;
     document.getElementById("scheduleModalTitle").textContent = "Schedule Interview";
-    document.getElementById("siSubmitBtn").textContent = "\u2728 Schedule Interview";
+    document.getElementById("siSubmitBtn").textContent = "Schedule Interview";
     loadCandidateSelect();
     openModal("scheduleModal");
 };
@@ -234,7 +429,6 @@ window.openScheduleForCandidate = function(candidateId, title, disableSelect, in
     document.getElementById("siRescheduleId").value = "";
     loadCandidateSelect();
 
-    // Ensure candidate exists in select (may not be in eligibleCandidates for Fail/Hold)
     var sel = document.getElementById("siCandidateId");
     var found = false;
     for (var i = 0; i < sel.options.length; i++) {
@@ -258,7 +452,7 @@ window.openScheduleForCandidate = function(candidateId, title, disableSelect, in
     document.getElementById("siCandidateId").disabled = disableSelect !== false;
     document.getElementById("siIsFinalRound").checked = false;
     document.getElementById("scheduleModalTitle").textContent = title || "Schedule Interview";
-    document.getElementById("siSubmitBtn").textContent = "\u2728 " + (title || "Schedule Interview");
+    document.getElementById("siSubmitBtn").textContent = title || "Schedule Interview";
     onCandidateSelect();
     openModal("scheduleModal");
 };
@@ -303,7 +497,7 @@ window.ajaxScheduleInterview = function() {
     var btn = document.getElementById("siSubmitBtn");
     var origText = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = "\u23F3 Saving...";
+    btn.innerHTML = "Saving...";
 
     if (rescheduleId) {
         apiPost("ajax/update.php", {
@@ -377,8 +571,8 @@ window.openFeedback = function(interviewId) {
         }
     }
 
-    document.getElementById("feedbackModalTitle").innerHTML = "&#x270F; Record Feedback";
-    document.getElementById("fbSubmitBtn").innerHTML = "&#x2728; Save Feedback";
+    document.getElementById("feedbackModalTitle").innerHTML = "Record Feedback";
+    document.getElementById("fbSubmitBtn").innerHTML = "Save Feedback";
     openModal("feedbackModal");
 };
 
@@ -394,8 +588,7 @@ window.openCombinedView = function(candidateId) {
     }
     if (!iv) return;
 
-    document.getElementById("combinedViewTitle").textContent = "Interview Logs of - " + cName;
-
+    document.getElementById("combinedViewTitle").textContent = "Interview Logs - " + cName;
     document.getElementById("combinedViewBody").innerHTML = "<div id=\"combinedHistoryBody\"><div style=\"text-align:center;padding:24px;color:var(--gray-400)\">Loading...</div></div>";
     openModal("combinedViewModal");
 
@@ -408,7 +601,6 @@ window.openCombinedView = function(candidateId) {
         var screening = res.screening;
         var h = "<div class=\"iv-logs\">";
 
-        // Screening card (if exists)
         if (screening) {
             var scrResult = screening.result || "";
             var scrResultBadge = "";
@@ -446,17 +638,13 @@ window.openCombinedView = function(candidateId) {
                 "</div>";
         }
 
-        // Interview logs
         if (data.length === 0) {
             h += "<div style=\"text-align:center;padding:24px;color:var(--gray-400)\">No interview records yet.</div>";
         } else {
             for (var i = 0; i < data.length; i++) {
                 var iv2 = data[i];
                 var isCompleted = iv2.status === "Completed";
-                var isPending = iv2.status === "Waiting for Feedback";
-
                 var statusBadge = isCompleted ? "<span class=\"badge badge-completed\">Completed</span>" : "<span class=\"badge badge-pending\">Waiting for Feedback</span>";
-
                 var headerColor = isCompleted ? "#059669" : "#d97706";
 
                 h +=
@@ -493,9 +681,7 @@ window.openCombinedView = function(candidateId) {
                 } else {
                     h += "<div class=\"iv-empty-state\">Waiting for Feedback</div>";
                 }
-                h +=
-                        "</div>" +
-                    "</div>";
+                h += "</div></div>";
             }
         }
         h += "</div>";
@@ -534,7 +720,7 @@ window.ajaxSaveFeedback = function() {
     var btn = document.getElementById("fbSubmitBtn");
     var origText = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = "\u23F3 Saving...";
+    btn.innerHTML = "Saving...";
 
     apiPost("ajax/update.php", {
         id: interviewId,
@@ -582,57 +768,46 @@ renderPage();
 
 ob_start();
 ?>
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon blue">&#x1F4C5;</div>
-        <div class="stat-info"><h3 id="statSchedule">0</h3><p>Needs Scheduling</p></div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon yellow">&#x23F3;</div>
-        <div class="stat-info"><h3 id="statFeedback">0</h3><p>Waiting Feedback</p></div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon purple">&#x1F504;</div>
-        <div class="stat-info"><h3 id="statNextRound">0</h3><p>Ready for Next Round</p></div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon green">&#x2705;</div>
-        <div class="stat-info"><h3 id="statDone">0</h3><p>Completed</p></div>
+<div class="cc-grid">
+    <div class="cc-card cc-schedule"><div><div class="cc-num" id="ccSchedule">0</div><div class="cc-label">Needs Scheduling</div></div></div>
+    <div class="cc-card cc-feedback"><div><div class="cc-num" id="ccFeedback">0</div><div class="cc-label">Waiting Feedback</div></div></div>
+    <div class="cc-card cc-next"><div><div class="cc-num" id="ccNext">0</div><div class="cc-label">Next Round</div></div></div>
+    <div class="cc-card cc-done"><div><div class="cc-num" id="ccDone">0</div><div class="cc-label">Completed</div></div></div>
+</div>
+
+<div class="rp-top">
+    <h1>Interview Candidates <small id="resultCount"></small></h1>
+    <div class="rp-actions">
+        <div class="rp-search">
+            <span class="rp-search-icon">&#x1F50D;</span>
+            <input type="text" id="searchInput" placeholder="Search by candidate, job, interviewer..." oninput="applyFilters()" autocomplete="off">
+            <button class="rp-search-clear" id="searchClear" onclick="clearSearch()">&times;</button>
+        </div>
+        <button class="btn btn-primary" onclick="window.openScheduleModal()">+ Schedule Interview</button>
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h2>All Interview Candidates</h2>
-        <div class="filter-bar">
-            <div class="search-box">
-                <span class="search-icon">&#x1F50D;</span>
-                <input type="text" id="searchInput" placeholder="Search..." onkeyup="applyFilters()">
-            </div>
-            <button class="btn btn-primary" onclick="window.openScheduleModal()">+ Schedule Interview</button>
-        </div>
+<div class="rp-card">
+    <div class="rp-table-wrap">
+        <table class="rp-table" id="interviewTable">
+            <thead>
+                <tr>
+                    <th class="rp-sortable" onclick="sortBy(0)">Candidate <span class="rp-sort-arrow" id="sortArrow0"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(1)">Job <span class="rp-sort-arrow" id="sortArrow1"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(2)">Round <span class="rp-sort-arrow" id="sortArrow2"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(3)">Type <span class="rp-sort-arrow" id="sortArrow3"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(4)">Interviewer <span class="rp-sort-arrow" id="sortArrow4"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(5)">Date / Time <span class="rp-sort-arrow" id="sortArrow5"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(6)">Status <span class="rp-sort-arrow" id="sortArrow6"></span></th>
+                    <th class="rp-sortable" onclick="sortBy(7)">Decision <span class="rp-sort-arrow" id="sortArrow7"></span></th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="ivTableBody"></tbody>
+        </table>
     </div>
-    <div class="card-body">
-        <div class="table-container">
-            <table id="interviewTable">
-                <thead>
-                    <tr>
-                        <th>Candidate</th>
-                        <th>Job</th>
-                        <th>Round</th>
-                        <th>Type</th>
-                        <th>Interviewer</th>
-                        <th>Date / Time</th>
-                        <th>Status</th>
-                        <th>Decision</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="ivTableBody"></tbody>
-            </table>
-            <div id="paginationBar" class="pagination-bar"></div>
-        </div>
-    </div>
+    <div class="rp-mobile-list" id="mobileList"></div>
+    <div id="paginationBar" class="rp-pagination"></div>
 </div>
 
 <!-- Schedule Interview Modal -->
@@ -671,11 +846,10 @@ ob_start();
                         <label>Interviewer Name <span class="required">*</span></label>
                         <input type="text" class="form-control" id="siInterviewer" required>
                     </div>
-
-                </div>
-                <div class="form-group">
-                    <label>Round Name</label>
-                    <input type="text" class="form-control" id="siRoundName" placeholder="e.g. Technical Screening">
+                    <div class="form-group">
+                        <label>Round Name</label>
+                        <input type="text" class="form-control" id="siRoundName" placeholder="e.g. Technical Screening">
+                    </div>
                 </div>
                 <div class="form-group" style="margin-bottom:0">
                     <label class="checkbox-label" style="display:flex;align-items:center;gap:8px;cursor:pointer">
@@ -687,7 +861,7 @@ ob_start();
         </div>
         <div class="modal-footer modal-footer-light">
             <button class="btn btn-outline" onclick="closeModal('scheduleModal')">Cancel</button>
-            <button class="btn btn-primary" id="siSubmitBtn" onclick="window.ajaxScheduleInterview()">&#x2728; Schedule Interview</button>
+            <button class="btn btn-primary" id="siSubmitBtn" onclick="window.ajaxScheduleInterview()">Schedule Interview</button>
         </div>
     </div>
 </div>
@@ -696,7 +870,7 @@ ob_start();
 <div class="modal-overlay" id="feedbackModal" onclick="if(event.target===this)closeModal('feedbackModal')">
     <div class="modal modal-sticky">
         <div class="modal-header modal-header-navy">
-            <h3 id="feedbackModalTitle">&#x270F; Record Feedback</h3>
+            <h3 id="feedbackModalTitle">Record Feedback</h3>
             <button class="modal-close" onclick="closeModal('feedbackModal')">&times;</button>
         </div>
         <div class="modal-body">
@@ -766,12 +940,12 @@ ob_start();
         </div>
         <div class="modal-footer modal-footer-light">
             <button class="btn btn-outline" onclick="closeModal('feedbackModal')">Cancel</button>
-            <button class="btn btn-primary" id="fbSubmitBtn" onclick="window.ajaxSaveFeedback()">&#x2728; Save Feedback</button>
+            <button class="btn btn-primary" id="fbSubmitBtn" onclick="window.ajaxSaveFeedback()">Save Feedback</button>
         </div>
     </div>
 </div>
 
-<!-- Combined View Modal (feedback + history) -->
+<!-- Combined View Modal -->
 <div class="modal-overlay" id="combinedViewModal" onclick="if(event.target===this)closeModal('combinedViewModal')">
     <div class="modal modal-sticky">
         <div class="modal-header modal-header-navy">
@@ -811,7 +985,6 @@ ob_start();
 .iv-reject-reason { font-size:13px; color:#dc2626; margin-bottom:6px; padding:6px 10px; background:#fef2f2; border-radius:6px; }
 .iv-feedback { font-size:13px; color:var(--gray-700); line-height:1.5; padding:8px 10px; background:#f8f9fa; border-radius:6px; border:1px solid var(--gray-100); margin-top:4px; }
 .iv-empty-state { text-align:center; padding:16px; color:var(--gray-400); font-size:13px; }
-@media (max-width:768px){ .iv-scores { grid-template-columns:1fr; gap:6px 12px; } .iv-meta { flex-direction:column; gap:6px; } .iv-score-item label { width:auto; flex-shrink:1; } .iv-score-item span { width:auto; flex-shrink:1; } .iv-card-header { flex-direction:column; align-items:flex-start; gap:4px; } .iv-card-header-right { width:100%; justify-content:space-between; } .iv-date { white-space:normal; } .iv-footer { flex-direction:column; align-items:flex-start; gap:8px; } }
 </style>
 <?php
 $content = ob_get_clean();

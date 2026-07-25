@@ -13,7 +13,6 @@ $sidebarItems = [
         ['id' => 'interview',      'text' => 'Interview',        'href' => 'interview/list.php'],
     ],
     'Offer Management' => [
-        ['id' => 'offer_overview',              'text' => 'Overview',             'href' => 'offer_management/index.php'],
         ['id' => 'offer_proposal',              'text' => 'Salary Proposal',      'href' => 'offer_management/proposal.php'],
         ['id' => 'offer_proposal_approval',     'text' => 'Proposal Approval',    'href' => 'offer_management/proposal_approval.php'],
         ['id' => 'offer_letter',                'text' => 'Offer Letter',         'href' => 'offer_management/letter.php'],

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $basePath    = '..';
 $pageTitle   = 'Generate Confirmation Letter';
 $activePage  = 'confirmation_list';
@@ -43,79 +43,7 @@ if ($employeeId > 0) {
 $empName = $emp ? trim(($emp['PBI_NAME'] ?? '') . ' ' . ($emp['last_name'] ?? '')) : '';
 $existingContentJson = json_encode($existingContent);
 
-$pageStyles  = '
-@import url("https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css");
-
-/* ===== HEADER ===== */
-.rp-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
-.rp-top h1{font-size:20px;font-weight:700;color:var(--gray-900);margin:0;white-space:nowrap}
-.rp-top h1 small{font-size:13px;font-weight:400;color:var(--gray-400);margin-left:8px}
-.rp-top .rp-back{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(--gray-200);border-radius:8px;background:#fff;font-size:13px;font-weight:500;color:var(--gray-600);text-decoration:none;transition:all .15s;font-family:inherit}
-.rp-top .rp-back:hover{border-color:var(--primary);color:var(--primary)}
-
-/* ===== CARD ===== */
-.rp-card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);overflow:hidden;padding:24px}
-
-/* ===== SECTION ===== */
-.sb-section{margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--gray-100)}
-.sb-section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.sb-section-title{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.sb-section-title .sb-icon{width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.sb-section-title .sb-icon.blue{background:#e8f0fe;color:var(--primary)}
-.sb-section-title .sb-icon.green{background:#e6f4ea;color:var(--success)}
-.sb-section-title .sb-icon.purple{background:#f0e6ff;color:#7c3aed}
-.sb-section-title .sb-icon.orange{background:#fef3e2;color:#e67e22}
-
-/* ===== INFO GRID ===== */
-.vc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
-.vc-item{padding:12px 14px;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-100)}
-.vc-item label{display:block;font-size:10px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
-.vc-item span{font-size:13px;color:var(--gray-800);font-weight:500;word-break:break-word}
-
-/* ===== EDITOR ===== */
-#quillEditor{height:400px;border-radius:0 0 8px 8px}
-.ql-toolbar.ql-snow{border-radius:8px 8px 0 0;border-color:var(--gray-300)}
-.ql-container.ql-snow{border-color:var(--gray-300)}
-.template-row{display:flex;gap:12px;align-items:end;margin-bottom:14px}
-.template-row .form-group{flex:1;margin-bottom:0}
-
-/* ===== ACTION BAR ===== */
-.bottom-actions{display:flex;justify-content:space-between;align-items:center;padding-top:20px;border-top:1px solid var(--gray-200)}
-
-/* ===== RESPONSIVE ===== */
-@media(max-width:900px){
- .vc-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
-}
-@media(max-width:768px){
- .page-content{padding:16px}
- .rp-top{flex-direction:column;align-items:stretch;gap:12px}
- .rp-top h1{font-size:18px}
- .rp-top h1 small{display:block;margin:4px 0 0;font-size:12px}
- .rp-top .rp-back{align-self:flex-start}
- .rp-card{padding:18px}
- .sb-section{margin-bottom:20px;padding-bottom:16px}
- .vc-grid{grid-template-columns:1fr 1fr;gap:10px}
- .template-row{flex-direction:column;align-items:stretch}
- #quillEditor{height:300px}
- .bottom-actions{flex-direction:column;gap:12px;align-items:stretch}
- .bottom-actions .rp-back{display:block;text-align:center}
- .bottom-actions .btn{width:100%;justify-content:center}
-}
-@media(max-width:480px){
- .page-content{padding:12px}
- .rp-card{padding:14px;border-radius:8px}
- .sb-section-title{font-size:13px;gap:6px}
- .sb-section-title .sb-icon{width:24px;height:24px;font-size:12px;border-radius:6px}
- .vc-grid{grid-template-columns:1fr;gap:8px}
- .vc-item{padding:10px 12px}
- .vc-item label{font-size:9px}
- .vc-item span{font-size:12px}
- #quillEditor{height:250px}
- .ql-toolbar.ql-snow .ql-formats{margin-right:6px}
- .form-control{font-size:13px;padding:8px 10px}
- .bottom-actions .btn{font-size:13px;padding:10px}
-}
-';
+$pageCss = 'css/page_css/confirmation-generate.css';
 
 $pageScripts = <<<EOSCRIPT
 var quill = null;

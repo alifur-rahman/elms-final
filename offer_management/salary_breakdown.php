@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $basePath    = '..';
 $pageTitle   = 'Salary Breakdown';
 $activePage  = 'offer_proposal';
@@ -36,44 +36,7 @@ if ($proposal && $proposal['salary_breakdown']) {
     if (is_array($bd)) $breakdown = $bd;
 }
 
-$pageStyles  = '
-/* ===== HEADER ===== */
-.rp-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
-.rp-top h1{font-size:20px;font-weight:700;color:var(--gray-900);margin:0;white-space:nowrap}
-.rp-top h1 small{font-size:13px;font-weight:400;color:var(--gray-400);margin-left:8px}
-.rp-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.rp-card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);overflow:hidden;padding:24px}
-.rp-empty{text-align:center;padding:48px 24px;color:var(--gray-400)}
-.rp-empty-icon{font-size:40px;margin-bottom:8px}
-.rp-empty h3{font-size:15px;color:var(--gray-600);margin:0 0 4px}
-.rp-empty p{font-size:13px;margin:0}
-/* Form sections */
-.sb-section{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--gray-100)}
-.sb-section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.sb-section-title{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.sb-section-title .sb-icon{width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.sb-section-title .sb-icon.blue{background:#e8f0fe;color:var(--primary)}
-.sb-section-title .sb-icon.green{background:#e6f4ea;color:var(--success)}
-.sb-section-title .sb-icon.orange{background:#fef3e2;color:#e67e22}
-.sb-section-title .sb-icon.purple{background:#f0e6ff;color:#7c3aed}
-.sb-checks{display:flex;gap:20px;flex-wrap:wrap;padding-top:4px}
-.sb-checks label{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer}
-.sb-btn-row{display:flex;justify-content:flex-end;gap:10px;padding-top:20px;border-top:1px solid var(--gray-200)}
-/* ===== RESPONSIVE ===== */
-@media(max-width:768px){
- .page-content{padding:16px}
- .rp-top{flex-direction:column;align-items:stretch;gap:12px}
- .rp-top h1{font-size:18px}
- .rp-actions{width:100%}
- .rp-card{padding:18px}
-}
-@media(max-width:480px){
- .page-content{padding:12px}
- .rp-card{padding:16px}
- .sb-btn-row{flex-direction:column}
- .sb-btn-row .btn{width:100%;justify-content:center}
-}
-';
+$pageCss = 'css/page_css/salary-breakdown.css';
 $candidateIdJson = json_encode($candidateId);
 $breakdownJson   = json_encode($breakdown);
 $pageScripts = <<<EOSCRIPT

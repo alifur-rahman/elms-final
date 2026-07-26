@@ -1,72 +1,10 @@
-<?php
+﻿<?php
 $basePath    = '..';
 $pageTitle   = 'View Employee';
 $activePage  = 'create_employee';
 $breadcrumb  = 'Home / Employee / View Employee';
 $offerId     = (int)($_GET['offer_id'] ?? 0);
-$pageStyles  = '
-/* ===== HEADER ===== */
-.rp-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
-.rp-top h1{font-size:20px;font-weight:700;color:var(--gray-900);margin:0;white-space:nowrap}
-.rp-top h1 small{font-size:13px;font-weight:400;color:var(--gray-400);margin-left:8px}
-.rp-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.rp-card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);overflow:hidden;padding:24px}
-.rp-empty{text-align:center;padding:48px 24px;color:var(--gray-400)}
-.rp-empty-icon{font-size:40px;margin-bottom:8px}
-.rp-empty h3{font-size:15px;color:var(--gray-600);margin:0 0 4px}
-.rp-empty p{font-size:13px;margin:0}
-
-/* ===== TABS ===== */
-.scr-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--gray-200);flex-wrap:wrap}
-.scr-tab{padding:12px 20px;font-size:13px;font-weight:600;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;color:var(--gray-500);transition:all .2s;font-family:inherit;white-space:nowrap}
-.scr-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
-.scr-tab:hover{color:var(--primary)}
-.tab-panel{display:none}
-.tab-panel.active{display:block}
-
-/* ===== SECTION BOXES ===== */
-.sb-section{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--gray-100)}
-.sb-section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.sb-section-title{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.sb-section-title .sb-icon{width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.sb-section-title .sb-icon.blue{background:#e8f0fe;color:var(--primary)}
-.sb-section-title .sb-icon.green{background:#e6f4ea;color:var(--success)}
-.sb-section-title .sb-icon.orange{background:#fef3e2;color:#e67e22}
-.sb-section-title .sb-icon.purple{background:#f0e6ff;color:#7c3aed}
-.sb-section-title .sb-icon.red{background:#fde8e8;color:var(--danger)}
-.sb-section-title .sb-icon.teal{background:#e0f7fa;color:#0d9488}
-
-/* ===== INFO GRID ===== */
-.vc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.vc-item{margin-bottom:8px}
-.vc-item label{display:block;font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
-.vc-item span{font-size:14px;color:var(--gray-800);font-weight:500}
-.vc-item.span-2{grid-column:span 2}
-.vc-item.span-3{grid-column:span 3}
-
-/* ===== RESPONSIVE ===== */
-@media(max-width:900px){
- .vc-grid{grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:768px){
- .page-content{padding:16px}
- .rp-top{flex-direction:column;align-items:stretch;gap:12px}
- .rp-top h1{font-size:18px}
- .rp-actions{width:100%}
- .rp-card{padding:18px}
- .vc-grid{grid-template-columns:1fr 1fr}
- .vc-item.span-2,.vc-item.span-3{grid-column:span 2}
- .scr-tab{padding:10px 14px;font-size:12px}
-}
-@media(max-width:480px){
- .page-content{padding:12px}
- .rp-card{padding:16px}
- .vc-grid{grid-template-columns:1fr}
- .vc-item.span-2,.vc-item.span-3{grid-column:span 1}
- .scr-tabs{gap:0}
- .scr-tab{padding:8px 10px;font-size:11px}
-}
-';
+$pageCss = 'css/page_css/view.css';
 $pageScripts = <<<EOSCRIPT
 var offerId = {$offerId};
 var empData = null;

@@ -1,37 +1,9 @@
-<?php
+﻿<?php
 $basePath    = '.';
 $pageTitle   = 'Dashboard';
 $activePage  = 'dashboard';
 $breadcrumb  = 'Home / Dashboard';
-$pageStyles  = '
-.welcome-card {
-    background: linear-gradient(135deg, #1a1d29 0%, #2d5a87 100%);
-    border-radius: 16px;
-    padding: 48px 40px;
-    color: #fff;
-    margin-bottom: 32px;
-    text-align: center;
-}
-.welcome-card h1 { font-size: 28px; margin-bottom: 8px; }
-.welcome-card p { color: rgba(255,255,255,.7); font-size: 14px; margin-bottom: 24px; }
-.welcome-card .brand-badge { display: inline-block; padding: 4px 16px; background: rgba(255,255,255,.12); border-radius: 20px; font-size: 12px; margin-bottom: 16px; }
-.lifecycle-flow { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 32px 0; padding: 24px; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-.flow-step { display: flex; flex-direction: column; align-items: center; text-decoration: none; padding: 12px 16px; border-radius: 8px; transition: all .2s ease; min-width: 80px; }
-.flow-step:hover { background: var(--gray-50); transform: translateY(-2px); }
-.flow-step .flow-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 8px; border: 2px solid var(--gray-200); background: #fff; }
-.flow-step:hover .flow-icon { border-color: var(--primary); background: #e8f0fe; }
-.flow-step .flow-label { font-size: 11px; font-weight: 500; color: var(--gray-700); text-align: center; }
-.flow-connector { width: 32px; height: 2px; background: var(--gray-300); flex-shrink: 0; }
-.quick-links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
-.quick-link-card { background: #fff; border-radius: 12px; padding: 20px 16px; text-align: center; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,.08); transition: all .2s ease; border: 1px solid var(--gray-200); }
-.quick-link-card:hover { transform: translateY(-3px); box-shadow: 0 4px 16px rgba(0,0,0,.12); border-color: var(--primary); }
-.quick-link-card .ql-icon { font-size: 28px; margin-bottom: 8px; }
-.quick-link-card .ql-label { font-size: 13px; font-weight: 500; color: var(--gray-800); }
-.quick-link-card .ql-count { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
-.quick-link-card .ql-badge { display: inline-block; margin-top: 6px; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; background: var(--danger); color: #fff; }
-@media (max-width:768px){ .welcome-card { padding: 32px 20px; } .welcome-card h1 { font-size: 22px; } .lifecycle-flow { padding: 16px; gap: 0; } .flow-step { min-width: 60px; padding: 8px 10px; } .flow-step .flow-icon { width: 40px; height: 40px; font-size: 16px; } .flow-connector { width: 20px; } .quick-links-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; } }
-@media (max-width:480px){ .welcome-card { padding: 24px 16px; } .welcome-card h1 { font-size: 18px; } .welcome-card p { font-size: 13px; } .flow-step { min-width: 48px; padding: 6px 8px; } .flow-step .flow-icon { width: 32px; height: 32px; font-size: 14px; } .flow-connector { width: 12px; } .flow-step .flow-label { font-size: 10px; } .quick-links-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } .quick-link-card { padding: 14px 10px; } }
-';
+$pageCss = 'css/page_css/index.css';
 
 ob_start();
 ?>

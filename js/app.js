@@ -70,7 +70,7 @@ var SIDEBAR_ITEMS = [
     { id: 'template_tags',  text: 'Registered Tags',  href: 'templates/tags.php' },
     { label: 'Settings', header: true },
     { id: 'activity_log', text: 'Activity Log', href: 'activity/log.php' },
-    { id: 'reports', text: 'Reports', href: 'reports/probation_summary.html' },
+    { id: 'reports', text: 'Reports', href: 'reports/index.php' },
     { id: 'docs',   text: 'Documentation', href: 'docs/documentation.html' }
 ];
 

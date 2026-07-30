@@ -36,7 +36,7 @@ $sidebarItems = [
     ],
     'Settings' => [
         ['id' => 'activity_log', 'text' => 'Activity Log',      'href' => 'activity/log.php'],
-        ['id' => 'reports',   'text' => 'Reports',          'href' => 'reports/probation_summary.html'],
+        ['id' => 'reports',   'text' => 'Reports',          'href' => 'reports/index.php'],
         ['id' => 'docs',      'text' => 'Documentation',    'href' => 'docs/documentation.html'],
     ],
 ];

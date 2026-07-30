@@ -240,7 +240,7 @@ ob_start();
             <a href="confirmation/confirmation_letters.php" class="quick-link-card"><div class="ql-icon">&#x1F4C3;</div><div class="ql-label">Confirmation Letters</div></a>
             <a href="templates/list.php" class="quick-link-card"><div class="ql-icon">&#x1F4CB;</div><div class="ql-label">Templates</div></a>
             <a href="templates/tags.php" class="quick-link-card"><div class="ql-icon">&#x1F3F7;</div><div class="ql-label">Template Tags</div></a>
-            <a href="reports/probation_summary.html" class="quick-link-card"><div class="ql-icon">&#x1F4C8;</div><div class="ql-label">Reports</div></a>
+            <a href="reports/index.php" class="quick-link-card"><div class="ql-icon">&#x1F4C8;</div><div class="ql-label">Reports</div></a>
             <a href="docs/documentation.html" class="quick-link-card"><div class="ql-icon">&#x1F4D6;</div><div class="ql-label">Documentation</div></a>
         </div>
     </div>

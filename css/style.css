@@ -295,6 +295,11 @@ body {
     color: var(--gray-500);
 }
 
+/* ===== DASHBOARD LAYOUT ===== */
+.db-grid { display:grid; grid-template-columns:1fr 300px; gap:24px; }
+.db-pipeline { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+.db-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
 /* ===== TABLES ===== */
 .card {
     background: #fff;
@@ -1374,6 +1379,8 @@ textarea.form-control {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    .db-grid { grid-template-columns:1fr; }
+    .db-pipeline { grid-template-columns:repeat(3,1fr); }
     .letter-preview {
         padding: 24px;
     }
@@ -1529,6 +1536,7 @@ textarea.form-control {
     .stats-grid {
         grid-template-columns: 1fr;
     }
+    .db-pipeline { grid-template-columns:repeat(2,1fr); }
     .top-header {
         padding: 8px 12px;
     }

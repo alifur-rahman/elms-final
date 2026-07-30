@@ -35,6 +35,7 @@ $sidebarItems = [
         ['id' => 'template_tags',  'text' => 'Registered Tags', 'href' => 'templates/tags.php'],
     ],
     'Settings' => [
+        ['id' => 'activity_log', 'text' => 'Activity Log',      'href' => 'activity/log.php'],
         ['id' => 'reports',   'text' => 'Reports',          'href' => 'reports/probation_summary.html'],
         ['id' => 'docs',      'text' => 'Documentation',    'href' => 'docs/documentation.html'],
     ],

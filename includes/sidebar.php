@@ -3,8 +3,9 @@ $activePage = $activePage ?? 'dashboard';
 
 $sidebarItems = [
     'Lifecycle' => [
-        ['id' => 'dashboard', 'text' => 'Dashboard', 'href' => 'dashboard.php'],
-        ['id' => 'lifecycle', 'text' => 'Lifecycle Timeline', 'href' => 'lifecycle/view.php'],
+        ['id' => 'overview',  'text' => 'Overview',         'href' => 'index.php'],
+        ['id' => 'dashboard', 'text' => 'Dashboard',        'href' => 'dashboard.php'],
+        ['id' => 'lifecycle', 'text' => 'Lifecycle Timeline','href' => 'lifecycle/view.php'],
     ],
     'Recruitment' => [
         ['id' => 'recruitment',    'text' => 'Pipeline',         'href' => 'recruitment/list.php' ],

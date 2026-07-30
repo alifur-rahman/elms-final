@@ -4,7 +4,7 @@ $pageTitle  = 'Probation Appraisal';
 $activePage = 'probation';
 $breadcrumb = 'Home / Probation / Probation Appraisal';
 $pageCss = 'css/page_css/probation-list.css';
-$pageJs = 'js/page_js/probation-list.js';;
+$pageJs = 'js/page_js/probation-list.js';
 ob_start();
 ?>
 <div class="cc-grid">

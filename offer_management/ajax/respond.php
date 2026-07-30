@@ -56,8 +56,8 @@ try {
                 addCandidateLog($pdo, $candidateId, 'offer_accepted', null, null, 'Offer accepted: ' . $notes);
             }
         } elseif ($response === 'Rejected') {
-            // Move candidate to Rejected status (99)
-            $uStmt = $pdo->prepare("UPDATE candidates SET status_id = 99 WHERE id = :id");
+            // Move candidate to Rejected status (7)
+            $uStmt = $pdo->prepare("UPDATE candidates SET status_id = 7 WHERE id = :id");
             $uStmt->execute([':id' => $candidateId]);
             addCandidateLog($pdo, $candidateId, 'offer_rejected_candidate', null, null, 'Offer rejected by candidate: ' . $notes);
         }

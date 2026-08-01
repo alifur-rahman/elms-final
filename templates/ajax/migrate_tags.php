@@ -31,6 +31,8 @@ try {
             ['Offer', 'HR_NAME', 'HR Name', 'HR representative name', 9],
             ['Offer', 'DATE', 'Current Date', 'Today\'s date', 10],
             ['Offer', 'RESPONSE_DATE', 'Response Deadline', 'Offer response deadline date', 11],
+            ['Offer', 'SALARY_BREAKDOWN', 'Salary Breakdown Table', 'Full salary breakdown rendered as an HTML table', 12],
+            ['Offer', 'RESPONSE_LINK', 'Response Link', 'Unique link for the candidate to accept or decline the offer', 13],
             ['Confirmation', 'EMPLOYEE_NAME', 'Employee Name', 'Full name of the employee', 1],
             ['Confirmation', 'DESIGNATION', 'Designation', 'Current designation', 2],
             ['Confirmation', 'DEPARTMENT', 'Department', 'Department name', 3],

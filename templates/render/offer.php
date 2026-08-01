@@ -65,6 +65,7 @@ function getOfferTagMap(PDO $pdo, int $recordId): array {
         'HR_NAME'          => 'HR Department',
         'DATE'             => $now->format('F j, Y'),
         'RESPONSE_DATE'    => $respDate->format('F j, Y'),
+        'RESPONSE_LINK'    => getOfferResponseLink($pdo, $recordId),
         'SALARY_BREAKDOWN' => $salaryBreakdownHtml,
     ];
 }

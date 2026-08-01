@@ -31,6 +31,36 @@ function addCandidateLog(PDO $pdo, int $candidateId, string $action, ?string $fr
     $stmt->execute([$candidateId, $action, $fromStatus, $toStatus, $notes]);
 }
 
+function appBaseUrl(): string {
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $docRoot = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? ROOT_PATH));
+    $appRoot = str_replace('\\', '/', ROOT_PATH);
+    $rel = '';
+    if ($docRoot && strpos($appRoot, $docRoot) === 0) {
+        $rel = rtrim(substr($appRoot, strlen($docRoot)), '/');
+    }
+    return $scheme . '://' . $host . $rel;
+}
+
+function getOfferResponseToken(PDO $pdo, int $offerId): ?string {
+    $stmt = $pdo->prepare("SELECT response_token FROM offers WHERE id = :id");
+    $stmt->execute([':id' => $offerId]);
+    $token = $stmt->fetchColumn();
+    if (!$token) {
+        $token = bin2hex(random_bytes(32));
+        $upd = $pdo->prepare("UPDATE offers SET response_token = :token WHERE id = :id");
+        $upd->execute([':token' => $token, ':id' => $offerId]);
+    }
+    return $token;
+}
+
+function getOfferResponseLink(PDO $pdo, int $offerId): ?string {
+    $token = getOfferResponseToken($pdo, $offerId);
+    if (!$token) return null;
+    return appBaseUrl() . '/offer_management/respond.php?token=' . $token;
+}
+
 /* ── WaterAid DB Helpers (mysqli-based, matching NOC style) ─────── */
 function get_mysqli(): mysqli {
     static $conn = null;

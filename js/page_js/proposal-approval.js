@@ -52,10 +52,10 @@ function updateSortArrows() {
         var el = document.getElementById("sortArrow" + i);
         if (!el) continue;
         if (i === sortCol) {
-            el.textContent = sortDir === "asc" ? "\\u25B2" : "\\u25BC";
+            el.textContent = sortDir === "asc" ? "" : "";
             el.parentNode.classList.add("rp-sorted");
         } else {
-            el.textContent = "\\u2195";
+            el.textContent = "";
             el.parentNode.classList.remove("rp-sorted");
         }
     }
@@ -139,7 +139,7 @@ function loadStats() {
 function renderMobileCards(pageData) {
     var c = document.getElementById("approvalMobileList");
     if (!pageData.length) {
-        c.innerHTML = "<div class=\"rp-empty\"><div class=\"rp-empty-icon\">\\u23F3</div><h3>No proposals found</h3></div>";
+        c.innerHTML = "<div class=\"rp-empty\"><div class=\"rp-empty-icon\"></div><h3>No proposals found</h3></div>";
         return;
     }
     var h = "";
@@ -156,8 +156,8 @@ function renderMobileCards(pageData) {
         h += "<div class=\"rp-mob-top\"><div class=\"rp-mob-title\">" + p.candidate_name + "<small>" + (p.job_title || "N/A") + " &middot; v" + p.version + "</small></div>";
         h += "<div class=\"rp-mob-badges\"><span class=\"" + sc + "\">" + status + "</span></div></div>";
         h += "<div class=\"rp-mob-grid\">";
-        h += "<div class=\"rp-mob-field\"><label>Proposed</label><span>" + formatCurrency(p.proposed_salary, "\\u09F3") + "</span></div>";
-        h += "<div class=\"rp-mob-field\"><label>Expected</label><span>" + (p.expected_salary ? formatCurrency(p.expected_salary, "\\u09F3") : "-") + "</span></div>";
+        h += "<div class=\"rp-mob-field\"><label>Proposed</label><span>" + formatCurrency(p.proposed_salary, "") + "</span></div>";
+        h += "<div class=\"rp-mob-field\"><label>Expected</label><span>" + (p.expected_salary ? formatCurrency(p.expected_salary, "") : "-") + "</span></div>";
         h += "<div class=\"rp-mob-field\"><label>Submitted</label><span>" + (p.submitted_at || "-") + "</span></div>";
         h += "</div><div class=\"rp-mob-footer\">" + actions + "</div></div>";
     });
@@ -173,7 +173,7 @@ function renderTable() {
     var tbody = document.getElementById("approvalTableBody");
     tbody.innerHTML = "";
     if (!pageData.length) {
-        tbody.innerHTML = "<tr><td colspan=\"6\"><div class=\"rp-empty\"><div class=\"rp-empty-icon\">\\u23F3</div><h3>No proposals found</h3></div></td></tr>";
+        tbody.innerHTML = "<tr><td colspan=\"6\"><div class=\"rp-empty\"><div class=\"rp-empty-icon\"></div><h3>No proposals found</h3></div></td></tr>";
     } else {
         pageData.forEach(function(p) {
             var idx = approvalsData.indexOf(p);
@@ -188,7 +188,7 @@ function renderTable() {
             tr.innerHTML =
                 "<td><strong>" + p.candidate_name + "</strong></td>" +
                 "<td>" + (p.job_title || "N/A") + "</td>" +
-                "<td>" + formatCurrency(p.proposed_salary, "\\u09F3") + "</td>" +
+                "<td>" + formatCurrency(p.proposed_salary, "") + "</td>" +
                 "<td><span class=\"" + sc + "\">" + status + "</span></td>" +
                 "<td>v" + p.version + "</td>" +
                 "<td><div class=\"rp-actions-cell\">" + actions + "</div></td>";
@@ -206,7 +206,7 @@ function openApprove(idx) {
     document.getElementById("apprProposalId").value = p.proposal_id;
     document.getElementById("apprCandidateName").value = p.candidate_name;
     document.getElementById("apprJobTitle").value = p.job_title;
-    document.getElementById("apprProposedSalary").value = formatCurrency(p.proposed_salary, "\\u09F3");
+    document.getElementById("apprProposedSalary").value = formatCurrency(p.proposed_salary, "");
     document.getElementById("apprJoiningDate").value = "";
     document.getElementById("apprProbation").value = 6;
     document.getElementById("apprNotes").value = "";
@@ -274,8 +274,8 @@ function openView(idx) {
     if (!p) return;
     document.getElementById("vwCandidate").textContent = p.candidate_name;
     document.getElementById("vwJobTitle").textContent = p.job_title;
-    document.getElementById("vwExpectedSalary").textContent = p.expected_salary ? formatCurrency(p.expected_salary, "\\u09F3") : "-";
-    document.getElementById("vwProposedSalary").textContent = formatCurrency(p.proposed_salary, "\\u09F3");
+    document.getElementById("vwExpectedSalary").textContent = p.expected_salary ? formatCurrency(p.expected_salary, "") : "-";
+    document.getElementById("vwProposedSalary").textContent = formatCurrency(p.proposed_salary, "");
     document.getElementById("vwVersion").textContent = "v" + p.version;
     document.getElementById("vwStatus").textContent = p.proposal_status === "Pending_Approval" ? "Pending" : p.proposal_status === "Finalized" ? "Approved" : "Rejected";
     document.getElementById("vwSubmitted").textContent = p.submitted_at || "-";
@@ -285,17 +285,17 @@ function openView(idx) {
     var hasBd = bd && bd.gross_salary;
     document.getElementById("vwBreakdownSection").style.display = hasBd ? "" : "none";
     if (hasBd) {
-        document.getElementById("vwGross").textContent = formatCurrency(bd.gross_salary, "\\u09F3");
-        document.getElementById("vwBasic").textContent = formatCurrency(bd.basic, "\\u09F3");
-        document.getElementById("vwHouseRent").textContent = formatCurrency(bd.house_rent, "\\u09F3");
-        document.getElementById("vwMedical").textContent = formatCurrency(bd.medical_allowance, "\\u09F3");
-        document.getElementById("vwConveyance").textContent = formatCurrency(bd.conveyance_allowance, "\\u09F3");
-        document.getElementById("vwTotalSalary").textContent = formatCurrency(bd.total_salary, "\\u09F3");
-        document.getElementById("vwPersonalPf").textContent = formatCurrency(bd.personal_pf || 0, "\\u09F3");
-        document.getElementById("vwCompanyPf").textContent = formatCurrency(bd.company_pf || 0, "\\u09F3");
-        document.getElementById("vwPfDeductible").textContent = formatCurrency(bd.pf_deductible || 0, "\\u09F3");
-        document.getElementById("vwMonthlyTax").textContent = formatCurrency(bd.monthly_income_tax || 0, "\\u09F3");
-        document.getElementById("vwTotalPayable").textContent = formatCurrency(bd.total_payable, "\\u09F3");
+        document.getElementById("vwGross").textContent = formatCurrency(bd.gross_salary, "");
+        document.getElementById("vwBasic").textContent = formatCurrency(bd.basic, "");
+        document.getElementById("vwHouseRent").textContent = formatCurrency(bd.house_rent, "");
+        document.getElementById("vwMedical").textContent = formatCurrency(bd.medical_allowance, "");
+        document.getElementById("vwConveyance").textContent = formatCurrency(bd.conveyance_allowance, "");
+        document.getElementById("vwTotalSalary").textContent = formatCurrency(bd.total_salary, "");
+        document.getElementById("vwPersonalPf").textContent = formatCurrency(bd.personal_pf || 0, "");
+        document.getElementById("vwCompanyPf").textContent = formatCurrency(bd.company_pf || 0, "");
+        document.getElementById("vwPfDeductible").textContent = formatCurrency(bd.pf_deductible || 0, "");
+        document.getElementById("vwMonthlyTax").textContent = formatCurrency(bd.monthly_income_tax || 0, "");
+        document.getElementById("vwTotalPayable").textContent = formatCurrency(bd.total_payable, "");
         document.getElementById("vwGender").textContent = bd.gender === "female" ? "Female" : "Male";
         document.getElementById("vwPfApplicable").textContent = bd.pf_applicable ? "Yes" : "No";
         document.getElementById("vwOtOut").textContent = bd.ot_applicable_out ? "Yes" : "No";
@@ -306,8 +306,8 @@ function openView(idx) {
         document.getElementById("vwBankCode").textContent = bd.receiving_bank_code || "-";
         document.getElementById("vwReceivingBank").textContent = bd.receiving_bank_name || "-";
         document.getElementById("vwSalaryGivenBy").textContent = bd.salary_given_by || "-";
-        document.getElementById("vwCashPaid").textContent = bd.cash_paid ? formatCurrency(bd.cash_paid, "\\u09F3") : "-";
-        document.getElementById("vwBankPaid").textContent = bd.bank_paid ? formatCurrency(bd.bank_paid, "\\u09F3") : "-";
+        document.getElementById("vwCashPaid").textContent = bd.cash_paid ? formatCurrency(bd.cash_paid, "") : "-";
+        document.getElementById("vwBankPaid").textContent = bd.bank_paid ? formatCurrency(bd.bank_paid, "") : "-";
     }
     openModal("viewProposalModal");
 }

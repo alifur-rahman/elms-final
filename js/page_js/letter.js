@@ -37,10 +37,10 @@ function updateSortArrows() {
         var el = document.getElementById("sortArrow" + i);
         if (!el) continue;
         if (i === sortCol) {
-            el.textContent = sortDir === "asc" ? "\\u25B2" : "\\u25BC";
+            el.textContent = sortDir === "asc" ? "" : "";
             el.parentNode.classList.add("rp-sorted");
         } else {
-            el.textContent = "\\u2195";
+            el.textContent = "";
             el.parentNode.classList.remove("rp-sorted");
         }
     }
@@ -136,7 +136,7 @@ function renderMobileCards(pageData) {
         h += "<div class=\"rp-mob-top\"><div class=\"rp-mob-title\">" + (o.candidate_name || "") + "<small>" + (o.job_title || "N/A") + "</small></div>";
         h += "<div class=\"rp-mob-badges\"><span class=\"" + lsClass + "\">" + ls + "</span></div></div>";
         h += "<div class=\"rp-mob-grid\">";
-        h += "<div class=\"rp-mob-field\"><label>Salary</label><span>" + (o.salary ? formatCurrency(o.salary, "\\u09F3") : "-") + "</span></div>";
+        h += "<div class=\"rp-mob-field\"><label>Salary</label><span>" + (o.salary ? formatCurrency(o.salary, "") : "-") + "</span></div>";
         h += "<div class=\"rp-mob-field\"><label>Generated</label><span>" + (o.letter_generated_at || "-") + "</span></div>";
         h += "</div><div class=\"rp-mob-footer\">" + actions + "</div></div>";
     });
@@ -172,7 +172,7 @@ function renderTable() {
             tr.innerHTML =
                 "<td><strong>" + (o.candidate_name || "") + "</strong></td>" +
                 "<td>" + (o.job_title || "N/A") + "</td>" +
-                "<td>" + (o.salary ? formatCurrency(o.salary, "\\u09F3") : "-") + "</td>" +
+                "<td>" + (o.salary ? formatCurrency(o.salary, "") : "-") + "</td>" +
                 "<td><span class=\"" + lsClass + "\">" + ls + "</span></td>" +
                 "<td>" + (o.letter_generated_at || "-") + "</td>" +
                 "<td><div class=\"rp-actions-cell\">" + actions + "</div></td>";

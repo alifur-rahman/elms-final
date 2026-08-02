@@ -43,7 +43,7 @@ function updateSortArrows() {
         var el = document.getElementById("sortArrow" + i);
         if (!el) continue;
         if (i === sortCol) {
-            el.textContent = sortDir === "asc" ? "\u25B2" : "\u25BC";
+            el.textContent = sortDir === "asc" ? "" : "";
             el.parentNode.classList.add("rp-sorted");
         } else {
             el.textContent = "\u2195";
@@ -155,8 +155,8 @@ function renderMobileCards(pageData) {
     var html = "";
     pageData.forEach(function(c) {
         var name = c.first_name + " " + c.last_name;
-        var salary = c.expected_salary ? formatCurrency(c.expected_salary, "\\u09F3") : "-";
-        var proposed = c.proposed_amount ? formatCurrency(c.proposed_amount, "\\u09F3") : "-";
+        var salary = c.expected_salary ? formatCurrency(c.expected_salary, "") : "-";
+        var proposed = c.proposed_amount ? formatCurrency(c.proposed_amount, "") : "-";
         var status = c.proposal_status || "None";
         var statusClass = getStatusBadgeClass(status);
         var action = "";
@@ -209,8 +209,8 @@ function renderTable() {
     } else {
         pageData.forEach(function(c) {
             var name = c.first_name + " " + c.last_name;
-            var salary = c.expected_salary ? formatCurrency(c.expected_salary, "\\u09F3") : "-";
-            var proposed = c.proposed_amount ? formatCurrency(c.proposed_amount, "\\u09F3") : "-";
+            var salary = c.expected_salary ? formatCurrency(c.expected_salary, "") : "-";
+            var proposed = c.proposed_amount ? formatCurrency(c.proposed_amount, "") : "-";
             var status = c.proposal_status || "None";
             var statusClass = getStatusBadgeClass(status);
             var action = "";

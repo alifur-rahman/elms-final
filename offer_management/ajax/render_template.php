@@ -30,11 +30,11 @@ try {
                r.title AS job_title,
                d.name AS dept_name,
                des.name AS designation_name
-        FROM offers o
-        LEFT JOIN candidates c ON c.id = o.candidate_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN departments d ON d.id = o.dept_id
-        LEFT JOIN designations des ON des.id = o.designation_id
+        FROM elms_offers o
+        LEFT JOIN elms_candidates c ON c.id = o.candidate_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
+        LEFT JOIN elms_departments d ON d.id = o.dept_id
+        LEFT JOIN elms_designations des ON des.id = o.designation_id
         WHERE o.id = :id
     ");
     $stmt->execute([':id' => $offerId]);
@@ -52,7 +52,7 @@ try {
 
     // Build salary breakdown HTML
     $salaryBreakdownHtml = '';
-    $sbStmt = $pdo->prepare("SELECT salary_breakdown FROM salary_proposals WHERE candidate_id = :cid AND salary_breakdown IS NOT NULL ORDER BY version DESC LIMIT 1");
+    $sbStmt = $pdo->prepare("SELECT salary_breakdown FROM elms_salary_proposals WHERE candidate_id = :cid AND salary_breakdown IS NOT NULL ORDER BY version DESC LIMIT 1");
     $sbStmt->execute([':cid' => $offer['candidate_id']]);
     $sbRow = $sbStmt->fetch();
     if ($sbRow && $sbRow['salary_breakdown']) {

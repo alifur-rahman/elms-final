@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/config.php';
 
 try {
     $pdo = getDB();
-    $stmt = $pdo->query("SELECT id, name FROM departments ORDER BY name ASC");
+    $stmt = $pdo->query("SELECT id, name FROM elms_departments ORDER BY name ASC");
     $rows = $stmt->fetchAll();
     $depts = [];
     foreach ($rows as $r) {

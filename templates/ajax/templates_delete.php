@@ -22,7 +22,7 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("DELETE FROM letter_templates WHERE id = :id");
+    $stmt = $pdo->prepare("DELETE FROM elms_letter_templates WHERE id = :id");
     $stmt->execute([':id' => $id]);
 
     echo json_encode(['success' => true, 'message' => 'Template deleted.']);

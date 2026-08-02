@@ -10,10 +10,10 @@ try {
                cs.name AS status_name, c.expected_salary, c.applied_at,
                r.title AS job_title, r.dept_id,
                o.id AS offer_id, o.status AS offer_status
-        FROM candidates c
-        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN offers o ON o.candidate_id = c.id AND o.status IN ('Pending','Approved')
+        FROM elms_candidates c
+        LEFT JOIN elms_candidate_statuses cs ON cs.id = c.status_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
+        LEFT JOIN elms_offers o ON o.candidate_id = c.id AND o.status IN ('Pending','Approved')
         WHERE (c.status_id = 4 AND o.id IS NULL)
            OR (c.status_id = 5 AND o.status = 'Pending')
         ORDER BY c.applied_at DESC

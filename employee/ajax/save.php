@@ -21,14 +21,14 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT PBI_ID FROM personnel_basic_info WHERE offer_id = :oid");
+    $stmt = $pdo->prepare("SELECT PBI_ID FROM elms_personnel_basic_info WHERE offer_id = :oid");
     $stmt->execute([':oid' => $offerId]);
     if ($stmt->fetch()) {
         echo json_encode(['success' => false, 'message' => 'Employee already exists for this offer']);
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT o.*, c.first_name, c.last_name, c.email FROM offers o LEFT JOIN candidates c ON c.id = o.candidate_id WHERE o.id = :id");
+    $stmt = $pdo->prepare("SELECT o.*, c.first_name, c.last_name, c.email FROM elms_offers o LEFT JOIN elms_candidates c ON c.id = o.candidate_id WHERE o.id = :id");
     $stmt->execute([':id' => $offerId]);
     $offer = $stmt->fetch();
     if (!$offer) {
@@ -36,7 +36,7 @@ try {
         exit;
     }
 
-    $maxCode = $pdo->query("SELECT MAX(PBI_CODE) AS mx FROM personnel_basic_info")->fetch();
+    $maxCode = $pdo->query("SELECT MAX(PBI_CODE) AS mx FROM elms_personnel_basic_info")->fetch();
     $nextNum = 1;
     if ($maxCode && $maxCode['mx']) {
         preg_match('/(\d+)$/', $maxCode['mx'], $m);
@@ -80,7 +80,7 @@ try {
         }
     }
 
-    $sql = "INSERT INTO personnel_basic_info (" . implode(',', $insertCols) . ") VALUES (" . implode(',', $insertVals) . ")";
+    $sql = "INSERT INTO elms_personnel_basic_info (" . implode(',', $insertCols) . ") VALUES (" . implode(',', $insertVals) . ")";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 

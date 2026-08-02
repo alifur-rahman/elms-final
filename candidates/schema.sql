@@ -11,7 +11,7 @@ USE elms;
 -- -----------------------------------------------------------
 -- Candidates (Job Applicants)
 -- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS candidates (
+CREATE TABLE IF NOT EXISTS elms_candidates (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     job_id          INT NOT NULL,
     code            VARCHAR(50) DEFAULT NULL,
@@ -34,5 +34,5 @@ CREATE TABLE IF NOT EXISTS candidates (
 
     INDEX idx_job_id (job_id),
     INDEX idx_status (status),
-    CONSTRAINT fk_candidate_job FOREIGN KEY (job_id) REFERENCES requisitions(id) ON DELETE CASCADE
+    CONSTRAINT fk_candidate_job FOREIGN KEY (job_id) REFERENCES elms_requisitions(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

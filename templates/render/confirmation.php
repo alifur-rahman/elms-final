@@ -6,11 +6,11 @@ function getConfirmationTagMap(PDO $pdo, int $recordId): array {
                des.name AS designation_name,
                o.salary, o.joining_date, o.probation_months,
                c.first_name AS c_first_name, c.last_name AS c_last_name, c.email AS c_email, c.phone AS c_phone
-        FROM personnel_basic_info pbi
-        LEFT JOIN departments d ON d.id = pbi.dept_id
-        LEFT JOIN designations des ON des.id = pbi.DESG_ID
-        LEFT JOIN offers o ON o.id = pbi.offer_id
-        LEFT JOIN candidates c ON c.id = pbi.candidate_id
+        FROM elms_personnel_basic_info pbi
+        LEFT JOIN elms_departments d ON d.id = pbi.dept_id
+        LEFT JOIN elms_designations des ON des.id = pbi.DESG_ID
+        LEFT JOIN elms_offers o ON o.id = pbi.offer_id
+        LEFT JOIN elms_candidates c ON c.id = pbi.candidate_id
         WHERE pbi.PBI_ID = :id
     ");
     $stmt->execute([':id' => $recordId]);
@@ -33,7 +33,7 @@ function getConfirmationTagMap(PDO $pdo, int $recordId): array {
     }
 
     $grossSalary = $emp['salary'] ?? 0;
-    $salaryStmt = $pdo->prepare("SELECT gross_salary, total_payable, basic_salary FROM salary_info WHERE offer_id = :oid LIMIT 1");
+    $salaryStmt = $pdo->prepare("SELECT gross_salary, total_payable, basic_salary FROM elms_salary_info WHERE offer_id = :oid LIMIT 1");
     $salaryStmt->execute([':oid' => $emp['offer_id'] ?? 0]);
     $salRow = $salaryStmt->fetch();
     if ($salRow) {

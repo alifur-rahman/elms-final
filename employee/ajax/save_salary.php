@@ -21,7 +21,7 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT PBI_ID FROM personnel_basic_info WHERE offer_id = :oid");
+    $stmt = $pdo->prepare("SELECT PBI_ID FROM elms_personnel_basic_info WHERE offer_id = :oid");
     $stmt->execute([':oid' => $offerId]);
     $emp = $stmt->fetch();
     if (!$emp) {
@@ -47,7 +47,7 @@ try {
         'pf_company', 'tax_status', 'pf_status', 'cash', 'pf_applicable', 'pf_deductible',
     ];
 
-    $exists = $pdo->prepare("SELECT id FROM salary_info WHERE offer_id = :oid");
+    $exists = $pdo->prepare("SELECT id FROM elms_salary_info WHERE offer_id = :oid");
     $exists->execute([':oid' => $offerId]);
     $existing = $exists->fetch();
 
@@ -64,7 +64,7 @@ try {
         $params[':pbid'] = $pbId;
         $setClauses[] = "edit_by = :editby";
         $params[':editby'] = '1';
-        $sql = "UPDATE salary_info SET " . implode(', ', $setClauses) . " WHERE offer_id = :oid";
+        $sql = "UPDATE elms_salary_info SET " . implode(', ', $setClauses) . " WHERE offer_id = :oid";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         $msg = "Salary information updated!";
@@ -79,7 +79,7 @@ try {
                 $params[":$f"] = $body[$f];
             }
         }
-        $sql = "INSERT INTO salary_info (" . implode(',', $insertCols) . ") VALUES (" . implode(',', $placeholders) . ")";
+        $sql = "INSERT INTO elms_salary_info (" . implode(',', $insertCols) . ") VALUES (" . implode(',', $placeholders) . ")";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         $msg = "Salary information saved!";

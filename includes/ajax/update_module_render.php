@@ -52,7 +52,7 @@ try {
         exit;
     }
 
-    $sql = "UPDATE template_modules SET " . implode(', ', $updates) . " WHERE id = :id";
+    $sql = "UPDATE elms_template_modules SET " . implode(', ', $updates) . " WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 

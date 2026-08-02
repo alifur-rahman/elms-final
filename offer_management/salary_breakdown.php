@@ -14,17 +14,17 @@ $candidate = null;
 $proposal  = null;
 
 if ($candidateId > 0) {
-    $stmt = $pdo->prepare("SELECT c.*, r.title AS job_title, cs.name AS status_name FROM candidates c LEFT JOIN requisitions r ON r.id = c.job_id LEFT JOIN candidate_statuses cs ON cs.id = c.status_id WHERE c.id = :id");
+    $stmt = $pdo->prepare("SELECT c.*, r.title AS job_title, cs.name AS status_name FROM elms_candidates c LEFT JOIN elms_requisitions r ON r.id = c.job_id LEFT JOIN elms_candidate_statuses cs ON cs.id = c.status_id WHERE c.id = :id");
     $stmt->execute([':id' => $candidateId]);
     $candidate = $stmt->fetch();
 }
 
 if ($proposalId > 0) {
-    $stmt = $pdo->prepare("SELECT * FROM salary_proposals WHERE id = :id");
+    $stmt = $pdo->prepare("SELECT * FROM elms_salary_proposals WHERE id = :id");
     $stmt->execute([':id' => $proposalId]);
     $proposal = $stmt->fetch();
 } elseif ($candidateId > 0) {
-    $stmt = $pdo->prepare("SELECT * FROM salary_proposals WHERE candidate_id = :cid ORDER BY version DESC LIMIT 1");
+    $stmt = $pdo->prepare("SELECT * FROM elms_salary_proposals WHERE candidate_id = :cid ORDER BY version DESC LIMIT 1");
     $stmt->execute([':cid' => $candidateId]);
     $proposal = $stmt->fetch();
 }

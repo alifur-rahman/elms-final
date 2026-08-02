@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../includes/config.php';
 try {
     $pdo = getDB();
 
-    $cnt = $pdo->query("SELECT COUNT(*) FROM letter_templates WHERE type = 'Confirmation'")->fetchColumn();
+    $cnt = $pdo->query("SELECT COUNT(*) FROM elms_letter_templates WHERE type = 'Confirmation'")->fetchColumn();
     if ((int)$cnt === 0) {
         $default = <<<'HTML'
 <div style="font-family:serif;line-height:1.8;max-width:700px;margin:0 auto;padding:24px">
@@ -34,7 +34,7 @@ try {
     <p style="margin-top:32px"><strong>{{HR_NAME}}</strong><br>Human Resources Department<br>{{COMPANY_NAME}}</p>
 </div>
 HTML;
-        $stmt = $pdo->prepare("INSERT INTO letter_templates (name, type, content, status) VALUES (?, ?, ?, 'Active')");
+        $stmt = $pdo->prepare("INSERT INTO elms_letter_templates (name, type, content, status) VALUES (?, ?, ?, 'Active')");
         $stmt->execute(['Confirmation Letter Template', 'Confirmation', $default]);
         echo json_encode(['success' => true, 'message' => 'Confirmation template seeded.']);
     } else {

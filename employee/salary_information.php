@@ -10,11 +10,11 @@ $pdo = getDB();
 $emp = null;
 $salary = null;
 if ($offerId > 0) {
-    $stmt = $pdo->prepare("SELECT p.PBI_ID, p.PBI_NAME, p.last_name, p.PBI_CODE, p.job_title, p.PBI_DESIGNATION, o.salary FROM personnel_basic_info p JOIN offers o ON o.id = p.offer_id WHERE p.offer_id = :oid");
+    $stmt = $pdo->prepare("SELECT p.PBI_ID, p.PBI_NAME, p.last_name, p.PBI_CODE, p.job_title, p.PBI_DESIGNATION, o.salary FROM elms_personnel_basic_info p JOIN elms_offers o ON o.id = p.offer_id WHERE p.offer_id = :oid");
     $stmt->execute([':oid' => $offerId]);
     $emp = $stmt->fetch();
     if ($emp) {
-        $stmt2 = $pdo->prepare("SELECT * FROM salary_info WHERE offer_id = :oid");
+        $stmt2 = $pdo->prepare("SELECT * FROM elms_salary_info WHERE offer_id = :oid");
         $stmt2->execute([':oid' => $offerId]);
         $salary = $stmt2->fetch();
     }

@@ -25,7 +25,7 @@ try {
     }
 
     // Load the module config to get the render file path
-    $modStmt = $pdo->prepare("SELECT render_file FROM template_modules WHERE module_name = :m AND is_active = 1");
+    $modStmt = $pdo->prepare("SELECT render_file FROM elms_template_modules WHERE module_name = :m AND is_active = 1");
     $modStmt->execute([':m' => $module]);
     $mod = $modStmt->fetch();
 

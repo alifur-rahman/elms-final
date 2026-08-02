@@ -28,14 +28,14 @@ try {
                des.name AS designation_name,
                pw_next.level AS current_level,
                pw_next.id AS wf_id
-        FROM probation_appraisals pa
-        LEFT JOIN personnel_basic_info pbi ON pbi.PBI_ID = pa.employee_id
-        LEFT JOIN departments d ON d.id = pbi.dept_id
-        LEFT JOIN designations des ON des.id = (SELECT o.designation_id FROM offers o WHERE o.id = pbi.offer_id LIMIT 1)
-        LEFT JOIN probation_workflow pw_next ON pw_next.appraisal_id = pa.id
+        FROM elms_probation_appraisals pa
+        LEFT JOIN elms_personnel_basic_info pbi ON pbi.PBI_ID = pa.employee_id
+        LEFT JOIN elms_departments d ON d.id = pbi.dept_id
+        LEFT JOIN elms_designations des ON des.id = (SELECT o.designation_id FROM elms_offers o WHERE o.id = pbi.offer_id LIMIT 1)
+        LEFT JOIN elms_probation_workflow pw_next ON pw_next.appraisal_id = pa.id
             AND pw_next.status = 'Pending'
             AND pw_next.id = (
-                SELECT pw1.id FROM probation_workflow pw1
+                SELECT pw1.id FROM elms_probation_workflow pw1
                 WHERE pw1.appraisal_id = pa.id
                   AND pw1.status = 'Pending'
                 ORDER BY CASE pw1.level

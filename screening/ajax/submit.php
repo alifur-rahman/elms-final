@@ -44,7 +44,7 @@ try {
     $pdo->beginTransaction();
 
     $stmt = $pdo->prepare("
-        INSERT INTO screenings
+        INSERT INTO elms_screenings
             (candidate_id, screened_by, date, rating, communication_score,
              experience_match, skill_match, education_match, remarks, result)
         VALUES
@@ -82,11 +82,11 @@ try {
     };
 
     // Get current candidate status code
-    $cs = $pdo->prepare("SELECT cs.code FROM candidates cc LEFT JOIN candidate_statuses cs ON cs.id = cc.status_id WHERE cc.id = :id");
+    $cs = $pdo->prepare("SELECT cs.code FROM elms_candidates cc LEFT JOIN elms_candidate_statuses cs ON cs.id = cc.status_id WHERE cc.id = :id");
     $cs->execute([':id' => $candidate_id]);
     $currentStatus = $cs->fetchColumn() ?: 'Applied';
 
-    $upd = $pdo->prepare("UPDATE candidates SET status_id = :status_id WHERE id = :id");
+    $upd = $pdo->prepare("UPDATE elms_candidates SET status_id = :status_id WHERE id = :id");
     $upd->execute([':status_id' => $targetStatusId, ':id' => $candidate_id]);
 
     addCandidateLog($pdo, $candidate_id, 'screening_' . strtolower($result), $currentStatus, $targetStatusName, $remarks ?: null);

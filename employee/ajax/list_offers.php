@@ -13,12 +13,12 @@ $sql = "SELECT o.*,
                d.name AS dept_name,
                des.name AS designation_name,
                p.PBI_ID AS employee_id
-        FROM offers o
-        LEFT JOIN candidates c ON c.id = o.candidate_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN departments d ON d.id = o.dept_id
-        LEFT JOIN designations des ON des.id = o.designation_id
-        LEFT JOIN personnel_basic_info p ON p.offer_id = o.id
+        FROM elms_offers o
+        LEFT JOIN elms_candidates c ON c.id = o.candidate_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
+        LEFT JOIN elms_departments d ON d.id = o.dept_id
+        LEFT JOIN elms_designations des ON des.id = o.designation_id
+        LEFT JOIN elms_personnel_basic_info p ON p.offer_id = o.id
         WHERE 1=1";
 
 $params = [];

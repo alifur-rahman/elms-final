@@ -13,12 +13,12 @@ $stmt = $pdo->prepare("
            des.name AS designation_name,
            d.name AS dept_name,
            r.title AS job_title
-    FROM offer_response_tokens ort
-    JOIN offers o ON o.id = ort.offer_id
-    LEFT JOIN candidates c ON c.id = o.candidate_id
-    LEFT JOIN designations des ON des.id = o.designation_id
-    LEFT JOIN departments d ON d.id = o.dept_id
-    LEFT JOIN requisitions r ON r.id = c.job_id
+    FROM elms_offer_response_tokens ort
+    JOIN elms_offers o ON o.id = ort.offer_id
+    LEFT JOIN elms_candidates c ON c.id = o.candidate_id
+    LEFT JOIN elms_designations des ON des.id = o.designation_id
+    LEFT JOIN elms_departments d ON d.id = o.dept_id
+    LEFT JOIN elms_requisitions r ON r.id = c.job_id
     WHERE ort.token = :token
 ");
 $stmt->execute([':token' => $token]);
@@ -55,10 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $state === 'open') {
 
         $pdo->beginTransaction();
         try {
-            $updO = $pdo->prepare("UPDATE offers SET response_status = :st, responded_at = NOW(), response_notes = :notes WHERE id = :id");
+            $updO = $pdo->prepare("UPDATE elms_offers SET response_status = :st, responded_at = NOW(), response_notes = :notes WHERE id = :id");
             $updO->execute([':st' => $status, ':notes' => $notes, ':id' => $rec['offer_id']]);
 
-            $updT = $pdo->prepare("UPDATE offer_response_tokens SET is_used = 1, used_at = NOW(), response_status = :st, response_notes = :notes, candidate_ip = :ip, candidate_user_agent = :ua WHERE id = :tid");
+            $updT = $pdo->prepare("UPDATE elms_offer_response_tokens SET is_used = 1, used_at = NOW(), response_status = :st, response_notes = :notes, candidate_ip = :ip, candidate_user_agent = :ua WHERE id = :tid");
             $updT->execute([':st' => $status, ':notes' => $notes, ':ip' => $ip, ':ua' => $ua, ':tid' => $rec['id']]);
 
             if (function_exists('addCandidateLog')) {

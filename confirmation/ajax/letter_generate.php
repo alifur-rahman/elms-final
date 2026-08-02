@@ -24,18 +24,18 @@ try {
         exit;
     }
 
-    $chk = $pdo->prepare("SELECT id FROM confirmation_letters WHERE employee_id = :eid LIMIT 1");
+    $chk = $pdo->prepare("SELECT id FROM elms_confirmation_letters WHERE employee_id = :eid LIMIT 1");
     $chk->execute([':eid' => $employeeId]);
     $existing = $chk->fetch();
 
     if ($existing) {
-        $uStmt = $pdo->prepare("UPDATE confirmation_letters SET letter_content = :content, status = 'Generated', employment_type = :emp_type, generated_at = NOW() WHERE id = :id");
+        $uStmt = $pdo->prepare("UPDATE elms_confirmation_letters SET letter_content = :content, status = 'Generated', employment_type = :emp_type, generated_at = NOW() WHERE id = :id");
         $uStmt->execute([':content' => $content, ':emp_type' => $empType, ':id' => $existing['id']]);
         $letterId = $existing['id'];
     } else {
         $appraisalId = (int)($body['appraisal_id'] ?? 0);
         $offerId = (int)($body['offer_id'] ?? 0);
-        $iStmt = $pdo->prepare("INSERT INTO confirmation_letters (employee_id, offer_id, appraisal_id, letter_content, letter_format, employment_type, status, generated_at) VALUES (:eid, :oid, :apid, :content, 'html', :emp_type, 'Generated', NOW())");
+        $iStmt = $pdo->prepare("INSERT INTO elms_confirmation_letters (employee_id, offer_id, appraisal_id, letter_content, letter_format, employment_type, status, generated_at) VALUES (:eid, :oid, :apid, :content, 'html', :emp_type, 'Generated', NOW())");
         $iStmt->execute([':eid' => $employeeId, ':oid' => $offerId ?: null, ':apid' => $appraisalId ?: null, ':content' => $content, ':emp_type' => $empType]);
         $letterId = $pdo->lastInsertId();
     }

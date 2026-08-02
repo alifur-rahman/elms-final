@@ -32,7 +32,7 @@ try {
 
     $pdo->beginTransaction();
 
-    $stmt = $pdo->prepare("UPDATE probation_appraisals SET overall_score = :score, recommendation = :rec, remarks = :remarks, supervisor_comments = :sup, dept_head_comments = :dept, hr_review = :hr" . ($status ? ", status = :status" : "") . " WHERE id = :id");
+    $stmt = $pdo->prepare("UPDATE elms_probation_appraisals SET overall_score = :score, recommendation = :rec, remarks = :remarks, supervisor_comments = :sup, dept_head_comments = :dept, hr_review = :hr" . ($status ? ", status = :status" : "") . " WHERE id = :id");
     $params = [
         ':score'   => $overallScore,
         ':rec'     => $recommendation ?: null,
@@ -47,10 +47,10 @@ try {
 
     // Save/update scores
     if (!empty($scores)) {
-        $delStmt = $pdo->prepare("DELETE FROM probation_scores WHERE appraisal_id = :aid");
+        $delStmt = $pdo->prepare("DELETE FROM elms_probation_scores WHERE appraisal_id = :aid");
         $delStmt->execute([':aid' => $id]);
 
-        $insStmt = $pdo->prepare("INSERT INTO probation_scores (appraisal_id, category_id, score, comments) VALUES (:aid, :cat, :score, :comments)");
+        $insStmt = $pdo->prepare("INSERT INTO elms_probation_scores (appraisal_id, category_id, score, comments) VALUES (:aid, :cat, :score, :comments)");
         foreach ($scores as $s) {
             $catId = (int)($s['category_id'] ?? 0);
             $score = (float)($s['score'] ?? 0);
@@ -61,12 +61,12 @@ try {
         }
     }
 
-    // Log lifecycle event (resolve candidate_id from personnel_basic_info)
-    $appStmt = $pdo->prepare("SELECT employee_id FROM probation_appraisals WHERE id = :id");
+    // Log lifecycle event (resolve candidate_id from elms_personnel_basic_info)
+    $appStmt = $pdo->prepare("SELECT employee_id FROM elms_probation_appraisals WHERE id = :id");
     $appStmt->execute([':id' => $id]);
     $empId = (int)$appStmt->fetchColumn();
     if ($empId) {
-        $candStmt = $pdo->prepare("SELECT candidate_id FROM personnel_basic_info WHERE PBI_ID = :eid");
+        $candStmt = $pdo->prepare("SELECT candidate_id FROM elms_personnel_basic_info WHERE PBI_ID = :eid");
         $candStmt->execute([':eid' => $empId]);
         $candId = (int)$candStmt->fetchColumn();
         if ($candId > 0) {

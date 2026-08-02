@@ -13,15 +13,15 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 echo "=== Clearing pipeline data ===\n";
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
-$pdo->exec("TRUNCATE TABLE offer_approvals");
-$pdo->exec("TRUNCATE TABLE offers");
-$pdo->exec("TRUNCATE TABLE interview_log");
-$pdo->exec("TRUNCATE TABLE screenings");
-$pdo->exec("TRUNCATE TABLE candidate_logs");
-$pdo->exec("DELETE FROM candidates");
-$pdo->exec("ALTER TABLE candidates AUTO_INCREMENT = 1");
-$pdo->exec("DELETE FROM requisitions");
-$pdo->exec("ALTER TABLE requisitions AUTO_INCREMENT = 1");
+$pdo->exec("TRUNCATE TABLE elms_offer_approvals");
+$pdo->exec("TRUNCATE TABLE elms_offers");
+$pdo->exec("TRUNCATE TABLE elms_interview_log");
+$pdo->exec("TRUNCATE TABLE elms_screenings");
+$pdo->exec("TRUNCATE TABLE elms_candidate_logs");
+$pdo->exec("DELETE FROM elms_candidates");
+$pdo->exec("ALTER TABLE elms_candidates AUTO_INCREMENT = 1");
+$pdo->exec("DELETE FROM elms_requisitions");
+$pdo->exec("ALTER TABLE elms_requisitions AUTO_INCREMENT = 1");
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
 echo "Pipeline data cleared.\n\n";
 
@@ -56,7 +56,7 @@ $reqs = [
 ];
 
 echo "=== Creating requisitions ===\n";
-$reqStmt = $pdo->prepare("INSERT INTO requisitions (title, dept_id, location, type, vacancies, deadline, salary_min, salary_max, priority, status) VALUES (:title, :dept_id, :loc, :type, :vac, :deadline, :sal_min, :sal_max, :priority, 'Active')");
+$reqStmt = $pdo->prepare("INSERT INTO elms_requisitions (title, dept_id, location, type, vacancies, deadline, salary_min, salary_max, priority, status) VALUES (:title, :dept_id, :loc, :type, :vac, :deadline, :sal_min, :sal_max, :priority, 'Active')");
 $reqIds = [];
 foreach ($reqs as $r) {
     $deadline = date('Y-m-d', strtotime('+' . rand(30, 120) . ' days'));
@@ -84,7 +84,7 @@ $firstNames = ['Rahul', 'Priya', 'Arif', 'Sadia', 'Tanvir', 'Nusrat', 'Hasan', '
 
 $lastNames  = ['Islam', 'Khan', 'Hossain', 'Ahmed', 'Rahman', 'Mollah', 'Chowdhury', 'Das', 'Sarker', 'Roy', 'Haque', 'Sen', 'Mondal', 'Biswas', 'Pal', 'Ghosh', 'Datta', 'Chakraborty', 'Bose', 'Majumder', 'Saha', 'Nath', 'Mistry', 'Kundu', 'Sikder', 'Gain', 'Barman', 'Malaker', 'Shil', 'Dhar', 'Poddar', 'Sutradhar'];
 
-$candStmt = $pdo->prepare("INSERT INTO candidates (job_id, code, first_name, last_name, email, phone, status_id, current_salary, expected_salary, applied_at) VALUES (:job_id, :code, :fname, :lname, :email, :phone, 1, :cur_sal, :exp_sal, :applied_at)");
+$candStmt = $pdo->prepare("INSERT INTO elms_candidates (job_id, code, first_name, last_name, email, phone, status_id, current_salary, expected_salary, applied_at) VALUES (:job_id, :code, :fname, :lname, :email, :phone, 1, :cur_sal, :exp_sal, :applied_at)");
 
 echo "=== Creating candidates ===\n";
 $count = 0;
@@ -119,7 +119,7 @@ foreach ($reqs as $ri => $r) {
         $candId = $pdo->lastInsertId();
 
         // Add log for Applied
-        $logStmt = $pdo->prepare("INSERT INTO candidate_logs (candidate_id, action, from_status, to_status, notes, created_by, created_at) VALUES (:cid, 'applied', NULL, 'Applied', 'Application submitted online', 'Admin User', :ca)");
+        $logStmt = $pdo->prepare("INSERT INTO elms_candidate_logs (candidate_id, action, from_status, to_status, notes, created_by, created_at) VALUES (:cid, 'applied', NULL, 'Applied', 'Application submitted online', 'Admin User', :ca)");
         $logStmt->execute([':cid' => $candId, ':ca' => $appliedAt]);
 
         $count++;

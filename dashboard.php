@@ -7,37 +7,37 @@ $breadcrumb  = 'Home / Dashboard';
 require_once __DIR__ . '/includes/config.php';
 $pdo = getDB();
 
-$totalCandidates   = (int)$pdo->query("SELECT COUNT(*) FROM candidates")->fetchColumn();
-$totalOffers       = (int)$pdo->query("SELECT COUNT(*) FROM offers")->fetchColumn();
-$pendingResponses  = (int)$pdo->query("SELECT COUNT(*) FROM offers WHERE response_status = 'Pending'")->fetchColumn();
-$totalRequisitions = (int)$pdo->query("SELECT COUNT(*) FROM requisitions WHERE status = 'Active'")->fetchColumn();
-$pendingProbation  = (int)$pdo->query("SELECT COUNT(*) FROM probation_appraisals WHERE status = 'Pending'")->fetchColumn();
-$totalEmployees    = (int)$pdo->query("SELECT COUNT(*) FROM personnel_basic_info")->fetchColumn();
+$totalCandidates   = (int)$pdo->query("SELECT COUNT(*) FROM elms_candidates")->fetchColumn();
+$totalOffers       = (int)$pdo->query("SELECT COUNT(*) FROM elms_offers")->fetchColumn();
+$pendingResponses  = (int)$pdo->query("SELECT COUNT(*) FROM elms_offers WHERE response_status = 'Pending'")->fetchColumn();
+$totalRequisitions = (int)$pdo->query("SELECT COUNT(*) FROM elms_requisitions WHERE status = 'Active'")->fetchColumn();
+$pendingProbation  = (int)$pdo->query("SELECT COUNT(*) FROM elms_probation_appraisals WHERE status = 'Pending'")->fetchColumn();
+$totalEmployees    = (int)$pdo->query("SELECT COUNT(*) FROM elms_personnel_basic_info")->fetchColumn();
 
 $pipeline = [];
-$rs = $pdo->query("SELECT cs.name, COUNT(*) cnt FROM candidates c JOIN candidate_statuses cs ON c.status_id = cs.id GROUP BY cs.id ORDER BY cs.sort_order");
+$rs = $pdo->query("SELECT cs.name, COUNT(*) cnt FROM elms_candidates c JOIN elms_candidate_statuses cs ON c.status_id = cs.id GROUP BY cs.id ORDER BY cs.sort_order");
 foreach ($rs as $r) $pipeline[$r['name']] = (int)$r['cnt'];
 
 $pendingOfferRows = $pdo->query("
     SELECT o.id, c.first_name, c.last_name
-    FROM offers o
-    JOIN candidates c ON o.candidate_id = c.id
+    FROM elms_offers o
+    JOIN elms_candidates c ON o.candidate_id = c.id
     WHERE o.response_status = 'Pending'
     ORDER BY o.created_at DESC
 ")->fetchAll();
 
 $pendingProbRows = $pdo->query("
     SELECT p.id, p.end_date, pi.PBI_NAME
-    FROM probation_appraisals p
-    JOIN personnel_basic_info pi ON p.employee_id = pi.PBI_ID
+    FROM elms_probation_appraisals p
+    JOIN elms_personnel_basic_info pi ON p.employee_id = pi.PBI_ID
     WHERE p.status = 'Pending'
     ORDER BY p.end_date ASC
 ")->fetchAll();
 
 $recentLogs = $pdo->query("
     SELECT cl.action, cl.notes, cl.created_at, c.first_name, c.last_name
-    FROM candidate_logs cl
-    LEFT JOIN candidates c ON cl.candidate_id = c.id
+    FROM elms_candidate_logs cl
+    LEFT JOIN elms_candidates c ON cl.candidate_id = c.id
     ORDER BY cl.id DESC LIMIT 8
 ")->fetchAll();
 

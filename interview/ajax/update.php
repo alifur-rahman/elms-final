@@ -23,7 +23,7 @@ try {
         exit;
     }
 
-    $check = $pdo->prepare("SELECT id, candidate_id FROM interview_log WHERE id = :id");
+    $check = $pdo->prepare("SELECT id, candidate_id FROM elms_interview_log WHERE id = :id");
     $check->execute([':id' => $id]);
     $existing = $check->fetch();
     if (!$existing) {
@@ -88,13 +88,13 @@ try {
         exit;
     }
 
-    $sql = "UPDATE interview_log SET " . implode(', ', $updates) . ", updated_at = NOW() WHERE id = :id";
+    $sql = "UPDATE elms_interview_log SET " . implode(', ', $updates) . ", updated_at = NOW() WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 
     // Update candidate status based on decision + is_final_round
     if ($status === 'Completed' && $decision !== '') {
-        $getIfr = $pdo->prepare("SELECT is_final_round FROM interview_log WHERE id = :id");
+        $getIfr = $pdo->prepare("SELECT is_final_round FROM elms_interview_log WHERE id = :id");
         $getIfr->execute([':id' => $id]);
         $finalRound = (bool) $getIfr->fetchColumn();
 
@@ -119,11 +119,11 @@ try {
         }
 
         if ($targetStatusId !== null) {
-            $cs = $pdo->prepare("SELECT cs.code FROM candidates cc LEFT JOIN candidate_statuses cs ON cs.id = cc.status_id WHERE cc.id = :id");
+            $cs = $pdo->prepare("SELECT cs.code FROM elms_candidates cc LEFT JOIN elms_candidate_statuses cs ON cs.id = cc.status_id WHERE cc.id = :id");
             $cs->execute([':id' => $candidate_id]);
             $currentStatus = $cs->fetchColumn() ?: 'Interview';
 
-            $upd = $pdo->prepare("UPDATE candidates SET status_id = :status_id WHERE id = :id");
+            $upd = $pdo->prepare("UPDATE elms_candidates SET status_id = :status_id WHERE id = :id");
             $upd->execute([':status_id' => $targetStatusId, ':id' => $candidate_id]);
 
             $logNotes = $feedback ?: null;

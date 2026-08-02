@@ -21,8 +21,8 @@ try {
 
     $stmt = $pdo->prepare("
         SELECT r.*, d.name AS dept_name
-        FROM requisitions r
-        LEFT JOIN departments d ON d.id = r.dept_id
+        FROM elms_requisitions r
+        LEFT JOIN elms_departments d ON d.id = r.dept_id
         WHERE r.id = :id
     ");
     $stmt->execute([':id' => $id]);

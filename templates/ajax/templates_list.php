@@ -6,7 +6,7 @@ try {
     $pdo = getDB();
     $type = trim($_GET['type'] ?? '');
 
-    $sql = "SELECT * FROM letter_templates";
+    $sql = "SELECT * FROM elms_letter_templates";
     $params = [];
     if ($type !== '') {
         $sql .= " WHERE type = :type";

@@ -52,12 +52,12 @@ try {
                d.name AS dept_name,
                des.name AS designation_name,
                ol.id AS letter_id, ol.status AS letter_status, ol.generated_at AS letter_generated_at, ol.sent_at AS letter_sent_at
-        FROM offers o
-        LEFT JOIN candidates c ON c.id = o.candidate_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN departments d ON d.id = o.dept_id
-        LEFT JOIN designations des ON des.id = o.designation_id
-        LEFT JOIN offer_letters ol ON ol.offer_id = o.id AND ol.id = (SELECT MAX(ol2.id) FROM offer_letters ol2 WHERE ol2.offer_id = o.id)
+        FROM elms_offers o
+        LEFT JOIN elms_candidates c ON c.id = o.candidate_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
+        LEFT JOIN elms_departments d ON d.id = o.dept_id
+        LEFT JOIN elms_designations des ON des.id = o.designation_id
+        LEFT JOIN elms_offer_letters ol ON ol.offer_id = o.id AND ol.id = (SELECT MAX(ol2.id) FROM elms_offer_letters ol2 WHERE ol2.offer_id = o.id)
         $whereClause
         ORDER BY o.sent_at DESC
     ");

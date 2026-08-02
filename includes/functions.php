@@ -27,7 +27,7 @@ function formatCurrency($amount, $symbol = '$') {
 }
 
 function addCandidateLog(PDO $pdo, int $candidateId, string $action, ?string $fromStatus = null, ?string $toStatus = null, ?string $notes = null): void {
-    $stmt = $pdo->prepare("INSERT INTO candidate_logs (candidate_id, action, from_status, to_status, notes, created_by) VALUES (?, ?, ?, ?, ?, 'Admin User')");
+    $stmt = $pdo->prepare("INSERT INTO elms_candidate_logs (candidate_id, action, from_status, to_status, notes, created_by) VALUES (?, ?, ?, ?, ?, 'Admin User')");
     $stmt->execute([$candidateId, $action, $fromStatus, $toStatus, $notes]);
 }
 
@@ -44,12 +44,12 @@ function appBaseUrl(): string {
 }
 
 function getOfferResponseToken(PDO $pdo, int $offerId): ?string {
-    $stmt = $pdo->prepare("SELECT response_token FROM offers WHERE id = :id");
+    $stmt = $pdo->prepare("SELECT response_token FROM elms_offers WHERE id = :id");
     $stmt->execute([':id' => $offerId]);
     $token = $stmt->fetchColumn();
     if (!$token) {
         $token = bin2hex(random_bytes(32));
-        $upd = $pdo->prepare("UPDATE offers SET response_token = :token WHERE id = :id");
+        $upd = $pdo->prepare("UPDATE elms_offers SET response_token = :token WHERE id = :id");
         $upd->execute([':token' => $token, ':id' => $offerId]);
     }
     return $token;

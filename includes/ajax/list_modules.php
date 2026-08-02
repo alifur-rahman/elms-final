@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../includes/config.php';
 
 try {
     $pdo = getDB();
-    $stmt = $pdo->query("SELECT * FROM template_modules ORDER BY id ASC");
+    $stmt = $pdo->query("SELECT * FROM elms_template_modules ORDER BY id ASC");
     $rows = $stmt->fetchAll();
     $modules = [];
     foreach ($rows as $r) {

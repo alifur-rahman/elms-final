@@ -30,9 +30,9 @@ try {
 
     $cStmt = $pdo->prepare("
         SELECT c.*, r.dept_id, cs.code AS status_code
-        FROM candidates c
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
+        FROM elms_candidates c
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
+        LEFT JOIN elms_candidate_statuses cs ON cs.id = c.status_id
         WHERE c.id = :id
     ");
     $cStmt->execute([':id' => $candidateId]);
@@ -48,7 +48,7 @@ try {
 
     $pdo->beginTransaction();
 
-    $stmt = $pdo->prepare("INSERT INTO offers (candidate_id, salary, joining_date, designation_id, dept_id, probation_months, notes, status, sent_at) VALUES (:candidate_id, :salary, :joining_date, :designation_id, :dept_id, :probation, :notes, 'Pending', NOW())");
+    $stmt = $pdo->prepare("INSERT INTO elms_offers (candidate_id, salary, joining_date, designation_id, dept_id, probation_months, notes, status, sent_at) VALUES (:candidate_id, :salary, :joining_date, :designation_id, :dept_id, :probation, :notes, 'Pending', NOW())");
     $stmt->execute([
         ':candidate_id'    => $candidateId,
         ':salary'          => $salary,
@@ -60,12 +60,12 @@ try {
     ]);
     $offerId = $pdo->lastInsertId();
 
-    $aStmt = $pdo->prepare("INSERT INTO offer_approvals (offer_id, level, approver, status) VALUES (:offer_id, 1, 'Admin User', 'Pending')");
+    $aStmt = $pdo->prepare("INSERT INTO elms_offer_approvals (offer_id, level, approver, status) VALUES (:offer_id, 1, 'Admin User', 'Pending')");
     $aStmt->execute([':offer_id' => $offerId]);
 
     // Update candidate status to Offered (status_id = 5) if currently Selected (status_id = 4)
     if ((int)$candidate['status_id'] === 4) {
-        $uStmt = $pdo->prepare("UPDATE candidates SET status_id = 5 WHERE id = :id");
+        $uStmt = $pdo->prepare("UPDATE elms_candidates SET status_id = 5 WHERE id = :id");
         $uStmt->execute([':id' => $candidateId]);
         addCandidateLog($pdo, $candidateId, 'offer_created', $candidate['status_code'], 'Offered', 'Offer created with salary ' . $salary);
     }

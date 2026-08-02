@@ -23,7 +23,7 @@ try {
     }
 
     // Check appraisal exists and is Draft
-    $chk = $pdo->prepare("SELECT status, employee_id FROM probation_appraisals WHERE id = :id");
+    $chk = $pdo->prepare("SELECT status, employee_id FROM elms_probation_appraisals WHERE id = :id");
     $chk->execute([':id' => $id]);
     $app = $chk->fetch();
     if (!$app) {
@@ -35,15 +35,15 @@ try {
     $pdo->beginTransaction();
 
     // Update status to Pending (submitted for workflow)
-    $stmt = $pdo->prepare("UPDATE probation_appraisals SET status = 'Pending' WHERE id = :id");
+    $stmt = $pdo->prepare("UPDATE elms_probation_appraisals SET status = 'Pending' WHERE id = :id");
     $stmt->execute([':id' => $id]);
 
     // Mark first workflow level (Self Assessment) as completed
-    $wfStmt = $pdo->prepare("UPDATE probation_workflow SET status = 'Approved', approved_by = 'Admin User', action_at = NOW() WHERE appraisal_id = :aid AND level = 'Self Assessment'");
+    $wfStmt = $pdo->prepare("UPDATE elms_probation_workflow SET status = 'Approved', approved_by = 'Admin User', action_at = NOW() WHERE appraisal_id = :aid AND level = 'Self Assessment'");
     $wfStmt->execute([':aid' => $id]);
 
-    // Log lifecycle (resolve candidate_id from personnel_basic_info)
-    $candStmt = $pdo->prepare("SELECT candidate_id FROM personnel_basic_info WHERE PBI_ID = :eid");
+    // Log lifecycle (resolve candidate_id from elms_personnel_basic_info)
+    $candStmt = $pdo->prepare("SELECT candidate_id FROM elms_personnel_basic_info WHERE PBI_ID = :eid");
     $candStmt->execute([':eid' => $app['employee_id']]);
     $candId = (int)$candStmt->fetchColumn();
     if ($candId > 0) {

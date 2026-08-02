@@ -25,11 +25,11 @@ try {
                o.response_notes AS offer_response_notes, o.status AS offer_status, o.probation_months,
                d.name AS dept_name,
                des.name AS designation_name
-        FROM probation_appraisals pa
-        LEFT JOIN personnel_basic_info pbi ON pbi.PBI_ID = pa.employee_id
-        LEFT JOIN offers o ON o.id = pbi.offer_id
-        LEFT JOIN departments d ON d.id = pbi.dept_id
-        LEFT JOIN designations des ON des.id = o.designation_id
+        FROM elms_probation_appraisals pa
+        LEFT JOIN elms_personnel_basic_info pbi ON pbi.PBI_ID = pa.employee_id
+        LEFT JOIN elms_offers o ON o.id = pbi.offer_id
+        LEFT JOIN elms_departments d ON d.id = pbi.dept_id
+        LEFT JOIN elms_designations des ON des.id = o.designation_id
         WHERE pa.id = :id LIMIT 1
     ");
     $stmt->execute([':id' => $id]);
@@ -44,8 +44,8 @@ try {
     // Get scores
     $scoresStmt = $pdo->prepare("
         SELECT ps.id, ps.category_id, ps.score, ps.comments, pc.name AS category_name, pc.weight
-        FROM probation_scores ps
-        LEFT JOIN probation_categories pc ON pc.id = ps.category_id
+        FROM elms_probation_scores ps
+        LEFT JOIN elms_probation_categories pc ON pc.id = ps.category_id
         WHERE ps.appraisal_id = :aid
         ORDER BY pc.sort_order ASC
     ");
@@ -63,7 +63,7 @@ try {
     }
 
     // Get workflow
-    $wfStmt = $pdo->prepare("SELECT * FROM probation_workflow WHERE appraisal_id = :aid ORDER BY FIELD(level, 'Self Assessment','Supervisor','Dept Head','HR Review','GM','Managing Director') ASC");
+    $wfStmt = $pdo->prepare("SELECT * FROM elms_probation_workflow WHERE appraisal_id = :aid ORDER BY FIELD(level, 'Self Assessment','Supervisor','Dept Head','HR Review','GM','Managing Director') ASC");
     $wfStmt->execute([':aid' => $id]);
     $workflow = [];
     foreach ($wfStmt as $w) {
@@ -86,7 +86,7 @@ try {
     $otherLogs = [];
 
     if ($r['candidate_id']) {
-        $screenStmt = $pdo->prepare("SELECT * FROM screenings WHERE candidate_id = :cid ORDER BY created_at DESC");
+        $screenStmt = $pdo->prepare("SELECT * FROM elms_screenings WHERE candidate_id = :cid ORDER BY created_at DESC");
         $screenStmt->execute([':cid' => $r['candidate_id']]);
         foreach ($screenStmt as $s) {
             $screenings[] = [
@@ -104,7 +104,7 @@ try {
             ];
         }
 
-        $intStmt = $pdo->prepare("SELECT * FROM interview_log WHERE candidate_id = :cid ORDER BY round ASC");
+        $intStmt = $pdo->prepare("SELECT * FROM elms_interview_log WHERE candidate_id = :cid ORDER BY round ASC");
         $intStmt->execute([':cid' => $r['candidate_id']]);
         foreach ($intStmt as $iv) {
             $interviews[] = [
@@ -128,7 +128,7 @@ try {
             ];
         }
 
-        $logsStmt = $pdo->prepare("SELECT * FROM candidate_logs WHERE candidate_id = :cid ORDER BY created_at DESC");
+        $logsStmt = $pdo->prepare("SELECT * FROM elms_candidate_logs WHERE candidate_id = :cid ORDER BY created_at DESC");
         $logsStmt->execute([':cid' => $r['candidate_id']]);
         foreach ($logsStmt as $log) {
             $entry = [

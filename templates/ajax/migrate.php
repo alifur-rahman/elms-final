@@ -16,7 +16,7 @@ try {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // Seed default template if table is empty
-    $cnt = $pdo->query("SELECT COUNT(*) FROM letter_templates")->fetchColumn();
+    $cnt = $pdo->query("SELECT COUNT(*) FROM elms_letter_templates")->fetchColumn();
     if ((int)$cnt === 0) {
         $default = <<<'HTML'
 <div style="font-family:serif;line-height:1.8;max-width:700px;margin:0 auto;padding:24px">
@@ -42,7 +42,7 @@ try {
     <p style="margin-top:32px"><strong>{{HR_NAME}}</strong><br>Human Resources Manager<br>{{COMPANY_NAME}}</p>
 </div>
 HTML;
-        $stmt = $pdo->prepare("INSERT INTO letter_templates (name, type, content, status) VALUES (?, ?, ?, 'Active')");
+        $stmt = $pdo->prepare("INSERT INTO elms_letter_templates (name, type, content, status) VALUES (?, ?, ?, 'Active')");
         $stmt->execute(['Standard Offer Letter', 'Offer', $default]);
     }
 

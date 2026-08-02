@@ -8,9 +8,9 @@ try {
     $stmt = $pdo->query("
         SELECT c.id, c.first_name, c.last_name, c.job_id, c.status_id,
                cs.name AS status_name, r.title AS job_title
-        FROM candidates c
-        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
+        FROM elms_candidates c
+        LEFT JOIN elms_candidate_statuses cs ON cs.id = c.status_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
         WHERE c.status_id IN (2, 3)
         ORDER BY c.first_name ASC
     ");
@@ -22,14 +22,14 @@ try {
         $cid = (int) $r['id'];
 
         // Count existing interviews & get max round
-        $cntStmt = $pdo->prepare("SELECT COUNT(*) AS cnt, COALESCE(MAX(`round`),0) AS mx FROM interview_log WHERE candidate_id = :id");
+        $cntStmt = $pdo->prepare("SELECT COUNT(*) AS cnt, COALESCE(MAX(`round`),0) AS mx FROM elms_interview_log WHERE candidate_id = :id");
         $cntStmt->execute([':id' => $cid]);
         $cntRow = $cntStmt->fetch();
         $interviewCount = (int) ($cntRow['cnt'] ?? 0);
         $maxRound = (int) ($cntRow['mx'] ?? 0);
 
         // Check if there's a pending interview waiting for feedback
-        $pendStmt = $pdo->prepare("SELECT id FROM interview_log WHERE candidate_id = :id AND status = 'Waiting for Feedback' LIMIT 1");
+        $pendStmt = $pdo->prepare("SELECT id FROM elms_interview_log WHERE candidate_id = :id AND status = 'Waiting for Feedback' LIMIT 1");
         $pendStmt->execute([':id' => $cid]);
         $scheduledId = $pendStmt->fetchColumn();
         $scheduledId = $scheduledId ? (int) $scheduledId : null;

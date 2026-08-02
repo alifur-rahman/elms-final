@@ -20,7 +20,7 @@ try {
         finalized_at DATETIME DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (candidate_id) REFERENCES elms_candidates(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
@@ -37,7 +37,7 @@ try {
         status VARCHAR(20) NOT NULL DEFAULT 'Draft',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (offer_id) REFERENCES elms_offers(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
@@ -52,15 +52,15 @@ try {
         sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         status VARCHAR(20) NOT NULL DEFAULT 'Sent',
         error_message TEXT DEFAULT NULL,
-        FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (offer_id) REFERENCES elms_offers(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
     // 4. Add response fields to offers table
     // ========================================================================
-    $cols = $pdo->query("SHOW COLUMNS FROM offers LIKE 'response_status'")->fetchAll();
+    $cols = $pdo->query("SHOW COLUMNS FROM elms_offers LIKE 'response_status'")->fetchAll();
     if (empty($cols)) {
-        $pdo->exec("ALTER TABLE offers
+        $pdo->exec("ALTER TABLE elms_offers
             ADD COLUMN response_status VARCHAR(20) DEFAULT 'Pending' AFTER status,
             ADD COLUMN responded_at DATETIME DEFAULT NULL AFTER response_status,
             ADD COLUMN response_notes TEXT DEFAULT NULL AFTER responded_at");

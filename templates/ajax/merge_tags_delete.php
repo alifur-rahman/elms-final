@@ -19,7 +19,7 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("DELETE FROM merge_tags WHERE id = :id");
+    $stmt = $pdo->prepare("DELETE FROM elms_merge_tags WHERE id = :id");
     $stmt->execute([':id' => $id]);
 
     if ($stmt->rowCount() === 0) {

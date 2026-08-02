@@ -20,9 +20,9 @@ try {
                sp.salary_breakdown,
                c.id AS candidate_id, c.first_name, c.last_name, c.expected_salary,
                r.title AS job_title, r.dept_id
-        FROM salary_proposals sp
-        JOIN candidates c ON c.id = sp.candidate_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
+        FROM elms_salary_proposals sp
+        JOIN elms_candidates c ON c.id = sp.candidate_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
         WHERE $where
         ORDER BY sp.created_at DESC
     ");

@@ -16,9 +16,9 @@ try {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    $cnt = $pdo->query("SELECT COUNT(*) FROM template_modules")->fetchColumn();
+    $cnt = $pdo->query("SELECT COUNT(*) FROM elms_template_modules")->fetchColumn();
     if ((int)$cnt === 0) {
-        $stmt = $pdo->prepare("INSERT INTO template_modules (module_name, label, render_file, description) VALUES (?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO elms_template_modules (module_name, label, render_file, description) VALUES (?, ?, ?, ?)");
         $stmt->execute(['Offer',        'Offer / Recruitment', 'templates/render/offer.php',        'Merge tags for offer letters and recruitment']);
         $stmt->execute(['Confirmation', 'Confirmation',        'templates/render/confirmation.php', 'Merge tags for confirmation letters']);
         $stmt->execute(['Probation',    'Probation',           'templates/render/probation.php',    'Merge tags for probation appraisal letters']);

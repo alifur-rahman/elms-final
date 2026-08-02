@@ -21,9 +21,9 @@ try {
 
     $stmt = $pdo->prepare("
         SELECT s.*, c.first_name, c.last_name, r.title AS job_title
-        FROM screenings s
-        LEFT JOIN candidates c ON c.id = s.candidate_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
+        FROM elms_screenings s
+        LEFT JOIN elms_candidates c ON c.id = s.candidate_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
         WHERE s.id = :id
     ");
     $stmt->execute([':id' => $id]);

@@ -8,9 +8,9 @@ try {
     $stmt = $pdo->query("
         SELECT c.id, c.first_name, c.last_name, c.code, c.job_id, c.status_id,
                cs.name AS status_name, r.title AS job_title, c.applied_at
-        FROM candidates c
-        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
+        FROM elms_candidates c
+        LEFT JOIN elms_candidate_statuses cs ON cs.id = c.status_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
         ORDER BY c.created_at DESC
     ");
 

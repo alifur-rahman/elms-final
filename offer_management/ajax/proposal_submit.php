@@ -25,7 +25,7 @@ try {
 
     // If only candidate_id given, find the latest proposal
     if ($proposalId <= 0) {
-        $pStmt = $pdo->prepare("SELECT id FROM salary_proposals WHERE candidate_id = :cid ORDER BY version DESC LIMIT 1");
+        $pStmt = $pdo->prepare("SELECT id FROM elms_salary_proposals WHERE candidate_id = :cid ORDER BY version DESC LIMIT 1");
         $pStmt->execute([':cid' => $candidateId]);
         $proposalId = (int)$pStmt->fetchColumn();
         if ($proposalId <= 0) {
@@ -35,7 +35,7 @@ try {
         }
     }
 
-    $check = $pdo->prepare("SELECT id, status, candidate_id FROM salary_proposals WHERE id = :id");
+    $check = $pdo->prepare("SELECT id, status, candidate_id FROM elms_salary_proposals WHERE id = :id");
     $check->execute([':id' => $proposalId]);
     $prop = $check->fetch();
 
@@ -51,7 +51,7 @@ try {
         exit;
     }
 
-    $uStmt = $pdo->prepare("UPDATE salary_proposals SET status = 'Pending_Approval' WHERE id = :id");
+    $uStmt = $pdo->prepare("UPDATE elms_salary_proposals SET status = 'Pending_Approval' WHERE id = :id");
     $uStmt->execute([':id' => $proposalId]);
 
     addCandidateLog($pdo, (int)$prop['candidate_id'], 'proposal_submitted_approval', null, null, 'Proposal #' . $proposalId . ' submitted for approval');

@@ -24,18 +24,18 @@ try {
             i.rating, i.score_technical, i.score_communication, i.score_problem_solving,
             i.score_attitude, i.reject_reason, i.is_final_round, i.feedback, i.decision,
             i.status AS interview_status
-        FROM candidates c
-        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN departments d ON d.id = r.dept_id
-        LEFT JOIN interview_log i ON i.id = (
-            SELECT i2.id FROM interview_log i2
+        FROM elms_candidates c
+        LEFT JOIN elms_candidate_statuses cs ON cs.id = c.status_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
+        LEFT JOIN elms_departments d ON d.id = r.dept_id
+        LEFT JOIN elms_interview_log i ON i.id = (
+            SELECT i2.id FROM elms_interview_log i2
             WHERE i2.candidate_id = c.id
             ORDER BY i2.id DESC LIMIT 1
         )
         WHERE (c.status_id IN (2, 3)
            OR (c.status_id IN (4, 7, 8)
-               AND EXISTS (SELECT 1 FROM interview_log il WHERE il.candidate_id = c.id)))
+               AND EXISTS (SELECT 1 FROM elms_interview_log il WHERE il.candidate_id = c.id)))
         ORDER BY
             CASE c.status_id WHEN 2 THEN 0 WHEN 3 THEN 1 ELSE 2 END,
             c.first_name ASC

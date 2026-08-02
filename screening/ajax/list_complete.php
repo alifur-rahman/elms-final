@@ -14,11 +14,11 @@ try {
             c.id AS candidate_id, c.first_name, c.last_name, c.email, c.phone,
             c.job_id, c.status_id, cs.name AS status_name, c.applied_at,
             r.title AS job_title, d.name AS dept_name
-        FROM screenings s
-        LEFT JOIN candidates c ON c.id = s.candidate_id
-        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN departments d ON d.id = r.dept_id
+        FROM elms_screenings s
+        LEFT JOIN elms_candidates c ON c.id = s.candidate_id
+        LEFT JOIN elms_candidate_statuses cs ON cs.id = c.status_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
+        LEFT JOIN elms_departments d ON d.id = r.dept_id
         ORDER BY s.created_at DESC
     ");
 

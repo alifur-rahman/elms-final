@@ -11,7 +11,7 @@ USE elms;
 -- -----------------------------------------------------------
 -- Screenings
 -- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS screenings (
+CREATE TABLE IF NOT EXISTS elms_screenings (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     candidate_id    INT NOT NULL,
     screened_by     VARCHAR(255) DEFAULT NULL,
@@ -29,5 +29,5 @@ CREATE TABLE IF NOT EXISTS screenings (
     INDEX idx_candidate_id (candidate_id),
     INDEX idx_result (result),
 
-    CONSTRAINT fk_screening_candidate FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE
+    CONSTRAINT fk_screening_candidate FOREIGN KEY (candidate_id) REFERENCES elms_candidates(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

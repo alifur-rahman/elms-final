@@ -7,7 +7,7 @@ try {
 
     // Check if salary_breakdown column exists (graceful for pre-migration DB)
     $hasBreakdown = false;
-    $cols = $pdo->query("SHOW COLUMNS FROM salary_proposals LIKE 'salary_breakdown'")->fetchAll();
+    $cols = $pdo->query("SHOW COLUMNS FROM elms_salary_proposals LIKE 'salary_breakdown'")->fetchAll();
     if (!empty($cols)) $hasBreakdown = true;
 
     $breakdownSelect = $hasBreakdown ? 'sp.salary_breakdown' : 'NULL AS salary_breakdown';
@@ -19,14 +19,14 @@ try {
                sp.id AS proposal_id, sp.proposed_salary, sp.offered_salary,
                sp.status AS proposal_status, sp.version, sp.negotiation_notes,
                $breakdownSelect
-        FROM candidates c
-        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN salary_proposals sp ON sp.candidate_id = c.id AND sp.id = (
-            SELECT MAX(sp2.id) FROM salary_proposals sp2 WHERE sp2.candidate_id = c.id
+        FROM elms_candidates c
+        LEFT JOIN elms_candidate_statuses cs ON cs.id = c.status_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
+        LEFT JOIN elms_salary_proposals sp ON sp.candidate_id = c.id AND sp.id = (
+            SELECT MAX(sp2.id) FROM elms_salary_proposals sp2 WHERE sp2.candidate_id = c.id
         )
         WHERE c.status_id = 4
-          AND c.id NOT IN (SELECT candidate_id FROM offers WHERE status IN ('Pending','Approved'))
+          AND c.id NOT IN (SELECT candidate_id FROM elms_offers WHERE status IN ('Pending','Approved'))
         ORDER BY c.applied_at DESC
     ");
 

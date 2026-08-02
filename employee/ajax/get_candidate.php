@@ -20,11 +20,11 @@ $stmt = $pdo->prepare("
            r.title AS job_title,
            d.name AS dept_name, d.id AS dept_id,
            des.name AS designation_name, des.id AS designation_id
-    FROM offers o
-    LEFT JOIN candidates c ON c.id = o.candidate_id
-    LEFT JOIN requisitions r ON r.id = c.job_id
-    LEFT JOIN departments d ON d.id = o.dept_id
-    LEFT JOIN designations des ON des.id = o.designation_id
+    FROM elms_offers o
+    LEFT JOIN elms_candidates c ON c.id = o.candidate_id
+    LEFT JOIN elms_requisitions r ON r.id = c.job_id
+    LEFT JOIN elms_departments d ON d.id = o.dept_id
+    LEFT JOIN elms_designations des ON des.id = o.designation_id
     WHERE o.id = :id
 ");
 $stmt->execute([':id' => $offerId]);
@@ -36,13 +36,13 @@ if (!$offer) {
     exit;
 }
 
-$stmt2 = $pdo->prepare("SELECT * FROM personnel_basic_info WHERE offer_id = :oid");
+$stmt2 = $pdo->prepare("SELECT * FROM elms_personnel_basic_info WHERE offer_id = :oid");
 $stmt2->execute([':oid' => $offerId]);
 $existing = $stmt2->fetch();
 
 $salary = null;
 if ($existing) {
-    $stmt3 = $pdo->prepare("SELECT * FROM salary_info WHERE offer_id = :oid");
+    $stmt3 = $pdo->prepare("SELECT * FROM elms_salary_info WHERE offer_id = :oid");
     $stmt3->execute([':oid' => $offerId]);
     $salary = $stmt3->fetch() ?: null;
 }

@@ -29,9 +29,9 @@ try {
     }
 
     $check = $pdo->prepare("SELECT sp.*, c.job_id, c.first_name, c.last_name, c.status_id, r.title AS job_title, r.dept_id 
-                            FROM salary_proposals sp
-                            JOIN candidates c ON c.id = sp.candidate_id
-                            LEFT JOIN requisitions r ON r.id = c.job_id
+                            FROM elms_salary_proposals sp
+                            JOIN elms_candidates c ON c.id = sp.candidate_id
+                            LEFT JOIN elms_requisitions r ON r.id = c.job_id
                             WHERE sp.id = :id");
     $check->execute([':id' => $proposalId]);
     $prop = $check->fetch();
@@ -53,7 +53,7 @@ try {
     $pdo->beginTransaction();
 
     if ($action === 'Rejected') {
-        $uStmt = $pdo->prepare("UPDATE salary_proposals SET status = 'Rejected' WHERE id = :id");
+        $uStmt = $pdo->prepare("UPDATE elms_salary_proposals SET status = 'Rejected' WHERE id = :id");
         $uStmt->execute([':id' => $proposalId]);
         addCandidateLog($pdo, $candidateId, 'proposal_rejected', null, null, 'Proposal #' . $proposalId . ' rejected: ' . ($comments ?: 'No comments'));
         $pdo->commit();
@@ -65,13 +65,13 @@ try {
     $finalSalary = $prop['offered_salary'] ?: $prop['proposed_salary'];
 
     // Update proposal to Finalized
-    $uStmt = $pdo->prepare("UPDATE salary_proposals SET status = 'Finalized', offered_salary = :sal, finalized_at = NOW() WHERE id = :id");
+    $uStmt = $pdo->prepare("UPDATE elms_salary_proposals SET status = 'Finalized', offered_salary = :sal, finalized_at = NOW() WHERE id = :id");
     $uStmt->execute([':sal' => $finalSalary, ':id' => $proposalId]);
 
     // Create offer with status 'Approved' (skip multi-level approval)
     $deptId = (int)($prop['dept_id'] ?: $body['dept_id'] ?? 0);
 
-    $iStmt = $pdo->prepare("INSERT INTO offers (candidate_id, salary, joining_date, designation_id, dept_id, probation_months, notes, status, sent_at) 
+    $iStmt = $pdo->prepare("INSERT INTO elms_offers (candidate_id, salary, joining_date, designation_id, dept_id, probation_months, notes, status, sent_at) 
                             VALUES (:cid, :sal, :jdate, :did, :dept, :prob, :notes, 'Approved', NOW())");
     $iStmt->execute([
         ':cid'  => $candidateId,
@@ -86,7 +86,7 @@ try {
 
     // Update candidate status to Offered (5) if currently Selected (4)
     if ((int)$prop['status_id'] === 4) {
-        $uStmt = $pdo->prepare("UPDATE candidates SET status_id = 5 WHERE id = :id");
+        $uStmt = $pdo->prepare("UPDATE elms_candidates SET status_id = 5 WHERE id = :id");
         $uStmt->execute([':id' => $candidateId]);
     }
 

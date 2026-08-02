@@ -26,10 +26,10 @@ try {
                pbi.PBI_NAME, pbi.last_name, pbi.job_title, pbi.dept_id,
                d.name AS dept_name,
                des.name AS designation_name
-        FROM probation_appraisals pa
-        LEFT JOIN personnel_basic_info pbi ON pbi.PBI_ID = pa.employee_id
-        LEFT JOIN departments d ON d.id = pbi.dept_id
-        LEFT JOIN designations des ON des.id = (SELECT o.designation_id FROM offers o WHERE o.id = pbi.offer_id LIMIT 1)
+        FROM elms_probation_appraisals pa
+        LEFT JOIN elms_personnel_basic_info pbi ON pbi.PBI_ID = pa.employee_id
+        LEFT JOIN elms_departments d ON d.id = pbi.dept_id
+        LEFT JOIN elms_designations des ON des.id = (SELECT o.designation_id FROM elms_offers o WHERE o.id = pbi.offer_id LIMIT 1)
         $whereClause
         ORDER BY pa.created_at DESC
     ");

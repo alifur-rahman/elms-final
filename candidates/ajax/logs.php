@@ -9,7 +9,7 @@ try {
     if ($candidateId > 0) {
         $stmt = $pdo->prepare("
             SELECT id, candidate_id, action, from_status, to_status, notes, created_by, created_at
-            FROM candidate_logs
+            FROM elms_candidate_logs
             WHERE candidate_id = :cid
             ORDER BY created_at DESC
         ");
@@ -17,8 +17,8 @@ try {
     } else {
         $stmt = $pdo->query("
             SELECT cl.*, CONCAT(c.first_name, ' ', c.last_name) AS candidate_name
-            FROM candidate_logs cl
-            LEFT JOIN candidates c ON c.id = cl.candidate_id
+            FROM elms_candidate_logs cl
+            LEFT JOIN elms_candidates c ON c.id = cl.candidate_id
             ORDER BY cl.created_at DESC
             LIMIT 100
         ");

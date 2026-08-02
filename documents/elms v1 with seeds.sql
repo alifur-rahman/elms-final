@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `candidates`
 --
 
-CREATE TABLE `candidates` (
+CREATE TABLE `elms_candidates` (
   `id` int(11) NOT NULL,
   `job_id` int(11) NOT NULL,
   `code` varchar(30) NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE `candidates` (
 -- Dumping data for table `candidates`
 --
 
-INSERT INTO `candidates` (`id`, `job_id`, `code`, `first_name`, `last_name`, `email`, `phone`, `nid`, `blood_group`, `dob`, `gender`, `present_address`, `permanent_address`, `current_salary`, `expected_salary`, `status_id`, `applied_at`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_candidates` (`id`, `job_id`, `code`, `first_name`, `last_name`, `email`, `phone`, `nid`, `blood_group`, `dob`, `gender`, `present_address`, `permanent_address`, `current_salary`, `expected_salary`, `status_id`, `applied_at`, `created_at`, `updated_at`) VALUES
 (1, 1, 'CND-001', 'Rahul', 'Sikder', 'rahul.sikder11@email.com', '+8801771635154', NULL, NULL, NULL, NULL, NULL, NULL, 36152.00, 89308.00, 5, '2026-05-19 13:51:54', '2026-07-09 11:51:54', '2026-07-22 10:00:03'),
 (2, 1, 'CND-002', 'Priya', 'Malaker', 'priya.malaker21@email.com', '+8801733800210', NULL, NULL, NULL, NULL, NULL, NULL, 28720.00, 77434.00, 5, '2026-06-18 13:51:54', '2026-07-09 11:51:54', '2026-07-16 11:02:44'),
 (3, 1, 'CND-003', 'Arif', 'Bose', 'arif.bose79@email.com', '+8801776916423', NULL, NULL, NULL, NULL, NULL, NULL, 135028.00, 145092.00, 8, '2026-05-13 13:51:54', '2026-07-09 11:51:54', '2026-07-16 10:54:02'),
@@ -125,7 +125,7 @@ INSERT INTO `candidates` (`id`, `job_id`, `code`, `first_name`, `last_name`, `em
 -- Table structure for table `candidate_logs`
 --
 
-CREATE TABLE `candidate_logs` (
+CREATE TABLE `elms_candidate_logs` (
   `id` int(11) NOT NULL,
   `candidate_id` int(11) NOT NULL,
   `action` varchar(50) NOT NULL,
@@ -140,7 +140,7 @@ CREATE TABLE `candidate_logs` (
 -- Dumping data for table `candidate_logs`
 --
 
-INSERT INTO `candidate_logs` (`id`, `candidate_id`, `action`, `from_status`, `to_status`, `notes`, `created_by`, `created_at`) VALUES
+INSERT INTO `elms_candidate_logs` (`id`, `candidate_id`, `action`, `from_status`, `to_status`, `notes`, `created_by`, `created_at`) VALUES
 (67, 5, 'screening_shortlist', 'Applied', 'Shortlisted', 'Screen result not good but need to take interview', 'Admin User', '2026-07-16 10:51:57'),
 (68, 1, 'screening_shortlist', 'Applied', 'Shortlisted', 'Good to go', 'Admin User', '2026-07-16 10:52:35'),
 (69, 2, 'screening_shortlist', 'Applied', 'Shortlisted', 'Good to go', 'Admin User', '2026-07-16 10:52:54'),
@@ -349,7 +349,7 @@ INSERT INTO `candidate_logs` (`id`, `candidate_id`, `action`, `from_status`, `to
 -- Table structure for table `candidate_statuses`
 --
 
-CREATE TABLE `candidate_statuses` (
+CREATE TABLE `elms_candidate_statuses` (
   `id` int(11) NOT NULL,
   `code` varchar(30) NOT NULL,
   `name` varchar(50) NOT NULL,
@@ -361,7 +361,7 @@ CREATE TABLE `candidate_statuses` (
 -- Dumping data for table `candidate_statuses`
 --
 
-INSERT INTO `candidate_statuses` (`id`, `code`, `name`, `sort_order`, `description`) VALUES
+INSERT INTO `elms_candidate_statuses` (`id`, `code`, `name`, `sort_order`, `description`) VALUES
 (1, 'Applied', 'Applied', 1, 'Initial application submitted'),
 (2, 'Shortlisted', 'Shortlisted', 2, 'Shortlisted after screening'),
 (3, 'Interview', 'Interview', 3, 'Interview in progress'),
@@ -377,7 +377,7 @@ INSERT INTO `candidate_statuses` (`id`, `code`, `name`, `sort_order`, `descripti
 -- Table structure for table `confirmation_letters`
 --
 
-CREATE TABLE `confirmation_letters` (
+CREATE TABLE `elms_confirmation_letters` (
   `id` int(11) NOT NULL,
   `employee_id` int(11) NOT NULL,
   `offer_id` int(11) DEFAULT NULL,
@@ -399,27 +399,27 @@ CREATE TABLE `confirmation_letters` (
 -- Dumping data for table `confirmation_letters`
 --
 
-INSERT INTO `confirmation_letters` (`id`, `employee_id`, `offer_id`, `appraisal_id`, `letter_content`, `letter_format`, `employment_type`, `status`, `generated_at`, `approved_at`, `approved_by`, `sent_at`, `sent_to_email`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_confirmation_letters` (`id`, `employee_id`, `offer_id`, `appraisal_id`, `letter_content`, `letter_format`, `employment_type`, `status`, `generated_at`, `approved_at`, `approved_by`, `sent_at`, `sent_to_email`, `created_at`, `updated_at`) VALUES
 (1, 2, NULL, 6, '<p>Test letter</p>', 'html', 'Permanent', 'Sent', '2026-07-23 15:54:00', '2026-07-23 15:55:35', 'Admin User', '2026-07-23 15:55:44', 'tahmina.mollah75@email.com', '2026-07-23 09:54:00', '2026-07-23 09:55:44'),
 (2, 1, NULL, 8, '<h2 class=\"ql-align-center\"><span class=\"ql-font-serif\">TechCorp International</span></h2><p class=\"ql-align-center\"><span class=\"ql-font-serif\" style=\"color: rgb(102, 102, 102);\">Employee Lifecycle Management</span></p><p><span class=\"ql-font-serif\">Date: July 23, 2026</span></p><p><span class=\"ql-font-serif\">Dear Priya Malaker,</span></p><p><strong class=\"ql-font-serif\">Subject: Confirmation of Employment</strong></p><p><span class=\"ql-font-serif\">We are pleased to inform you that, based on your performance during the probation period, your employment with TechCorp International has been confirmed effective from </span><strong class=\"ql-font-serif\">January 16, 2027</strong><span class=\"ql-font-serif\">.</span></p><p><span class=\"ql-font-serif\">You are being confirmed as </span><strong class=\"ql-font-serif\">Software Engineer</strong><span class=\"ql-font-serif\"> in the </span><strong class=\"ql-font-serif\">Engineering</strong><span class=\"ql-font-serif\"> department.</span></p><table><tbody><tr><td data-row=\"1\"><span class=\"ql-font-serif\">Employee Code:</span></td><td data-row=\"1\"><span class=\"ql-font-serif\">EMP-00001</span></td></tr><tr><td data-row=\"2\"><span class=\"ql-font-serif\">Designation:</span></td><td data-row=\"2\"><span class=\"ql-font-serif\">Software Engineer</span></td></tr><tr><td data-row=\"3\"><span class=\"ql-font-serif\">Department:</span></td><td data-row=\"3\"><span class=\"ql-font-serif\">Engineering</span></td></tr><tr><td data-row=\"4\"><span class=\"ql-font-serif\">Joining Date:</span></td><td data-row=\"4\"><span class=\"ql-font-serif\">July 16, 2026</span></td></tr><tr><td data-row=\"5\"><span class=\"ql-font-serif\">Probation Period:</span></td><td data-row=\"5\"><span class=\"ql-font-serif\">6 months</span></td></tr><tr><td data-row=\"6\"><span class=\"ql-font-serif\">Current Salary:</span></td><td data-row=\"6\"><span class=\"ql-font-serif\">77,434.00 BDT</span></td></tr></tbody></table><p><span class=\"ql-font-serif\">We appreciate your contribution and look forward to your continued success with the organization.</span></p><p><span class=\"ql-font-serif\">We wish you all the best in your future endeavors with us.</span></p><p><br></p><p><span class=\"ql-font-serif\">Best Regards,</span></p><p><strong class=\"ql-font-serif\">HR Department</strong></p><p><span class=\"ql-font-serif\">Human Resources Department</span></p><p><span class=\"ql-font-serif\">TechCorp International</span></p><p><br></p>', 'html', 'Permanent', 'Approved', '2026-07-23 15:57:28', '2026-07-23 15:57:38', 'Admin User', NULL, NULL, '2026-07-23 09:57:28', '2026-07-23 09:57:38');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `departments`
+-- Table structure for table `elms_departments`
 --
 
-CREATE TABLE `departments` (
+CREATE TABLE `elms_departments` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `code` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `departments`
+-- Dumping data for table `elms_departments`
 --
 
-INSERT INTO `departments` (`id`, `name`, `code`) VALUES
+INSERT INTO `elms_departments` (`id`, `name`, `code`) VALUES
 (1, 'Engineering', 'ENG'),
 (2, 'Marketing', 'MKT'),
 (3, 'Finance', 'FIN'),
@@ -432,10 +432,10 @@ INSERT INTO `departments` (`id`, `name`, `code`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `designations`
+-- Table structure for table `elms_designations`
 --
 
-CREATE TABLE `designations` (
+CREATE TABLE `elms_designations` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `code` varchar(20) DEFAULT NULL,
@@ -443,10 +443,10 @@ CREATE TABLE `designations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `designations`
+-- Dumping data for table `elms_designations`
 --
 
-INSERT INTO `designations` (`id`, `name`, `code`, `dept_id`) VALUES
+INSERT INTO `elms_designations` (`id`, `name`, `code`, `dept_id`) VALUES
 (1, 'Software Engineer', 'SE', 1),
 (2, 'Senior Developer', 'SD', 1),
 (3, 'Team Lead', 'TL', 1),
@@ -464,7 +464,7 @@ INSERT INTO `designations` (`id`, `name`, `code`, `dept_id`) VALUES
 -- Table structure for table `interview_log`
 --
 
-CREATE TABLE `interview_log` (
+CREATE TABLE `elms_interview_log` (
   `id` int(11) NOT NULL,
   `candidate_id` int(11) NOT NULL,
   `round` int(11) NOT NULL,
@@ -490,7 +490,7 @@ CREATE TABLE `interview_log` (
 -- Dumping data for table `interview_log`
 --
 
-INSERT INTO `interview_log` (`id`, `candidate_id`, `round`, `round_name`, `type`, `interviewer`, `date`, `status`, `score_technical`, `score_communication`, `score_problem_solving`, `score_attitude`, `rating`, `decision`, `reject_reason`, `feedback`, `is_final_round`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_interview_log` (`id`, `candidate_id`, `round`, `round_name`, `type`, `interviewer`, `date`, `status`, `score_technical`, `score_communication`, `score_problem_solving`, `score_attitude`, `rating`, `decision`, `reject_reason`, `feedback`, `is_final_round`, `created_at`, `updated_at`) VALUES
 (12, 2, 1, 'Writter', 'In-Person', 'Interview 1', '2026-07-16 03:33:00', 'hold', 4.0, 3.0, 4.0, 3.0, 3.5, 'Hold', NULL, 'Good to go for practical interview', 0, '2026-07-16 10:54:55', '2026-07-16 10:58:20'),
 (13, 2, 2, 'Practical', 'In-Person', 'Interviewer 2', '2026-07-16 03:33:00', 'Completed', 4.0, 4.0, 3.0, 3.0, 3.5, 'Pass', NULL, 'fsdfa', 1, '2026-07-16 10:56:13', '2026-07-16 11:01:51'),
 (14, 1, 1, 'Written', 'In-Person', 'Interview 1', '2026-07-16 22:22:00', 'Rescheduled', 3.0, 3.0, 3.0, 3.0, 3.0, 'Fail', 'Lack of technical skills', 'dsfasdf', 0, '2026-07-16 11:55:34', '2026-07-16 12:03:16'),
@@ -529,7 +529,7 @@ INSERT INTO `interview_log` (`id`, `candidate_id`, `round`, `round_name`, `type`
 -- Table structure for table `letter_templates`
 --
 
-CREATE TABLE `letter_templates` (
+CREATE TABLE `elms_letter_templates` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `type` varchar(50) NOT NULL DEFAULT 'Offer',
@@ -543,7 +543,7 @@ CREATE TABLE `letter_templates` (
 -- Dumping data for table `letter_templates`
 --
 
-INSERT INTO `letter_templates` (`id`, `name`, `type`, `content`, `status`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_letter_templates` (`id`, `name`, `type`, `content`, `status`, `created_at`, `updated_at`) VALUES
 (8, 'Offer Letter', 'Offer', '<h1 style=\"text-align:center;color:#1a73e8;\">{{COMPANY_NAME}}</h1><p>\n</p><p style=\"text-align:center;color:#9aa0a6;font-size:13px;\">Employee Lifecycle Management</p><p>\n</p><p><br></p><p>\n</p><p style=\"text-align:right;color:#5f6368;font-size:13px;\">Date: {{DATE}}</p><p>\n</p><p>Dear <strong>{{CANDIDATE_NAME}}</strong>,</p><p>\n</p><h2 style=\"color:#1a73e8;border-bottom:2px solid #1a73e8;padding-bottom:6px;\">Offer of Employment</h2><p>\n</p><p>We are pleased to offer you the position of <strong>{{JOB_TITLE}}</strong> with <strong>{{COMPANY_NAME}}</strong>. After reviewing your qualifications and experience, we are confident that you will be a valuable asset to our organization.</p><p>\n</p><h3 style=\"color:#3c4043;\">Position Details</h3><p>\n</p><p><strong>Position:</strong> {{DESIGNATION}}</p><p>\n</p><p><strong>Department:</strong> {{DEPARTMENT}}</p><p>\n</p><p><strong>Offered Salary:</strong> {{SALARY}}</p><p>\n</p><p><strong>Joining Date:</strong> {{JOINING_DATE}}</p><p>\n</p><p><strong>Probation Period:</strong> {{PROBATION_MONTHS}} months</p><p>\n</p><h3 style=\"color:#3c4043;\">Salary Breakdown</h3><p>\n{{SALARY_BREAKDOWN}}\n</p><h2 style=\"color:#1a73e8;border-bottom:2px solid #1a73e8;padding-bottom:6px;\">Acceptance</h2><p>\n</p><p>Please confirm your acceptance of this offer by <strong>{{RESPONSE_DATE}}</strong>. If you have any questions, please feel free to contact us.</p><p>\n\n</p><p>Best Regards,\n</p><p><strong>Admin User</strong></p><p>Human Resources Manager</p><p><strong>{{COMPANY_NAME}}</strong>\n</p>', 'Active', '2026-07-19 07:04:38', '2026-07-22 10:45:24'),
 (10, 'Confirmation Letter Template', 'Confirmation', '<div style=\"font-family:serif;line-height:1.8;max-width:700px;margin:0 auto;padding:24px\">\n    <div style=\"text-align:center;border-bottom:2px solid #000;padding-bottom:16px;margin-bottom:16px\">\n        <h2 style=\"margin:0\">{{COMPANY_NAME}}</h2>\n        <p style=\"color:#666;font-size:12px\">Employee Lifecycle Management</p>\n    </div>\n    <p>Date: {{DATE}}</p>\n    <p>Dear {{EMPLOYEE_NAME}},</p>\n    <p><strong>Subject: Confirmation of Employment</strong></p>\n    <p>We are pleased to inform you that, based on your performance during the probation period, your employment with {{COMPANY_NAME}} has been confirmed effective from <strong>{{CONFIRMATION_DATE}}</strong>.</p>\n    <p>You are being confirmed as <strong>{{DESIGNATION}}</strong> in the <strong>{{DEPARTMENT}}</strong> department.</p>\n    <table style=\"width:100%;border-collapse:collapse;margin:12px 0\">\n        <tr><td style=\"padding:4px 8px;font-weight:500;width:200px\">Employee Code:</td><td>{{EMPLOYEE_CODE}}</td></tr>\n        <tr><td style=\"padding:4px 8px;font-weight:500\">Designation:</td><td>{{DESIGNATION}}</td></tr>\n        <tr><td style=\"padding:4px 8px;font-weight:500\">Department:</td><td>{{DEPARTMENT}}</td></tr>\n        <tr><td style=\"padding:4px 8px;font-weight:500\">Joining Date:</td><td>{{JOINING_DATE}}</td></tr>\n        <tr><td style=\"padding:4px 8px;font-weight:500\">Probation Period:</td><td>{{PROBATION_MONTHS}} months</td></tr>\n        <tr><td style=\"padding:4px 8px;font-weight:500\">Current Salary:</td><td>{{SALARY}}</td></tr>\n    </table>\n    {{SALARY_BREAKDOWN}}\n    <p>We appreciate your contribution and look forward to your continued success with the organization.</p>\n    <p>We wish you all the best in your future endeavors with us.</p>\n    <br>\n    <p>Best Regards,</p>\n    <p style=\"margin-top:32px\"><strong>{{HR_NAME}}</strong><br>Human Resources Department<br>{{COMPANY_NAME}}</p>\n</div>', 'Active', '2026-07-23 09:53:08', '2026-07-23 09:53:08');
 
@@ -553,7 +553,7 @@ INSERT INTO `letter_templates` (`id`, `name`, `type`, `content`, `status`, `crea
 -- Table structure for table `merge_tags`
 --
 
-CREATE TABLE `merge_tags` (
+CREATE TABLE `elms_merge_tags` (
   `id` int(11) NOT NULL,
   `type` varchar(50) NOT NULL DEFAULT 'Offer',
   `tag` varchar(100) NOT NULL,
@@ -568,7 +568,7 @@ CREATE TABLE `merge_tags` (
 -- Dumping data for table `merge_tags`
 --
 
-INSERT INTO `merge_tags` (`id`, `type`, `tag`, `label`, `description`, `sort_order`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_merge_tags` (`id`, `type`, `tag`, `label`, `description`, `sort_order`, `created_at`, `updated_at`) VALUES
 (1, 'Offer', 'CANDIDATE_NAME', 'Candidate Name', 'Full name of the candidate', 1, '2026-07-19 05:07:39', '2026-07-19 05:07:39'),
 (2, 'Offer', 'DESIGNATION', 'Designation', 'Offered designation/title', 2, '2026-07-19 05:07:39', '2026-07-19 05:07:39'),
 (3, 'Offer', 'JOB_TITLE', 'Job Title', 'Title of the position', 3, '2026-07-19 05:07:39', '2026-07-19 05:07:39'),
@@ -588,7 +588,7 @@ INSERT INTO `merge_tags` (`id`, `type`, `tag`, `label`, `description`, `sort_ord
 -- Table structure for table `offers`
 --
 
-CREATE TABLE `offers` (
+CREATE TABLE `elms_offers` (
   `id` int(11) NOT NULL,
   `candidate_id` int(11) NOT NULL,
   `salary` decimal(12,2) NOT NULL,
@@ -611,7 +611,7 @@ CREATE TABLE `offers` (
 -- Dumping data for table `offers`
 --
 
-INSERT INTO `offers` (`id`, `candidate_id`, `salary`, `joining_date`, `designation_id`, `dept_id`, `probation_months`, `notes`, `status`, `response_status`, `responded_at`, `response_notes`, `sent_at`, `accepted_at`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_offers` (`id`, `candidate_id`, `salary`, `joining_date`, `designation_id`, `dept_id`, `probation_months`, `notes`, `status`, `response_status`, `responded_at`, `response_notes`, `sent_at`, `accepted_at`, `created_at`, `updated_at`) VALUES
 (5, 2, 77434.00, '2026-07-16', 1, 1, 6, 'efsdf', 'Approved', 'Accepted', '2026-07-16 17:03:32', '', '2026-07-25 17:08:24', NULL, '2026-07-16 11:02:44', '2026-07-25 11:08:24'),
 (6, 12, 134389.00, '2026-08-01', 4, 2, 6, 'fsdfawef', 'Approved', 'Accepted', '2026-07-19 15:45:19', 'asdfdas', '2026-07-23 15:17:08', NULL, '2026-07-19 07:00:41', '2026-07-23 09:17:08'),
 (7, 9, 100000.00, '2026-07-22', 4, 2, 6, 'kkk', 'Approved', 'Accepted', '2026-07-23 12:55:37', 'fasdf', '2026-07-23 14:25:06', NULL, '2026-07-22 08:30:50', '2026-07-23 08:25:06'),
@@ -633,7 +633,7 @@ INSERT INTO `offers` (`id`, `candidate_id`, `salary`, `joining_date`, `designati
 -- Table structure for table `offer_approvals`
 --
 
-CREATE TABLE `offer_approvals` (
+CREATE TABLE `elms_offer_approvals` (
   `id` int(11) NOT NULL,
   `offer_id` int(11) NOT NULL,
   `level` int(11) NOT NULL DEFAULT 1,
@@ -648,7 +648,7 @@ CREATE TABLE `offer_approvals` (
 -- Dumping data for table `offer_approvals`
 --
 
-INSERT INTO `offer_approvals` (`id`, `offer_id`, `level`, `approver`, `status`, `comment`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_offer_approvals` (`id`, `offer_id`, `level`, `approver`, `status`, `comment`, `created_at`, `updated_at`) VALUES
 (5, 5, 1, 'Admin User', 'Approved', '', '2026-07-16 11:02:44', '2026-07-16 11:03:03');
 
 -- --------------------------------------------------------
@@ -657,7 +657,7 @@ INSERT INTO `offer_approvals` (`id`, `offer_id`, `level`, `approver`, `status`, 
 -- Table structure for table `offer_email_log`
 --
 
-CREATE TABLE `offer_email_log` (
+CREATE TABLE `elms_offer_email_log` (
   `id` int(11) NOT NULL,
   `offer_id` int(11) NOT NULL,
   `recipient` varchar(100) NOT NULL,
@@ -672,7 +672,7 @@ CREATE TABLE `offer_email_log` (
 -- Dumping data for table `offer_email_log`
 --
 
-INSERT INTO `offer_email_log` (`id`, `offer_id`, `recipient`, `subject`, `body`, `sent_at`, `status`, `error_message`) VALUES
+INSERT INTO `elms_offer_email_log` (`id`, `offer_id`, `recipient`, `subject`, `body`, `sent_at`, `status`, `error_message`) VALUES
 (5, 5, 'priya.malaker21@email.com', 'Offer of Employment - Priya Malaker', '<div style=\"font-family:serif;line-height:1.8;max-width:700px;margin:0 auto;padding:24px\">\n    <div style=\"text-align:center;border-bottom:2px solid #000;padding-bottom:16px;margin-bottom:16px\">\n        <h2 style=\"margin:0\">TechCorp International</h2>\n        <p style=\"color:#666;font-size:12px\">Employee Lifecycle Management</p>\n    </div>\n    <p>Date: July 16, 2026</p>\n    <p>Dear Priya Malaker,</p>\n    <p><strong>Sub: Offer of Employment</strong></p>\n    <p>We are pleased to offer you the position of <strong>Software Engineer</strong> with TechCorp International. After reviewing your qualifications and experience, we are confident that you will be a valuable asset to our organization.</p>\n    <p>Your offer details are as follows:</p>\n    <table style=\"width:100%;border-collapse:collapse;margin:12px 0\">\n        <tr><td style=\"padding:4px 8px;font-weight:500;width:200px\">Position:</td><td>Software Engineer</td></tr>\n        <tr><td style=\"padding:4px 8px;font-weight:500\">Department:</td><td>Engineering</td></tr>\n        <tr><td style=\"padding:4px 8px;font-weight:500\">Offered Salary:</td><td>৳77434.00</td></tr>\n        <tr><td style=\"padding:4px 8px;font-weight:500\">Joining Date:</td><td>July 16, 2026</td></tr>\n        <tr><td style=\"padding:4px 8px;font-weight:500\">Probation Period:</td><td>6 months</td></tr>\n    </table>\n    <p>Please confirm your acceptance of this offer by July 30, 2026. If you have any questions, please feel free to contact us.</p>\n    <br>\n    <p>Best Regards,</p>\n    <p style=\"margin-top:32px\"><strong>Admin User</strong><br>Human Resources Manager<br>TechCorp International</p>\n</div>', '2026-07-16 17:03:20', 'Sent', NULL),
 (6, 6, 'tahmina.mollah75@email.com', 'Offer Letter - Digital Marketing Manager', 'sdf', '2026-07-19 15:44:52', 'Sent', NULL),
 (7, 8, 'rahul.sikder11@email.com', 'Offer Letter - Senior Software Engineer', 'fsdf', '2026-07-23 12:56:21', 'Sent', NULL),
@@ -694,7 +694,7 @@ INSERT INTO `offer_email_log` (`id`, `offer_id`, `recipient`, `subject`, `body`,
 -- Table structure for table `offer_letters`
 --
 
-CREATE TABLE `offer_letters` (
+CREATE TABLE `elms_offer_letters` (
   `id` int(11) NOT NULL,
   `offer_id` int(11) NOT NULL,
   `letter_content` longtext DEFAULT NULL,
@@ -711,7 +711,7 @@ CREATE TABLE `offer_letters` (
 -- Dumping data for table `offer_letters`
 --
 
-INSERT INTO `offer_letters` (`id`, `offer_id`, `letter_content`, `letter_format`, `generated_at`, `sent_at`, `sent_to_email`, `status`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_offer_letters` (`id`, `offer_id`, `letter_content`, `letter_format`, `generated_at`, `sent_at`, `sent_to_email`, `status`, `created_at`, `updated_at`) VALUES
 (6, 8, '<h1 class=\"ql-align-center\"><span style=\"color: rgb(26, 115, 232);\">TechCorp International</span></h1><p class=\"ql-align-center\"><span style=\"color: rgb(154, 160, 166);\">Employee Lifecycle Management</span></p><p class=\"ql-align-right\"><span style=\"color: rgb(95, 99, 104);\">Date: July 22, 2026</span></p><p>Dear <strong>Rahul Sikder</strong>,</p><h2><span style=\"color: rgb(26, 115, 232);\">Offer of Employment</span></h2><p>We are pleased to offer you the position of <strong>Senior Software Engineer</strong> with <strong>TechCorp International</strong>. After reviewing your qualifications and experience, we are confident that you will be a valuable asset to our organization.</p><h3><span style=\"color: rgb(60, 64, 67);\">Position Details</span></h3><p><strong>Position:</strong> Senior Developer</p><p><strong>Department:</strong> Engineering</p><p><strong>Offered Salary:</strong> 100,000.00 BDT</p><p><strong>Joining Date:</strong> July 22, 2026</p><p><strong>Probation Period:</strong> 6 months</p><h3><span style=\"color: rgb(60, 64, 67);\">Salary Breakdown</span></h3><table><tbody><tr><td data-row=\"1\"><span style=\"background-color: rgb(245, 245, 245);\">Component Amount (BDT)</span></td></tr><tr><td data-row=\"2\"> Gross Salary</td><td data-row=\"2\" class=\"ql-align-right\">100,000.00</td></tr><tr><td data-row=\"3\">Basic</td><td data-row=\"3\" class=\"ql-align-right\">57,142.00</td></tr><tr><td data-row=\"4\">House Rent</td><td data-row=\"4\" class=\"ql-align-right\">28,571.00</td></tr><tr><td data-row=\"5\">Medical Allowance</td><td data-row=\"5\" class=\"ql-align-right\">5,714.00</td></tr><tr><td data-row=\"6\">Conveyance Allowance</td><td data-row=\"6\" class=\"ql-align-right\">8,571.00</td></tr><tr><td data-row=\"7\"><span style=\"background-color: rgb(249, 249, 249);\">Total Salary</span></td><td data-row=\"7\" class=\"ql-align-right\"><span style=\"background-color: rgb(249, 249, 249);\">100,000.00</span></td></tr><tr><td data-row=\"8\">Personal PF</td><td data-row=\"8\" class=\"ql-align-right\">(0.00)</td></tr><tr><td data-row=\"9\">PF Deductible</td><td data-row=\"9\" class=\"ql-align-right\">(0.00)</td></tr><tr><td data-row=\"10\">Monthly Income Tax</td><td data-row=\"10\" class=\"ql-align-right\">(8,750.00)</td></tr><tr><td data-row=\"11\"><span style=\"background-color: rgb(240, 247, 255);\">Total Payable</span></td><td data-row=\"11\" class=\"ql-align-right\"><span style=\"background-color: rgb(240, 247, 255);\">91,250.00</span></td></tr></tbody></table><h2><span style=\"color: rgb(26, 115, 232);\">Acceptance</span></h2><p>Please confirm your acceptance of this offer by <strong>August 5, 2026</strong>. If you have any questions, please feel free to contact us.</p><blockquote><span style=\"color: rgb(95, 99, 104); background-color: rgb(241, 243, 244);\">Best Regards,</span></blockquote><blockquote><strong style=\"color: rgb(95, 99, 104); background-color: rgb(241, 243, 244);\">Admin User</strong></blockquote><blockquote><span style=\"color: rgb(95, 99, 104); background-color: rgb(241, 243, 244);\">Human Resources Manager</span></blockquote><blockquote><strong style=\"color: rgb(95, 99, 104); background-color: rgb(241, 243, 244);\">TechCorp International</strong></blockquote><p><br></p>', 'html', '2026-07-22 16:29:51', '2026-07-23 12:56:21', 'rahul.sikder11@email.com', 'Sent', '2026-07-22 10:29:51', '2026-07-23 06:56:21'),
 (7, 7, '<h1 class=\"ql-align-center\"><span style=\"color: rgb(26, 115, 232);\">TechCorp International</span></h1><p><br></p><p class=\"ql-align-center\"><span style=\"color: rgb(154, 160, 166);\">Employee Lifecycle Management</span></p><p><br></p><p><br></p><p><br></p><p class=\"ql-align-right\"><span style=\"color: rgb(95, 99, 104);\">Date: July 23, 2026</span></p><p><br></p><p>Dear <strong>Kazi Poddar</strong>,</p><p><br></p><h2><span style=\"color: rgb(26, 115, 232);\">Offer of Employment</span></h2><p><br></p><p>We are pleased to offer you the position of <strong>Digital Marketing Manager</strong> with <strong>TechCorp International</strong>. After reviewing your qualifications and experience, we are confident that you will be a valuable asset to our organization.</p><p><br></p><h3><span style=\"color: rgb(60, 64, 67);\">Position Details</span></h3><p><br></p><p><strong>Position:</strong> Marketing Specialist</p><p><br></p><p><strong>Department:</strong> Marketing</p><p><br></p><p><strong>Offered Salary:</strong> 100,000.00 BDT</p><p><br></p><p><strong>Joining Date:</strong> July 22, 2026</p><p><br></p><p><strong>Probation Period:</strong> 6 months</p><p><br></p><h3><span style=\"color: rgb(60, 64, 67);\">Salary Breakdown</span></h3><table><tbody><tr><td data-row=\"1\"><span style=\"background-color: rgb(245, 245, 245);\">Component Amount (BDT)</span></td></tr><tr><td data-row=\"2\"> Gross Salary</td><td data-row=\"2\" class=\"ql-align-right\">100,000.00</td></tr><tr><td data-row=\"3\">Basic</td><td data-row=\"3\" class=\"ql-align-right\">57,142.00</td></tr><tr><td data-row=\"4\">House Rent</td><td data-row=\"4\" class=\"ql-align-right\">28,571.00</td></tr><tr><td data-row=\"5\">Medical Allowance</td><td data-row=\"5\" class=\"ql-align-right\">5,714.00</td></tr><tr><td data-row=\"6\">Conveyance Allowance</td><td data-row=\"6\" class=\"ql-align-right\">8,571.00</td></tr><tr><td data-row=\"7\"><span style=\"background-color: rgb(249, 249, 249);\">Total Salary</span></td><td data-row=\"7\" class=\"ql-align-right\"><span style=\"background-color: rgb(249, 249, 249);\">100,000.00</span></td></tr><tr><td data-row=\"8\">Personal PF</td><td data-row=\"8\" class=\"ql-align-right\">(0.00)</td></tr><tr><td data-row=\"9\">PF Deductible</td><td data-row=\"9\" class=\"ql-align-right\">(0.00)</td></tr><tr><td data-row=\"10\">Monthly Income Tax</td><td data-row=\"10\" class=\"ql-align-right\">(8,750.00)</td></tr><tr><td data-row=\"11\"><span style=\"background-color: rgb(240, 247, 255);\">Total Payable</span></td><td data-row=\"11\" class=\"ql-align-right\"><span style=\"background-color: rgb(240, 247, 255);\">91,250.00</span></td></tr></tbody></table><h2><span style=\"color: rgb(26, 115, 232);\">Acceptance</span></h2><p><br></p><p>Please confirm your acceptance of this offer by <strong>August 6, 2026</strong>. If you have any questions, please feel free to contact us.</p><p><br></p><p>Best Regards,</p><p><strong>Admin User</strong></p><p>Human Resources Manager</p><p><strong>TechCorp International</strong></p>', 'html', '2026-07-23 14:24:56', '2026-07-23 14:25:06', 'kazi.poddar37@email.com', 'Sent', '2026-07-23 08:24:56', '2026-07-23 08:25:06'),
 (8, 10, '<h1 class=\"ql-align-center\"><span style=\"color: rgb(26, 115, 232);\">TechCorp International</span></h1><p><br></p><p class=\"ql-align-center\"><span style=\"color: rgb(154, 160, 166);\">Employee Lifecycle Management</span></p><p><br></p><p><br></p><p><br></p><p class=\"ql-align-right\"><span style=\"color: rgb(95, 99, 104);\">Date: July 23, 2026</span></p><p><br></p><p>Dear <strong>Sharmin Haque</strong>,</p><p><br></p><h2><span style=\"color: rgb(26, 115, 232);\">Offer of Employment</span></h2><p><br></p><p>We are pleased to offer you the position of <strong>Digital Marketing Manager</strong> with <strong>TechCorp International</strong>. After reviewing your qualifications and experience, we are confident that you will be a valuable asset to our organization.</p><p><br></p><h3><span style=\"color: rgb(60, 64, 67);\">Position Details</span></h3><p><br></p><p><strong>Position:</strong> Marketing Specialist</p><p><br></p><p><strong>Department:</strong> Marketing</p><p><br></p><p><strong>Offered Salary:</strong> 100.00 BDT</p><p><br></p><p><strong>Joining Date:</strong> July 23, 2026</p><p><br></p><p><strong>Probation Period:</strong> 1 months</p><p><br></p><h3><span style=\"color: rgb(60, 64, 67);\">Salary Breakdown</span></h3><table><tbody><tr><td data-row=\"1\"><span style=\"background-color: rgb(245, 245, 245);\">Component Amount (BDT)</span></td></tr><tr><td data-row=\"2\"> Gross Salary</td><td data-row=\"2\" class=\"ql-align-right\">100.00</td></tr><tr><td data-row=\"3\">Basic</td><td data-row=\"3\" class=\"ql-align-right\">57.00</td></tr><tr><td data-row=\"4\">House Rent</td><td data-row=\"4\" class=\"ql-align-right\">29.00</td></tr><tr><td data-row=\"5\">Medical Allowance</td><td data-row=\"5\" class=\"ql-align-right\">6.00</td></tr><tr><td data-row=\"6\">Conveyance Allowance</td><td data-row=\"6\" class=\"ql-align-right\">9.00</td></tr><tr><td data-row=\"7\"><span style=\"background-color: rgb(249, 249, 249);\">Total Salary</span></td><td data-row=\"7\" class=\"ql-align-right\"><span style=\"background-color: rgb(249, 249, 249);\">100.00</span></td></tr><tr><td data-row=\"8\">Personal PF</td><td data-row=\"8\" class=\"ql-align-right\">(0.00)</td></tr><tr><td data-row=\"9\">PF Deductible</td><td data-row=\"9\" class=\"ql-align-right\">(0.00)</td></tr><tr><td data-row=\"10\">Monthly Income Tax</td><td data-row=\"10\" class=\"ql-align-right\">(0.00)</td></tr><tr><td data-row=\"11\"><span style=\"background-color: rgb(240, 247, 255);\">Total Payable</span></td><td data-row=\"11\" class=\"ql-align-right\"><span style=\"background-color: rgb(240, 247, 255);\">100.00</span></td></tr></tbody></table><h2><span style=\"color: rgb(26, 115, 232);\">Acceptance</span></h2><p><br></p><p>Please confirm your acceptance of this offer by <strong>August 6, 2026</strong>. If you have any questions, please feel free to contact us.</p><p><br></p><p>Best Regards,</p><p><strong>Admin User</strong></p><p>Human Resources Manager</p><p><strong>TechCorp International</strong></p>', 'html', '2026-07-23 15:13:57', '2026-07-23 15:14:11', 'sharmin.haque97@email.com', 'Sent', '2026-07-23 09:13:57', '2026-07-23 09:14:11'),
@@ -729,10 +729,10 @@ INSERT INTO `offer_letters` (`id`, `offer_id`, `letter_content`, `letter_format`
 -- --------------------------------------------------------
 
 --
--- Table structure for table `personnel_basic_info`
+-- Table structure for table `elms_personnel_basic_info`
 --
 
-CREATE TABLE `personnel_basic_info` (
+CREATE TABLE `elms_personnel_basic_info` (
   `PBI_ID` bigint(20) NOT NULL,
   `PBI_CODE` varchar(100) NOT NULL,
   `MACHINE_ID` varchar(50) NOT NULL DEFAULT '',
@@ -846,10 +846,10 @@ CREATE TABLE `personnel_basic_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Dumping data for table `personnel_basic_info`
+-- Dumping data for table `elms_personnel_basic_info`
 --
 
-INSERT INTO `personnel_basic_info` (`PBI_ID`, `PBI_CODE`, `MACHINE_ID`, `PBI_DUE_DOJ`, `PBI_NAME`, `PBI_FATHER_NAME`, `PBI_MOTHER_NAME`, `DEPT_ID`, `PBI_DEPARTMENT`, `LEAVE_RULE_ID`, `nid`, `employee_type`, `DESG_ID`, `PBI_DESIGNATION`, `PBI_ZONE`, `PBI_AREA`, `PBI_BRANCH`, `PBI_REGION`, `PBI_DOJ`, `PBI_SERVICE_LENGTH`, `PBI_DOC`, `PBI_DOB`, `PBI_SEX`, `PBI_MARITAL_STA`, `PBI_RELIGION`, `PBI_NATIONALITY`, `PBI_PERMANENT_ADD`, `PBI_PRESENT_ADD`, `PBI_PHONE`, `PBI_MOBILE`, `PBI_EMAIL`, `PBI_JOB_STATUS`, `PBI_DOC2`, `resign_date`, `PBI_BLOOD_GROUP`, `PBI_CON_TYPE`, `PBI_ORG`, `incharge_id`, `PBI_EMAIL_ALT`, `EMPLOYMENT_TYPE`, `define_schedule`, `resign_type`, `note`, `PBI_PICTURE_ATT_PATH`, `PBI_NID_ATT_PATH`, `JOB_LOC_ID`, `PBI_TIN_ATT_PATH`, `PBI_PASSPORT_ATT_PATH`, `pre_block_no`, `pre_ps`, `pre_house_no`, `pre_flat`, `pre_road_no`, `pre_district`, `PBI_CV_ATT_PATH`, `PBI_OTHER_ATT_PATH`, `PBI_DURATION`, `last_name`, `cell_no_traking`, `section`, `cost_center`, `PBI_FUNCTION`, `job_title`, `grade`, `job_description`, `class`, `level`, `cost_type`, `age_on_join`, `PBI_WORK_STATION`, `joining_designation`, `incharge_id_2`, `Friday`, `Saturday`, `Sunday`, `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `emp_deletion_reason`, `emp_date_deleted_at`, `payroll_designation`, `spouse_name`, `highte`, `weight`, `birth_reg_no`, `child1_details`, `hobbies`, `nominee`, `nominee_relation`, `child1_name`, `child1_dob`, `child2_name`, `child2_dob`, `child2_details`, `child3_name`, `child3_dob`, `child3_details`, `child4_name`, `child4_dob`, `child4_details`, `salary_schedule`, `line`, `schedule_type`, `punch_type`, `entry_by`, `edit_by`, `territory`, `candidate_id`, `offer_id`) VALUES
+INSERT INTO `elms_personnel_basic_info` (`PBI_ID`, `PBI_CODE`, `MACHINE_ID`, `PBI_DUE_DOJ`, `PBI_NAME`, `PBI_FATHER_NAME`, `PBI_MOTHER_NAME`, `DEPT_ID`, `PBI_DEPARTMENT`, `LEAVE_RULE_ID`, `nid`, `employee_type`, `DESG_ID`, `PBI_DESIGNATION`, `PBI_ZONE`, `PBI_AREA`, `PBI_BRANCH`, `PBI_REGION`, `PBI_DOJ`, `PBI_SERVICE_LENGTH`, `PBI_DOC`, `PBI_DOB`, `PBI_SEX`, `PBI_MARITAL_STA`, `PBI_RELIGION`, `PBI_NATIONALITY`, `PBI_PERMANENT_ADD`, `PBI_PRESENT_ADD`, `PBI_PHONE`, `PBI_MOBILE`, `PBI_EMAIL`, `PBI_JOB_STATUS`, `PBI_DOC2`, `resign_date`, `PBI_BLOOD_GROUP`, `PBI_CON_TYPE`, `PBI_ORG`, `incharge_id`, `PBI_EMAIL_ALT`, `EMPLOYMENT_TYPE`, `define_schedule`, `resign_type`, `note`, `PBI_PICTURE_ATT_PATH`, `PBI_NID_ATT_PATH`, `JOB_LOC_ID`, `PBI_TIN_ATT_PATH`, `PBI_PASSPORT_ATT_PATH`, `pre_block_no`, `pre_ps`, `pre_house_no`, `pre_flat`, `pre_road_no`, `pre_district`, `PBI_CV_ATT_PATH`, `PBI_OTHER_ATT_PATH`, `PBI_DURATION`, `last_name`, `cell_no_traking`, `section`, `cost_center`, `PBI_FUNCTION`, `job_title`, `grade`, `job_description`, `class`, `level`, `cost_type`, `age_on_join`, `PBI_WORK_STATION`, `joining_designation`, `incharge_id_2`, `Friday`, `Saturday`, `Sunday`, `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `emp_deletion_reason`, `emp_date_deleted_at`, `payroll_designation`, `spouse_name`, `highte`, `weight`, `birth_reg_no`, `child1_details`, `hobbies`, `nominee`, `nominee_relation`, `child1_name`, `child1_dob`, `child2_name`, `child2_dob`, `child2_details`, `child3_name`, `child3_dob`, `child3_details`, `child4_name`, `child4_dob`, `child4_details`, `salary_schedule`, `line`, `schedule_type`, `punch_type`, `entry_by`, `edit_by`, `territory`, `candidate_id`, `offer_id`) VALUES
 (1, 'EMP-00001', '', '2026-07-16', 'Priya', NULL, NULL, 1, NULL, 0, NULL, 'Non Roster', 1, 'Software Engineer', NULL, NULL, NULL, 0, '2026-07-16', NULL, NULL, NULL, NULL, NULL, NULL, 'Bangladeshi', NULL, NULL, '+8801733800210', '+8801733800210', 'priya.malaker21@email.com', NULL, NULL, NULL, '', '', 1, 0, '', 'Probationer', '', '', NULL, NULL, NULL, 0, NULL, NULL, '', '', '', '', '', '', '', '', '', 'Malaker', '', '', '', '', 'Senior Software Engineer', 0, '', '', '', '', '', '', '', 0, 'Off', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, '', 'Regular', 'Regular', 1, 0, 0, 2, 5),
 (2, 'EMP-00002', '', '2026-08-01', 'Tahmina', NULL, NULL, 2, NULL, 0, 65555555, 'Roster', 4, 'Marketing Specialist', 'fsdf', 'sdf', 'fasf', 0, '2026-08-01', NULL, NULL, '2002-07-23', 'Female', 'Single', 'Islam', 'Bangladeshi', 'afds', 'asdfas', '+8801750673848', '+8801750673848', 'tahmina.mollah75@email.com', NULL, NULL, NULL, 'A+', '', 1, 0, 'tahmina.mollah75@email.com', 'Full-Time', '', '', 'fsdfsd', NULL, NULL, 0, NULL, NULL, '3434', 'fsdf', 'fasdf', 'sdfa', '34343', 'sf', '', '', '', 'Mollah', '', 'sfdasdfas', 'asdfasdfa', 'dffas', 'Digital Marketing Manager', 0, '', 'sdf', 'fasdf', 'fasdf', '', 'fasdf', '', 0, 'Off', '', '', '', '', '', '', '', '', '', 'fsdf', '5\'8\"', '70', '343434', 'fsadf', 'Football', 'dfasd', 'asdfa', 'fsdf', '3423', 'sdf', '34', 'fsdf', '', '', '', '', '', '', 0, 'fasf', 'Roster', 'Single', 1, 0, 0, 12, 6),
 (3, 'EMP-00003', '', '2026-07-22', 'Kazi', NULL, NULL, 2, NULL, 0, NULL, 'Non Roster', 4, 'Marketing Specialist', NULL, NULL, NULL, 0, '2026-07-22', NULL, NULL, NULL, NULL, NULL, NULL, 'Bangladeshi', NULL, NULL, '+8801758748880', '+8801758748880', 'kazi.poddar37@email.com', NULL, NULL, NULL, '', '', 1, 0, '', 'Full-Time', '', '', NULL, NULL, NULL, 0, NULL, NULL, '', '', '', '', '', '', '', '', '', 'Poddar', '', '', '', '', 'Digital Marketing Manager', 0, '', '', '', '', '', '', '', 0, 'Off', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, '', 'Regular', 'Regular', 1, 0, 0, 9, 7),
@@ -866,7 +866,7 @@ INSERT INTO `personnel_basic_info` (`PBI_ID`, `PBI_CODE`, `MACHINE_ID`, `PBI_DUE
 -- Table structure for table `probation_appraisals`
 --
 
-CREATE TABLE `probation_appraisals` (
+CREATE TABLE `elms_probation_appraisals` (
   `id` int(11) NOT NULL,
   `employee_id` int(11) NOT NULL,
   `joining_date` date DEFAULT NULL,
@@ -889,7 +889,7 @@ CREATE TABLE `probation_appraisals` (
 -- Dumping data for table `probation_appraisals`
 --
 
-INSERT INTO `probation_appraisals` (`id`, `employee_id`, `joining_date`, `probation_months`, `end_date`, `review_date`, `status`, `overall_score`, `recommendation`, `remarks`, `supervisor_comments`, `dept_head_comments`, `hr_review`, `created_by`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_probation_appraisals` (`id`, `employee_id`, `joining_date`, `probation_months`, `end_date`, `review_date`, `status`, `overall_score`, `recommendation`, `remarks`, `supervisor_comments`, `dept_head_comments`, `hr_review`, `created_by`, `created_at`, `updated_at`) VALUES
 (6, 2, '2026-07-16', 6, '2027-01-16', NULL, 'Completed', 3.94, 'Confirm', NULL, 'sdf', 'sdf', 'fasf', 'Admin User', '2026-07-16 11:04:23', '2026-07-19 10:36:46'),
 (8, 1, '2026-07-16', 6, '2027-01-16', NULL, 'Completed', 3.72, 'Confirm', NULL, 'fsad', 'adsf', 'asdf', 'Admin User', '2026-07-23 09:30:45', '2026-07-23 09:56:55'),
 (9, 7, '2026-07-23', 1, '2026-08-23', NULL, 'Pending', 4.55, 'Confirm', NULL, NULL, NULL, NULL, 'Admin User', '2026-07-25 11:18:04', '2026-07-25 11:18:04'),
@@ -902,7 +902,7 @@ INSERT INTO `probation_appraisals` (`id`, `employee_id`, `joining_date`, `probat
 -- Table structure for table `probation_categories`
 --
 
-CREATE TABLE `probation_categories` (
+CREATE TABLE `elms_probation_categories` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `weight` decimal(5,2) NOT NULL DEFAULT 0.00,
@@ -915,7 +915,7 @@ CREATE TABLE `probation_categories` (
 -- Dumping data for table `probation_categories`
 --
 
-INSERT INTO `probation_categories` (`id`, `name`, `weight`, `sort_order`, `status`, `created_at`) VALUES
+INSERT INTO `elms_probation_categories` (`id`, `name`, `weight`, `sort_order`, `status`, `created_at`) VALUES
 (1, 'Attendance', 15.00, 1, 'Active', '2026-07-13 12:07:58'),
 (2, 'Discipline', 10.00, 2, 'Active', '2026-07-13 12:07:58'),
 (3, 'Job Knowledge', 15.00, 3, 'Active', '2026-07-13 12:07:58'),
@@ -933,7 +933,7 @@ INSERT INTO `probation_categories` (`id`, `name`, `weight`, `sort_order`, `statu
 -- Table structure for table `probation_scores`
 --
 
-CREATE TABLE `probation_scores` (
+CREATE TABLE `elms_probation_scores` (
   `id` int(11) NOT NULL,
   `appraisal_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
@@ -946,7 +946,7 @@ CREATE TABLE `probation_scores` (
 -- Dumping data for table `probation_scores`
 --
 
-INSERT INTO `probation_scores` (`id`, `appraisal_id`, `category_id`, `score`, `comments`, `created_at`) VALUES
+INSERT INTO `elms_probation_scores` (`id`, `appraisal_id`, `category_id`, `score`, `comments`, `created_at`) VALUES
 (118, 6, 1, 4.00, NULL, '2026-07-16 11:04:23'),
 (119, 6, 1, 4.00, NULL, '2026-07-16 11:04:23'),
 (120, 6, 1, 4.00, NULL, '2026-07-16 11:04:23'),
@@ -1101,7 +1101,7 @@ INSERT INTO `probation_scores` (`id`, `appraisal_id`, `category_id`, `score`, `c
 -- Table structure for table `probation_workflow`
 --
 
-CREATE TABLE `probation_workflow` (
+CREATE TABLE `elms_probation_workflow` (
   `id` int(11) NOT NULL,
   `appraisal_id` int(11) NOT NULL,
   `level` varchar(50) NOT NULL,
@@ -1116,7 +1116,7 @@ CREATE TABLE `probation_workflow` (
 -- Dumping data for table `probation_workflow`
 --
 
-INSERT INTO `probation_workflow` (`id`, `appraisal_id`, `level`, `status`, `approved_by`, `comments`, `action_at`, `created_at`) VALUES
+INSERT INTO `elms_probation_workflow` (`id`, `appraisal_id`, `level`, `status`, `approved_by`, `comments`, `action_at`, `created_at`) VALUES
 (31, 6, 'Self Assessment', 'Approved', 'Admin User', NULL, '2026-07-16 17:04:23', '2026-07-16 11:04:23'),
 (32, 6, 'Supervisor', 'Approved', 'Admin User', 'fdsf', '2026-07-19 12:07:05', '2026-07-16 11:04:23'),
 (33, 6, 'Dept Head', 'Approved', 'Admin User', 'sdf', '2026-07-19 15:46:29', '2026-07-16 11:04:23'),
@@ -1154,7 +1154,7 @@ INSERT INTO `probation_workflow` (`id`, `appraisal_id`, `level`, `status`, `appr
 -- Table structure for table `requisitions`
 --
 
-CREATE TABLE `requisitions` (
+CREATE TABLE `elms_requisitions` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `dept_id` int(11) NOT NULL,
@@ -1180,7 +1180,7 @@ CREATE TABLE `requisitions` (
 -- Dumping data for table `requisitions`
 --
 
-INSERT INTO `requisitions` (`id`, `title`, `dept_id`, `location`, `type`, `vacancies`, `deadline`, `education`, `experience`, `salary_min`, `salary_max`, `skills`, `description`, `responsibilities`, `benefits`, `priority`, `status`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_requisitions` (`id`, `title`, `dept_id`, `location`, `type`, `vacancies`, `deadline`, `education`, `experience`, `salary_min`, `salary_max`, `skills`, `description`, `responsibilities`, `benefits`, `priority`, `status`, `created_at`, `updated_at`) VALUES
 (1, 'Senior Software Engineer', 1, 'Dhaka, Bangladesh', 'Full Time', 3, '2026-10-04', NULL, 0.0, 120000.00, 180000.00, NULL, NULL, NULL, NULL, 'High', 'Active', '2026-07-09 11:51:53', '2026-07-09 11:51:53'),
 (2, 'Junior Software Developer', 1, 'Dhaka, Bangladesh', 'Full Time', 5, '2026-10-08', NULL, 0.0, 40000.00, 70000.00, NULL, NULL, NULL, NULL, 'Medium', 'Active', '2026-07-09 11:51:53', '2026-07-09 11:51:53'),
 (3, 'Digital Marketing Manager', 2, 'Dhaka, Bangladesh', 'Full Time', 2, '2026-09-18', NULL, 0.0, 80000.00, 120000.00, NULL, NULL, NULL, NULL, 'High', 'Active', '2026-07-09 11:51:53', '2026-07-09 11:51:53'),
@@ -1201,10 +1201,10 @@ INSERT INTO `requisitions` (`id`, `title`, `dept_id`, `location`, `type`, `vacan
 -- --------------------------------------------------------
 
 --
--- Table structure for table `salary_info`
+-- Table structure for table `elms_salary_info`
 --
 
-CREATE TABLE `salary_info` (
+CREATE TABLE `elms_salary_info` (
   `id` int(11) NOT NULL,
   `PBI_ID` int(11) NOT NULL,
   `offer_id` int(11) NOT NULL,
@@ -1272,10 +1272,10 @@ CREATE TABLE `salary_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `salary_info`
+-- Dumping data for table `elms_salary_info`
 --
 
-INSERT INTO `salary_info` (`id`, `PBI_ID`, `offer_id`, `salary_type`, `basic_salary`, `commission`, `consolidated_salary`, `house_rent`, `dearness_allowance`, `contribution`, `entertainment`, `special_allowance`, `convenience`, `utility_allowance`, `children_edu_allowance`, `responsibility_allowance`, `superintendent_allowance`, `servant_allowance`, `transport_allowance`, `fuel_allowance`, `comstry_allowance`, `marketing_allowance`, `realestate_allowance`, `car_driver_allowance`, `ta`, `da`, `others`, `other_allowance`, `food_allowance`, `mobile_allowance`, `medical_allowance`, `mobile_ceiling`, `bonus_applicable`, `overtime_applicable`, `ot_weekend_applicable`, `ot_holiday_applicable`, `pf`, `sm_money`, `income_tax`, `group_insurance`, `cfund`, `cash_bank`, `ac_no`, `cash_amt`, `bank_amt`, `branch_info`, `security_amount`, `cooperative_share`, `motorcycle_install`, `fixed_tada`, `gross_salary`, `total_salary`, `total_payable`, `m_income_tex`, `bank_name`, `pf_company`, `tax_status`, `pf_status`, `cash`, `edit_by`, `pf_applicable`, `pf_deductible`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_salary_info` (`id`, `PBI_ID`, `offer_id`, `salary_type`, `basic_salary`, `commission`, `consolidated_salary`, `house_rent`, `dearness_allowance`, `contribution`, `entertainment`, `special_allowance`, `convenience`, `utility_allowance`, `children_edu_allowance`, `responsibility_allowance`, `superintendent_allowance`, `servant_allowance`, `transport_allowance`, `fuel_allowance`, `comstry_allowance`, `marketing_allowance`, `realestate_allowance`, `car_driver_allowance`, `ta`, `da`, `others`, `other_allowance`, `food_allowance`, `mobile_allowance`, `medical_allowance`, `mobile_ceiling`, `bonus_applicable`, `overtime_applicable`, `ot_weekend_applicable`, `ot_holiday_applicable`, `pf`, `sm_money`, `income_tax`, `group_insurance`, `cfund`, `cash_bank`, `ac_no`, `cash_amt`, `bank_amt`, `branch_info`, `security_amount`, `cooperative_share`, `motorcycle_install`, `fixed_tada`, `gross_salary`, `total_salary`, `total_payable`, `m_income_tex`, `bank_name`, `pf_company`, `tax_status`, `pf_status`, `cash`, `edit_by`, `pf_applicable`, `pf_deductible`, `created_at`, `updated_at`) VALUES
 (1, 2, 6, '', 76793.00, 0.00, 0.00, 38397.00, 0.00, 0.00, 0.00, 0.00, 11519.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 7679.00, 0.00, '', '', '', '', 0.00, 0.00, 0.00, 0.00, 0.00, '', '', 0.00, 0.00, '', 0.00, 0, 0.00, 0.00, 134389, 134389, 0, 0, 0, 0.00, '', '', 0, '', 'No', 'No', '2026-07-23 06:54:18', '2026-07-23 06:54:18'),
 (2, 3, 7, '', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '', '', '', '', 0.00, 0.00, 0.00, 0.00, 0.00, '', '', 0.00, 0.00, '', 0.00, 0, 0.00, 0.00, 0, 100000, 0, 0, 0, 0.00, '', '', 0, '', 'No', 'No', '2026-07-23 06:59:05', '2026-07-23 06:59:05'),
 (3, 4, 8, '', 57142.00, 0.00, 0.00, 28571.00, 0.00, 0.00, 0.00, 0.00, 8571.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 5714.00, 0.00, '', '', '', '', 0.00, 0.00, 0.00, 0.00, 0.00, '', '', 0.00, 0.00, '', 0.00, 0, 0.00, 0.00, 100000, 100000, 0, 0, 0, 0.00, '', '', 0, '', 'No', 'No', '2026-07-23 07:22:37', '2026-07-23 07:22:37'),
@@ -1291,7 +1291,7 @@ INSERT INTO `salary_info` (`id`, `PBI_ID`, `offer_id`, `salary_type`, `basic_sal
 -- Table structure for table `salary_proposals`
 --
 
-CREATE TABLE `salary_proposals` (
+CREATE TABLE `elms_salary_proposals` (
   `id` int(11) NOT NULL,
   `candidate_id` int(11) NOT NULL,
   `proposed_salary` decimal(12,2) NOT NULL,
@@ -1310,7 +1310,7 @@ CREATE TABLE `salary_proposals` (
 -- Dumping data for table `salary_proposals`
 --
 
-INSERT INTO `salary_proposals` (`id`, `candidate_id`, `proposed_salary`, `offered_salary`, `negotiation_notes`, `salary_breakdown`, `status`, `version`, `created_by`, `finalized_at`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_salary_proposals` (`id`, `candidate_id`, `proposed_salary`, `offered_salary`, `negotiation_notes`, `salary_breakdown`, `status`, `version`, `created_by`, `finalized_at`, `created_at`, `updated_at`) VALUES
 (6, 2, 77434.00, NULL, '', NULL, 'Proposed', 1, 'Admin User', NULL, '2026-07-16 11:02:02', '2026-07-16 11:02:02'),
 (7, 2, 77434.00, 77434.00, 'fsd', NULL, 'Finalized', 2, 'Admin User', '2026-07-16 17:02:18', '2026-07-16 11:02:10', '2026-07-16 11:02:18'),
 (9, 5, 190524.00, NULL, 'sdfasdf a', NULL, 'Rejected', 1, 'Admin User', NULL, '2026-07-19 06:27:37', '2026-07-19 07:03:14'),
@@ -1336,7 +1336,7 @@ INSERT INTO `salary_proposals` (`id`, `candidate_id`, `proposed_salary`, `offere
 -- Table structure for table `screenings`
 --
 
-CREATE TABLE `screenings` (
+CREATE TABLE `elms_screenings` (
   `id` int(11) NOT NULL,
   `candidate_id` int(11) NOT NULL,
   `screened_by` varchar(100) DEFAULT 'Admin User',
@@ -1356,7 +1356,7 @@ CREATE TABLE `screenings` (
 -- Dumping data for table `screenings`
 --
 
-INSERT INTO `screenings` (`id`, `candidate_id`, `screened_by`, `date`, `rating`, `communication_score`, `experience_match`, `skill_match`, `education_match`, `remarks`, `result`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_screenings` (`id`, `candidate_id`, `screened_by`, `date`, `rating`, `communication_score`, `experience_match`, `skill_match`, `education_match`, `remarks`, `result`, `created_at`, `updated_at`) VALUES
 (11, 5, 'Admin User', '2026-07-16', 4.0, 4.0, 'Low', 'Low', 'Low', 'Screen result not good but need to take interview', 'Shortlist', '2026-07-16 10:51:57', '2026-07-16 10:51:57'),
 (12, 1, 'Admin User', '2026-07-16', 4.0, 4.0, 'Medium', 'Medium', 'Medium', 'Good to go', 'Shortlist', '2026-07-16 10:52:35', '2026-07-16 10:52:35'),
 (13, 2, 'Admin User', '2026-07-16', 4.0, 4.0, 'Medium', 'Medium', 'Medium', 'Good to go', 'Shortlist', '2026-07-16 10:52:54', '2026-07-16 10:52:54'),
@@ -1393,7 +1393,7 @@ INSERT INTO `screenings` (`id`, `candidate_id`, `screened_by`, `date`, `rating`,
 -- Table structure for table `template_modules`
 --
 
-CREATE TABLE `template_modules` (
+CREATE TABLE `elms_template_modules` (
   `id` int(11) NOT NULL,
   `module_name` varchar(50) NOT NULL,
   `label` varchar(100) NOT NULL,
@@ -1408,20 +1408,48 @@ CREATE TABLE `template_modules` (
 -- Dumping data for table `template_modules`
 --
 
-INSERT INTO `template_modules` (`id`, `module_name`, `label`, `render_file`, `description`, `is_active`, `created_at`, `updated_at`) VALUES
+INSERT INTO `elms_template_modules` (`id`, `module_name`, `label`, `render_file`, `description`, `is_active`, `created_at`, `updated_at`) VALUES
 (1, 'Offer', 'Offer / Recruitment', 'templates/render/offer.php', 'Merge tags for offer letters and recruitment', 1, '2026-07-19 05:44:54', '2026-07-19 05:44:54'),
 (2, 'Confirmation', 'Confirmation', 'templates/render/confirmation.php', 'Merge tags for confirmation letters', 1, '2026-07-19 05:44:54', '2026-07-19 05:44:54'),
 (3, 'Probation', 'Probation', 'templates/render/probation.php', 'Merge tags for probation appraisal letters', 1, '2026-07-19 05:44:54', '2026-07-19 05:44:54'),
 (4, 'General', 'General Letter', 'templates/render/general.php', 'General purpose merge tags', 1, '2026-07-19 05:44:54', '2026-07-19 05:44:54');
 
+-- --------------------------------------------------------
+
 --
+-- Table structure for table `elms_fr`
+--
+
+CREATE TABLE `elms_fr` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'Active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for table `elms_fr`
+--
+ALTER TABLE `elms_fr`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for table `elms_fr`
+--
+ALTER TABLE `elms_fr`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- ---------------------------------------------------------
 -- Indexes for dumped tables
 --
 
 --
 -- Indexes for table `candidates`
 --
-ALTER TABLE `candidates`
+ALTER TABLE `elms_candidates`
   ADD PRIMARY KEY (`id`),
   ADD KEY `job_id` (`job_id`),
   ADD KEY `status_id` (`status_id`);
@@ -1429,60 +1457,60 @@ ALTER TABLE `candidates`
 --
 -- Indexes for table `candidate_logs`
 --
-ALTER TABLE `candidate_logs`
+ALTER TABLE `elms_candidate_logs`
   ADD PRIMARY KEY (`id`),
   ADD KEY `candidate_id` (`candidate_id`);
 
 --
 -- Indexes for table `candidate_statuses`
 --
-ALTER TABLE `candidate_statuses`
+ALTER TABLE `elms_candidate_statuses`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `code` (`code`);
 
 --
 -- Indexes for table `confirmation_letters`
 --
-ALTER TABLE `confirmation_letters`
+ALTER TABLE `elms_confirmation_letters`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `departments`
+-- Indexes for table `elms_departments`
 --
-ALTER TABLE `departments`
+ALTER TABLE `elms_departments`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `designations`
+-- Indexes for table `elms_designations`
 --
-ALTER TABLE `designations`
+ALTER TABLE `elms_designations`
   ADD PRIMARY KEY (`id`),
   ADD KEY `dept_id` (`dept_id`);
 
 --
 -- Indexes for table `interview_log`
 --
-ALTER TABLE `interview_log`
+ALTER TABLE `elms_interview_log`
   ADD PRIMARY KEY (`id`),
   ADD KEY `candidate_id` (`candidate_id`);
 
 --
 -- Indexes for table `letter_templates`
 --
-ALTER TABLE `letter_templates`
+ALTER TABLE `elms_letter_templates`
   ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `merge_tags`
 --
-ALTER TABLE `merge_tags`
+ALTER TABLE `elms_merge_tags`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uq_tag_type` (`tag`,`type`);
 
 --
 -- Indexes for table `offers`
 --
-ALTER TABLE `offers`
+ALTER TABLE `elms_offers`
   ADD PRIMARY KEY (`id`),
   ADD KEY `candidate_id` (`candidate_id`),
   ADD KEY `designation_id` (`designation_id`),
@@ -1491,28 +1519,28 @@ ALTER TABLE `offers`
 --
 -- Indexes for table `offer_approvals`
 --
-ALTER TABLE `offer_approvals`
+ALTER TABLE `elms_offer_approvals`
   ADD PRIMARY KEY (`id`),
   ADD KEY `offer_id` (`offer_id`);
 
 --
 -- Indexes for table `offer_email_log`
 --
-ALTER TABLE `offer_email_log`
+ALTER TABLE `elms_offer_email_log`
   ADD PRIMARY KEY (`id`),
   ADD KEY `offer_id` (`offer_id`);
 
 --
 -- Indexes for table `offer_letters`
 --
-ALTER TABLE `offer_letters`
+ALTER TABLE `elms_offer_letters`
   ADD PRIMARY KEY (`id`),
   ADD KEY `offer_id` (`offer_id`);
 
 --
--- Indexes for table `personnel_basic_info`
+-- Indexes for table `elms_personnel_basic_info`
 --
-ALTER TABLE `personnel_basic_info`
+ALTER TABLE `elms_personnel_basic_info`
   ADD PRIMARY KEY (`PBI_ID`),
   ADD KEY `candidate_id` (`candidate_id`),
   ADD KEY `offer_id` (`offer_id`);
@@ -1520,19 +1548,19 @@ ALTER TABLE `personnel_basic_info`
 --
 -- Indexes for table `probation_appraisals`
 --
-ALTER TABLE `probation_appraisals`
+ALTER TABLE `elms_probation_appraisals`
   ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `probation_categories`
 --
-ALTER TABLE `probation_categories`
+ALTER TABLE `elms_probation_categories`
   ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `probation_scores`
 --
-ALTER TABLE `probation_scores`
+ALTER TABLE `elms_probation_scores`
   ADD PRIMARY KEY (`id`),
   ADD KEY `appraisal_id` (`appraisal_id`),
   ADD KEY `category_id` (`category_id`);
@@ -1540,21 +1568,21 @@ ALTER TABLE `probation_scores`
 --
 -- Indexes for table `probation_workflow`
 --
-ALTER TABLE `probation_workflow`
+ALTER TABLE `elms_probation_workflow`
   ADD PRIMARY KEY (`id`),
   ADD KEY `appraisal_id` (`appraisal_id`);
 
 --
 -- Indexes for table `requisitions`
 --
-ALTER TABLE `requisitions`
+ALTER TABLE `elms_requisitions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_dept_id` (`dept_id`);
 
 --
--- Indexes for table `salary_info`
+-- Indexes for table `elms_salary_info`
 --
-ALTER TABLE `salary_info`
+ALTER TABLE `elms_salary_info`
   ADD PRIMARY KEY (`id`),
   ADD KEY `PBI_ID` (`PBI_ID`),
   ADD KEY `offer_id` (`offer_id`);
@@ -1562,21 +1590,21 @@ ALTER TABLE `salary_info`
 --
 -- Indexes for table `salary_proposals`
 --
-ALTER TABLE `salary_proposals`
+ALTER TABLE `elms_salary_proposals`
   ADD PRIMARY KEY (`id`),
   ADD KEY `candidate_id` (`candidate_id`);
 
 --
 -- Indexes for table `screenings`
 --
-ALTER TABLE `screenings`
+ALTER TABLE `elms_screenings`
   ADD PRIMARY KEY (`id`),
   ADD KEY `candidate_id` (`candidate_id`);
 
 --
 -- Indexes for table `template_modules`
 --
-ALTER TABLE `template_modules`
+ALTER TABLE `elms_template_modules`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `module_name` (`module_name`);
 
@@ -1587,139 +1615,139 @@ ALTER TABLE `template_modules`
 --
 -- AUTO_INCREMENT for table `candidates`
 --
-ALTER TABLE `candidates`
+ALTER TABLE `elms_candidates`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `candidate_logs`
 --
-ALTER TABLE `candidate_logs`
+ALTER TABLE `elms_candidate_logs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=268;
 
 --
 -- AUTO_INCREMENT for table `candidate_statuses`
 --
-ALTER TABLE `candidate_statuses`
+ALTER TABLE `elms_candidate_statuses`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `confirmation_letters`
 --
-ALTER TABLE `confirmation_letters`
+ALTER TABLE `elms_confirmation_letters`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT for table `departments`
+-- AUTO_INCREMENT for table `elms_departments`
 --
-ALTER TABLE `departments`
+ALTER TABLE `elms_departments`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT for table `designations`
+-- AUTO_INCREMENT for table `elms_designations`
 --
-ALTER TABLE `designations`
+ALTER TABLE `elms_designations`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `interview_log`
 --
-ALTER TABLE `interview_log`
+ALTER TABLE `elms_interview_log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `letter_templates`
 --
-ALTER TABLE `letter_templates`
+ALTER TABLE `elms_letter_templates`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `merge_tags`
 --
-ALTER TABLE `merge_tags`
+ALTER TABLE `elms_merge_tags`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `offers`
 --
-ALTER TABLE `offers`
+ALTER TABLE `elms_offers`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `offer_approvals`
 --
-ALTER TABLE `offer_approvals`
+ALTER TABLE `elms_offer_approvals`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `offer_email_log`
 --
-ALTER TABLE `offer_email_log`
+ALTER TABLE `elms_offer_email_log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `offer_letters`
 --
-ALTER TABLE `offer_letters`
+ALTER TABLE `elms_offer_letters`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
--- AUTO_INCREMENT for table `personnel_basic_info`
+-- AUTO_INCREMENT for table `elms_personnel_basic_info`
 --
-ALTER TABLE `personnel_basic_info`
+ALTER TABLE `elms_personnel_basic_info`
   MODIFY `PBI_ID` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `probation_appraisals`
 --
-ALTER TABLE `probation_appraisals`
+ALTER TABLE `elms_probation_appraisals`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `probation_categories`
 --
-ALTER TABLE `probation_categories`
+ALTER TABLE `elms_probation_categories`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `probation_scores`
 --
-ALTER TABLE `probation_scores`
+ALTER TABLE `elms_probation_scores`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=295;
 
 --
 -- AUTO_INCREMENT for table `probation_workflow`
 --
-ALTER TABLE `probation_workflow`
+ALTER TABLE `elms_probation_workflow`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 
 --
 -- AUTO_INCREMENT for table `requisitions`
 --
-ALTER TABLE `requisitions`
+ALTER TABLE `elms_requisitions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
--- AUTO_INCREMENT for table `salary_info`
+-- AUTO_INCREMENT for table `elms_salary_info`
 --
-ALTER TABLE `salary_info`
+ALTER TABLE `elms_salary_info`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `salary_proposals`
 --
-ALTER TABLE `salary_proposals`
+ALTER TABLE `elms_salary_proposals`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `screenings`
 --
-ALTER TABLE `screenings`
+ALTER TABLE `elms_screenings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `template_modules`
 --
-ALTER TABLE `template_modules`
+ALTER TABLE `elms_template_modules`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
@@ -1729,84 +1757,84 @@ ALTER TABLE `template_modules`
 --
 -- Constraints for table `candidates`
 --
-ALTER TABLE `candidates`
-  ADD CONSTRAINT `candidates_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `requisitions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `candidates_ibfk_2` FOREIGN KEY (`status_id`) REFERENCES `candidate_statuses` (`id`) ON UPDATE CASCADE;
+ALTER TABLE `elms_candidates`
+  ADD CONSTRAINT `candidates_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `elms_requisitions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `candidates_ibfk_2` FOREIGN KEY (`status_id`) REFERENCES `elms_candidate_statuses` (`id`) ON UPDATE CASCADE;
 
 --
 -- Constraints for table `candidate_logs`
 --
-ALTER TABLE `candidate_logs`
-  ADD CONSTRAINT `candidate_logs_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `candidates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `elms_candidate_logs`
+  ADD CONSTRAINT `candidate_logs_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `elms_candidates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `designations`
+-- Constraints for table `elms_designations`
 --
-ALTER TABLE `designations`
-  ADD CONSTRAINT `designations_ibfk_1` FOREIGN KEY (`dept_id`) REFERENCES `departments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `elms_designations`
+  ADD CONSTRAINT `designations_ibfk_1` FOREIGN KEY (`dept_id`) REFERENCES `elms_departments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `interview_log`
 --
-ALTER TABLE `interview_log`
-  ADD CONSTRAINT `interview_log_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `candidates` (`id`) ON DELETE CASCADE;
+ALTER TABLE `elms_interview_log`
+  ADD CONSTRAINT `interview_log_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `elms_candidates` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `offers`
 --
-ALTER TABLE `offers`
-  ADD CONSTRAINT `offers_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `candidates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `offers_ibfk_2` FOREIGN KEY (`designation_id`) REFERENCES `designations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `offers_ibfk_3` FOREIGN KEY (`dept_id`) REFERENCES `departments` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `elms_offers`
+  ADD CONSTRAINT `offers_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `elms_candidates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `offers_ibfk_2` FOREIGN KEY (`designation_id`) REFERENCES `elms_designations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `offers_ibfk_3` FOREIGN KEY (`dept_id`) REFERENCES `elms_departments` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `offer_approvals`
 --
-ALTER TABLE `offer_approvals`
-  ADD CONSTRAINT `offer_approvals_ibfk_1` FOREIGN KEY (`offer_id`) REFERENCES `offers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `elms_offer_approvals`
+  ADD CONSTRAINT `offer_approvals_ibfk_1` FOREIGN KEY (`offer_id`) REFERENCES `elms_offers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `offer_email_log`
 --
-ALTER TABLE `offer_email_log`
-  ADD CONSTRAINT `offer_email_log_ibfk_1` FOREIGN KEY (`offer_id`) REFERENCES `offers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `elms_offer_email_log`
+  ADD CONSTRAINT `offer_email_log_ibfk_1` FOREIGN KEY (`offer_id`) REFERENCES `elms_offers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `offer_letters`
 --
-ALTER TABLE `offer_letters`
-  ADD CONSTRAINT `offer_letters_ibfk_1` FOREIGN KEY (`offer_id`) REFERENCES `offers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `elms_offer_letters`
+  ADD CONSTRAINT `offer_letters_ibfk_1` FOREIGN KEY (`offer_id`) REFERENCES `elms_offers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `probation_scores`
 --
-ALTER TABLE `probation_scores`
-  ADD CONSTRAINT `probation_scores_ibfk_1` FOREIGN KEY (`appraisal_id`) REFERENCES `probation_appraisals` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `probation_scores_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `probation_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `elms_probation_scores`
+  ADD CONSTRAINT `probation_scores_ibfk_1` FOREIGN KEY (`appraisal_id`) REFERENCES `elms_probation_appraisals` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `probation_scores_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `elms_probation_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `probation_workflow`
 --
-ALTER TABLE `probation_workflow`
-  ADD CONSTRAINT `probation_workflow_ibfk_1` FOREIGN KEY (`appraisal_id`) REFERENCES `probation_appraisals` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `elms_probation_workflow`
+  ADD CONSTRAINT `probation_workflow_ibfk_1` FOREIGN KEY (`appraisal_id`) REFERENCES `elms_probation_appraisals` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `requisitions`
 --
-ALTER TABLE `requisitions`
-  ADD CONSTRAINT `fk_requisition_dept` FOREIGN KEY (`dept_id`) REFERENCES `departments` (`id`) ON UPDATE CASCADE;
+ALTER TABLE `elms_requisitions`
+  ADD CONSTRAINT `fk_requisition_dept` FOREIGN KEY (`dept_id`) REFERENCES `elms_departments` (`id`) ON UPDATE CASCADE;
 
 --
 -- Constraints for table `salary_proposals`
 --
-ALTER TABLE `salary_proposals`
-  ADD CONSTRAINT `salary_proposals_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `candidates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `elms_salary_proposals`
+  ADD CONSTRAINT `salary_proposals_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `elms_candidates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `screenings`
 --
-ALTER TABLE `screenings`
-  ADD CONSTRAINT `screenings_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `candidates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `elms_screenings`
+  ADD CONSTRAINT `screenings_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `elms_candidates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

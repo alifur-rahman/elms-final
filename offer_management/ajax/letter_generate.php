@@ -24,22 +24,22 @@ try {
     }
 
     // Check if a letter already exists
-    $chk = $pdo->prepare("SELECT id FROM offer_letters WHERE offer_id = :oid LIMIT 1");
+    $chk = $pdo->prepare("SELECT id FROM elms_offer_letters WHERE offer_id = :oid LIMIT 1");
     $chk->execute([':oid' => $offerId]);
     $existing = $chk->fetch();
 
     if ($existing) {
-        $uStmt = $pdo->prepare("UPDATE offer_letters SET letter_content = :content, status = 'Generated', generated_at = NOW() WHERE id = :id");
+        $uStmt = $pdo->prepare("UPDATE elms_offer_letters SET letter_content = :content, status = 'Generated', generated_at = NOW() WHERE id = :id");
         $uStmt->execute([':content' => $content, ':id' => $existing['id']]);
         $letterId = $existing['id'];
     } else {
-        $iStmt = $pdo->prepare("INSERT INTO offer_letters (offer_id, letter_content, letter_format, status, generated_at) VALUES (:oid, :content, 'html', 'Generated', NOW())");
+        $iStmt = $pdo->prepare("INSERT INTO elms_offer_letters (offer_id, letter_content, letter_format, status, generated_at) VALUES (:oid, :content, 'html', 'Generated', NOW())");
         $iStmt->execute([':oid' => $offerId, ':content' => $content]);
         $letterId = $pdo->lastInsertId();
     }
 
     // Log lifecycle
-    $oInfo = $pdo->prepare("SELECT candidate_id FROM offers WHERE id = :id");
+    $oInfo = $pdo->prepare("SELECT candidate_id FROM elms_offers WHERE id = :id");
     $oInfo->execute([':id' => $offerId]);
     $candidateId = (int)$oInfo->fetchColumn();
     if ($candidateId) addCandidateLog($pdo, $candidateId, 'offer_letter_generated', null, null, 'Offer letter generated.');

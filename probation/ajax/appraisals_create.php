@@ -26,7 +26,7 @@ try {
     }
 
     // Prevent duplicate appraisal for same employee
-    $dupCheck = $pdo->prepare("SELECT COUNT(*) FROM probation_appraisals WHERE employee_id = :eid");
+    $dupCheck = $pdo->prepare("SELECT COUNT(*) FROM elms_probation_appraisals WHERE employee_id = :eid");
     $dupCheck->execute([':eid' => $employeeId]);
     if ((int)$dupCheck->fetchColumn() > 0) {
         http_response_code(409);
@@ -44,7 +44,7 @@ try {
 
     $pdo->beginTransaction();
 
-    $stmt = $pdo->prepare("INSERT INTO probation_appraisals (employee_id, joining_date, probation_months, end_date, review_date, status, created_by) VALUES (:emp, :join, :months, :end, :review, 'Draft', 'Admin User')");
+    $stmt = $pdo->prepare("INSERT INTO elms_probation_appraisals (employee_id, joining_date, probation_months, end_date, review_date, status, created_by) VALUES (:emp, :join, :months, :end, :review, 'Draft', 'Admin User')");
     $stmt->execute([
         ':emp'    => $employeeId,
         ':join'   => $joiningDate ?: null,
@@ -56,7 +56,7 @@ try {
 
     // Create empty workflow entries
     $levels = ['Self Assessment', 'Supervisor', 'Dept Head', 'HR Review', 'GM', 'Managing Director'];
-    $wfStmt = $pdo->prepare("INSERT INTO probation_workflow (appraisal_id, level, status) VALUES (:aid, :level, 'Pending')");
+    $wfStmt = $pdo->prepare("INSERT INTO elms_probation_workflow (appraisal_id, level, status) VALUES (:aid, :level, 'Pending')");
     foreach ($levels as $level) {
         $wfStmt->execute([':aid' => $appraisalId, ':level' => $level]);
     }

@@ -26,7 +26,7 @@ try {
     }
 
     // Log the email attempt
-    $logStmt = $pdo->prepare("INSERT INTO offer_email_log (offer_id, recipient, subject, body, status) VALUES (:oid, :rec, :sub, :body, 'Sent')");
+    $logStmt = $pdo->prepare("INSERT INTO elms_offer_email_log (offer_id, recipient, subject, body, status) VALUES (:oid, :rec, :sub, :body, 'Sent')");
     $logStmt->execute([
         ':oid' => $offerId,
         ':rec' => $recipient,
@@ -35,15 +35,15 @@ try {
     ]);
 
     // Update the offer letter as sent
-    $lStmt = $pdo->prepare("UPDATE offer_letters SET status = 'Sent', sent_at = NOW(), sent_to_email = :rec WHERE offer_id = :oid");
+    $lStmt = $pdo->prepare("UPDATE elms_offer_letters SET status = 'Sent', sent_at = NOW(), sent_to_email = :rec WHERE offer_id = :oid");
     $lStmt->execute([':rec' => $recipient, ':oid' => $offerId]);
 
     // Update the offer sent_at date
-    $oStmt = $pdo->prepare("UPDATE offers SET sent_at = NOW() WHERE id = :id");
+    $oStmt = $pdo->prepare("UPDATE elms_offers SET sent_at = NOW() WHERE id = :id");
     $oStmt->execute([':id' => $offerId]);
 
     // Log lifecycle
-    $oInfo = $pdo->prepare("SELECT candidate_id FROM offers WHERE id = :id");
+    $oInfo = $pdo->prepare("SELECT candidate_id FROM elms_offers WHERE id = :id");
     $oInfo->execute([':id' => $offerId]);
     $candidateId = (int)$oInfo->fetchColumn();
     if ($candidateId) addCandidateLog($pdo, $candidateId, 'offer_sent', null, null, 'Offer sent via email to ' . $recipient);

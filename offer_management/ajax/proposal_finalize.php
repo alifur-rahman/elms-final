@@ -24,16 +24,16 @@ try {
     }
 
     // Get the latest proposal for this candidate and finalize it
-    $pStmt = $pdo->prepare("SELECT id FROM salary_proposals WHERE candidate_id = :cid ORDER BY version DESC LIMIT 1");
+    $pStmt = $pdo->prepare("SELECT id FROM elms_salary_proposals WHERE candidate_id = :cid ORDER BY version DESC LIMIT 1");
     $pStmt->execute([':cid' => $candidateId]);
     $prop = $pStmt->fetch();
 
     if ($prop) {
-        $uStmt = $pdo->prepare("UPDATE salary_proposals SET status = 'Finalized', offered_salary = :sal, finalized_at = NOW() WHERE id = :id");
+        $uStmt = $pdo->prepare("UPDATE elms_salary_proposals SET status = 'Finalized', offered_salary = :sal, finalized_at = NOW() WHERE id = :id");
         $uStmt->execute([':sal' => $offeredSalary, ':id' => $prop['id']]);
     } else {
         // No prior proposal, create one as finalized
-        $iStmt = $pdo->prepare("INSERT INTO salary_proposals (candidate_id, proposed_salary, offered_salary, status, version, finalized_at) VALUES (:cid, :sal, :sal, 'Finalized', 1, NOW())");
+        $iStmt = $pdo->prepare("INSERT INTO elms_salary_proposals (candidate_id, proposed_salary, offered_salary, status, version, finalized_at) VALUES (:cid, :sal, :sal, 'Finalized', 1, NOW())");
         $iStmt->execute([':cid' => $candidateId, ':sal' => $offeredSalary]);
     }
 

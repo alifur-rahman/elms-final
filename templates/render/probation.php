@@ -4,10 +4,10 @@ function getProbationTagMap(PDO $pdo, int $recordId): array {
         SELECT pa.*,
                e.first_name, e.last_name, e.joining_date,
                d.name AS dept_name, des.name AS designation_name
-        FROM probation_appraisals pa
+        FROM elms_probation_appraisals pa
         LEFT JOIN employees e ON e.id = pa.employee_id
-        LEFT JOIN departments d ON d.id = e.dept_id
-        LEFT JOIN designations des ON des.id = e.designation_id
+        LEFT JOIN elms_departments d ON d.id = e.dept_id
+        LEFT JOIN elms_designations des ON des.id = e.designation_id
         WHERE pa.id = :id
     ");
     $stmt->execute([':id' => $recordId]);

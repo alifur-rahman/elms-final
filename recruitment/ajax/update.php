@@ -23,7 +23,7 @@ try {
         exit;
     }
 
-    $check = $pdo->prepare("SELECT id FROM requisitions WHERE id = :id");
+    $check = $pdo->prepare("SELECT id FROM elms_requisitions WHERE id = :id");
     $check->execute([':id' => $id]);
     if (!$check->fetch()) {
         http_response_code(404);
@@ -60,7 +60,7 @@ try {
     }
 
     $stmt = $pdo->prepare("
-        UPDATE requisitions SET
+        UPDATE elms_requisitions SET
             title = :title, dept_id = :dept_id, location = :location, type = :type,
             vacancies = :vacancies, deadline = :deadline, education = :education,
             experience = :experience, salary_min = :salary_min, salary_max = :salary_max,

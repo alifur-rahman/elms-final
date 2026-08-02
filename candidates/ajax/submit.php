@@ -42,7 +42,7 @@ try {
         exit;
     }
 
-    $stmt = $pdo->query("SELECT MAX(id) AS max_id FROM candidates");
+    $stmt = $pdo->query("SELECT MAX(id) AS max_id FROM elms_candidates");
     $maxRow = $stmt->fetch();
     $nextId = ($maxRow['max_id'] ?? 0) + 1;
     $code = 'CAND-' . date('Y') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
@@ -50,7 +50,7 @@ try {
     $pdo->beginTransaction();
 
     $stmt = $pdo->prepare("
-        INSERT INTO candidates
+        INSERT INTO elms_candidates
             (job_id, code, first_name, last_name, email, phone, nid, blood_group,
              dob, gender, present_address, permanent_address,
              current_salary, expected_salary, status_id)

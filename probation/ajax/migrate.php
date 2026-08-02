@@ -49,8 +49,8 @@ try {
         score DECIMAL(5,2) NOT NULL DEFAULT 0,
         comments TEXT DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (appraisal_id) REFERENCES probation_appraisals(id) ON DELETE CASCADE ON UPDATE CASCADE,
-        FOREIGN KEY (category_id) REFERENCES probation_categories(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (appraisal_id) REFERENCES elms_probation_appraisals(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (category_id) REFERENCES elms_probation_categories(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
@@ -65,13 +65,13 @@ try {
         comments TEXT DEFAULT NULL,
         action_at DATETIME DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (appraisal_id) REFERENCES probation_appraisals(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (appraisal_id) REFERENCES elms_probation_appraisals(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
     // 5. Seed default categories (if empty)
     // ========================================================================
-    $cnt = $pdo->query("SELECT COUNT(*) FROM probation_categories")->fetchColumn();
+    $cnt = $pdo->query("SELECT COUNT(*) FROM elms_probation_categories")->fetchColumn();
     if ((int)$cnt === 0) {
         $categories = [
             ['Attendance', 15, 1],
@@ -85,17 +85,17 @@ try {
             ['Behavior', 5, 9],
             ['Teamwork', 5, 10],
         ];
-        $stmt = $pdo->prepare("INSERT INTO probation_categories (name, weight, sort_order, status) VALUES (?, ?, ?, 'Active')");
+        $stmt = $pdo->prepare("INSERT INTO elms_probation_categories (name, weight, sort_order, status) VALUES (?, ?, ?, 'Active')");
         foreach ($categories as $c) {
             $stmt->execute($c);
         }
         // Verify sum is 100
-        $totalWeight = $pdo->query("SELECT SUM(weight) FROM probation_categories")->fetchColumn();
+        $totalWeight = $pdo->query("SELECT SUM(weight) FROM elms_probation_categories")->fetchColumn();
         if ((float)$totalWeight !== 100.0) {
             // Adjust last category to make sum exactly 100
             $diff = 100.0 - (float)$totalWeight;
             $lastId = $pdo->lastInsertId();
-            $pdo->prepare("UPDATE probation_categories SET weight = weight + ? WHERE id = ?")->execute([$diff, $lastId]);
+            $pdo->prepare("UPDATE elms_probation_categories SET weight = weight + ? WHERE id = ?")->execute([$diff, $lastId]);
         }
     }
 

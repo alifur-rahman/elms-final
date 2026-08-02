@@ -25,7 +25,7 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("INSERT INTO letter_templates (name, type, content, status) VALUES (:name, :type, :content, :status)");
+    $stmt = $pdo->prepare("INSERT INTO elms_letter_templates (name, type, content, status) VALUES (:name, :type, :content, :status)");
     $stmt->execute([':name' => $name, ':type' => $type, ':content' => $content, ':status' => $status]);
 
     echo json_encode(['success' => true, 'message' => 'Template created.', 'id' => (int)$pdo->lastInsertId()]);

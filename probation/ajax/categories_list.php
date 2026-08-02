@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../includes/config.php';
 
 try {
     $pdo = getDB();
-    $stmt = $pdo->query("SELECT id, name, weight, sort_order FROM probation_categories WHERE status = 'Active' ORDER BY sort_order ASC");
+    $stmt = $pdo->query("SELECT id, name, weight, sort_order FROM elms_probation_categories WHERE status = 'Active' ORDER BY sort_order ASC");
     $rows = $stmt->fetchAll();
     $cats = [];
     foreach ($rows as $r) {

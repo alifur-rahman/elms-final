@@ -27,7 +27,7 @@ try {
     $pdo->beginTransaction();
 
     // Get current pending workflow entry
-    $wfStmt = $pdo->prepare("SELECT id, level, status FROM probation_workflow WHERE appraisal_id = :aid AND status = 'Pending' ORDER BY FIELD(level, 'Self Assessment','Supervisor','Dept Head','HR Review','GM','Managing Director') ASC LIMIT 1");
+    $wfStmt = $pdo->prepare("SELECT id, level, status FROM elms_probation_workflow WHERE appraisal_id = :aid AND status = 'Pending' ORDER BY FIELD(level, 'Self Assessment','Supervisor','Dept Head','HR Review','GM','Managing Director') ASC LIMIT 1");
     $wfStmt->execute([':aid' => $appraisalId]);
     $wf = $wfStmt->fetch();
 
@@ -41,12 +41,12 @@ try {
     $currentLevel = $wf['level'];
 
     // Get employee_id
-    $appStmt = $pdo->prepare("SELECT employee_id FROM probation_appraisals WHERE id = :id");
+    $appStmt = $pdo->prepare("SELECT employee_id FROM elms_probation_appraisals WHERE id = :id");
     $appStmt->execute([':id' => $appraisalId]);
     $empId = (int)$appStmt->fetchColumn();
 
-    // Resolve candidate_id from personnel_basic_info
-    $candStmt = $pdo->prepare("SELECT candidate_id FROM personnel_basic_info WHERE PBI_ID = :eid");
+    // Resolve candidate_id from elms_personnel_basic_info
+    $candStmt = $pdo->prepare("SELECT candidate_id FROM elms_personnel_basic_info WHERE PBI_ID = :eid");
     $candStmt->execute([':eid' => $empId]);
     $candId = (int)$candStmt->fetchColumn();
 
@@ -54,7 +54,7 @@ try {
 
     if ($action === 'approve') {
         // Mark current level as approved
-        $updStmt = $pdo->prepare("UPDATE probation_workflow SET status = 'Approved', approved_by = 'Admin User', comments = :comments, action_at = NOW() WHERE id = :id");
+        $updStmt = $pdo->prepare("UPDATE elms_probation_workflow SET status = 'Approved', approved_by = 'Admin User', comments = :comments, action_at = NOW() WHERE id = :id");
         $updStmt->execute([':comments' => $comments ?: null, ':id' => $wfId]);
 
         // Check if this was the last level
@@ -63,30 +63,30 @@ try {
 
         if ($currentLevel === $lastLevel) {
             // All levels approved → mark as Completed
-            $pdo->prepare("UPDATE probation_appraisals SET status = 'Completed' WHERE id = :id")->execute([':id' => $appraisalId]);
+            $pdo->prepare("UPDATE elms_probation_appraisals SET status = 'Completed' WHERE id = :id")->execute([':id' => $appraisalId]);
             if ($candId > 0) addCandidateLog($pdo, $candId, 'probation_completed', null, null, 'Probation appraisal #' . $appraisalId . ' fully approved.');
         } else {
             // Move to In Progress
-            $pdo->prepare("UPDATE probation_appraisals SET status = 'In Progress' WHERE id = :id")->execute([':id' => $appraisalId]);
+            $pdo->prepare("UPDATE elms_probation_appraisals SET status = 'In Progress' WHERE id = :id")->execute([':id' => $appraisalId]);
             if ($candId > 0) addCandidateLog($pdo, $candId, 'probation_approved', null, null, 'Probation appraisal #' . $appraisalId . ' approved at ' . $currentLevel . ' level.');
         }
 
         echo json_encode(['success' => true, 'message' => 'Approved at ' . $currentLevel . ' level.']);
     } elseif ($action === 'sendback') {
         // Mark as Sent Back
-        $updStmt = $pdo->prepare("UPDATE probation_workflow SET status = 'Sent Back', approved_by = 'Admin User', comments = :comments, action_at = NOW() WHERE id = :id");
+        $updStmt = $pdo->prepare("UPDATE elms_probation_workflow SET status = 'Sent Back', approved_by = 'Admin User', comments = :comments, action_at = NOW() WHERE id = :id");
         $updStmt->execute([':comments' => $comments ?: null, ':id' => $wfId]);
 
-        $pdo->prepare("UPDATE probation_appraisals SET status = 'Draft' WHERE id = :id")->execute([':id' => $appraisalId]);
+        $pdo->prepare("UPDATE elms_probation_appraisals SET status = 'Draft' WHERE id = :id")->execute([':id' => $appraisalId]);
         if ($candId > 0) addCandidateLog($pdo, $candId, 'probation_sentback', null, null, 'Probation appraisal #' . $appraisalId . ' sent back at ' . $currentLevel . ' level.');
 
         echo json_encode(['success' => true, 'message' => 'Sent back to previous level.']);
     } elseif ($action === 'reject') {
         // Mark as Rejected
-        $updStmt = $pdo->prepare("UPDATE probation_workflow SET status = 'Rejected', approved_by = 'Admin User', comments = :comments, action_at = NOW() WHERE id = :id");
+        $updStmt = $pdo->prepare("UPDATE elms_probation_workflow SET status = 'Rejected', approved_by = 'Admin User', comments = :comments, action_at = NOW() WHERE id = :id");
         $updStmt->execute([':comments' => $comments ?: null, ':id' => $wfId]);
 
-        $pdo->prepare("UPDATE probation_appraisals SET status = 'Rejected' WHERE id = :id")->execute([':id' => $appraisalId]);
+        $pdo->prepare("UPDATE elms_probation_appraisals SET status = 'Rejected' WHERE id = :id")->execute([':id' => $appraisalId]);
         if ($candId > 0) addCandidateLog($pdo, $candId, 'probation_rejected', null, null, 'Probation appraisal #' . $appraisalId . ' rejected at ' . $currentLevel . ' level.');
 
         echo json_encode(['success' => true, 'message' => 'Rejected.']);

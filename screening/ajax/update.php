@@ -23,7 +23,7 @@ try {
         exit;
     }
 
-    $check = $pdo->prepare("SELECT id, candidate_id FROM screenings WHERE id = :id");
+    $check = $pdo->prepare("SELECT id, candidate_id FROM elms_screenings WHERE id = :id");
     $check->execute([':id' => $id]);
     $existing = $check->fetch();
     if (!$existing) {
@@ -60,7 +60,7 @@ try {
     $pdo->beginTransaction();
 
     $stmt = $pdo->prepare("
-        UPDATE screenings SET
+        UPDATE elms_screenings SET
             candidate_id = :candidate_id, screened_by = :screened_by, date = :date,
             rating = :rating, communication_score = :communication,
             experience_match = :experience_match, skill_match = :skill_match,
@@ -95,11 +95,11 @@ try {
         default     => 'Applied',
     };
 
-    $cs = $pdo->prepare("SELECT cs.code FROM candidates cc LEFT JOIN candidate_statuses cs ON cs.id = cc.status_id WHERE cc.id = :id");
+    $cs = $pdo->prepare("SELECT cs.code FROM elms_candidates cc LEFT JOIN elms_candidate_statuses cs ON cs.id = cc.status_id WHERE cc.id = :id");
     $cs->execute([':id' => $candidate_id]);
     $currentStatus = $cs->fetchColumn() ?: 'Applied';
 
-    $upd = $pdo->prepare("UPDATE candidates SET status_id = :status_id WHERE id = :id");
+    $upd = $pdo->prepare("UPDATE elms_candidates SET status_id = :status_id WHERE id = :id");
     $upd->execute([':status_id' => $targetStatusId, ':id' => $candidate_id]);
 
     addCandidateLog($pdo, $candidate_id, 'screening_' . strtolower($result) . '_update', $currentStatus, $targetStatusName, $remarks ?: null);

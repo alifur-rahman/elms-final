@@ -23,7 +23,7 @@ try {
         exit;
     }
 
-    $check = $pdo->prepare("SELECT id, first_name, last_name FROM candidates WHERE id = :id");
+    $check = $pdo->prepare("SELECT id, first_name, last_name FROM elms_candidates WHERE id = :id");
     $check->execute([':id' => $id]);
     $candidate = $check->fetch();
 
@@ -37,7 +37,7 @@ try {
 
     addCandidateLog($pdo, $id, 'candidate_deleted', null, null, 'Candidate deleted');
 
-    $stmt = $pdo->prepare("DELETE FROM candidates WHERE id = :id");
+    $stmt = $pdo->prepare("DELETE FROM elms_candidates WHERE id = :id");
     $stmt->execute([':id' => $id]);
 
     echo json_encode([

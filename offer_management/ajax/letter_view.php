@@ -14,9 +14,9 @@ try {
 
     $stmt = $pdo->prepare("
         SELECT ol.*, c.first_name, c.last_name, c.email
-        FROM offer_letters ol
-        LEFT JOIN offers o ON o.id = ol.offer_id
-        LEFT JOIN candidates c ON c.id = o.candidate_id
+        FROM elms_offer_letters ol
+        LEFT JOIN elms_offers o ON o.id = ol.offer_id
+        LEFT JOIN elms_candidates c ON c.id = o.candidate_id
         WHERE ol.offer_id = :oid
         ORDER BY ol.id DESC LIMIT 1
     ");

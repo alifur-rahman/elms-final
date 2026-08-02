@@ -33,7 +33,7 @@ try {
     }
 
     // Verify the approval record exists and is pending
-    $check = $pdo->prepare("SELECT id, status FROM offer_approvals WHERE id = :id AND offer_id = :oid");
+    $check = $pdo->prepare("SELECT id, status FROM elms_offer_approvals WHERE id = :id AND offer_id = :oid");
     $check->execute([':id' => $approvalId, ':oid' => $offerId]);
     $approval = $check->fetch();
 
@@ -52,25 +52,25 @@ try {
     $pdo->beginTransaction();
 
     // Get candidate_id for lifecycle logging
-    $oInfo = $pdo->prepare("SELECT candidate_id FROM offers WHERE id = :id");
+    $oInfo = $pdo->prepare("SELECT candidate_id FROM elms_offers WHERE id = :id");
     $oInfo->execute([':id' => $offerId]);
     $candidateId = (int)$oInfo->fetchColumn();
 
     // Update approval record
-    $uStmt = $pdo->prepare("UPDATE offer_approvals SET status = :status, comment = :comment WHERE id = :id");
+    $uStmt = $pdo->prepare("UPDATE elms_offer_approvals SET status = :status, comment = :comment WHERE id = :id");
     $uStmt->execute([':status' => $action, ':comment' => $comment, ':id' => $approvalId]);
 
     if ($action === 'Rejected') {
-        $oStmt = $pdo->prepare("UPDATE offers SET status = 'Rejected' WHERE id = :id");
+        $oStmt = $pdo->prepare("UPDATE elms_offers SET status = 'Rejected' WHERE id = :id");
         $oStmt->execute([':id' => $offerId]);
         if ($candidateId) addCandidateLog($pdo, $candidateId, 'offer_rejected', null, null, 'Offer rejected at approval: ' . $comment);
     } else {
-        $pendingCount = $pdo->prepare("SELECT COUNT(*) FROM offer_approvals WHERE offer_id = :oid AND status = 'Pending'");
+        $pendingCount = $pdo->prepare("SELECT COUNT(*) FROM elms_offer_approvals WHERE offer_id = :oid AND status = 'Pending'");
         $pendingCount->execute([':oid' => $offerId]);
         $remaining = $pendingCount->fetchColumn();
 
         if ($remaining == 0) {
-            $oStmt = $pdo->prepare("UPDATE offers SET status = 'Approved' WHERE id = :id");
+            $oStmt = $pdo->prepare("UPDATE elms_offers SET status = 'Approved' WHERE id = :id");
             $oStmt->execute([':id' => $offerId]);
             if ($candidateId) addCandidateLog($pdo, $candidateId, 'offer_approved', null, null, 'Offer approved after all levels.');
         }

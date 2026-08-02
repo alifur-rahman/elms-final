@@ -14,8 +14,8 @@ try {
 
     $stmt = $pdo->prepare("
         SELECT cl.*, cs.name AS status_name
-        FROM candidate_logs cl
-        LEFT JOIN candidate_statuses cs ON cs.code = cl.to_status
+        FROM elms_candidate_logs cl
+        LEFT JOIN elms_candidate_statuses cs ON cs.code = cl.to_status
         WHERE cl.candidate_id = :candidate_id
         ORDER BY cl.created_at ASC
     ");

@@ -12,8 +12,8 @@ try {
 
     $stmt = $pdo->query("
         SELECT r.*, d.name AS dept_name
-        FROM requisitions r
-        LEFT JOIN departments d ON d.id = r.dept_id
+        FROM elms_requisitions r
+        LEFT JOIN elms_departments d ON d.id = r.dept_id
         ORDER BY r.created_at DESC
     ");
 

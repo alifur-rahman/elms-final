@@ -38,12 +38,12 @@ try {
     $pdo->beginTransaction();
 
     // Calculate next round based on ALL existing entries for this candidate
-    $maxStmt = $pdo->prepare("SELECT COALESCE(MAX(`round`), 0) FROM interview_log WHERE candidate_id = :cid");
+    $maxStmt = $pdo->prepare("SELECT COALESCE(MAX(`round`), 0) FROM elms_interview_log WHERE candidate_id = :cid");
     $maxStmt->execute([':cid' => $candidate_id]);
     $round = (int) $maxStmt->fetchColumn() + 1;
 
     $stmt = $pdo->prepare("
-        INSERT INTO interview_log
+        INSERT INTO elms_interview_log
             (candidate_id, date, type, interviewer, round, round_name, is_final_round, status)
         VALUES
             (:candidate_id, :date, :type, :interviewer, :round, :round_name, :is_final_round, :status)
@@ -65,7 +65,7 @@ try {
     $insertId = $pdo->lastInsertId();
 
     // Update candidate status to Interview (status_id = 3)
-    $upd = $pdo->prepare("UPDATE candidates SET status_id = 3 WHERE id = :id");
+    $upd = $pdo->prepare("UPDATE elms_candidates SET status_id = 3 WHERE id = :id");
     $upd->execute([':id' => $candidate_id]);
 
     $logFromStatus = ($round > 1) ? 'Interview' : 'Shortlisted';

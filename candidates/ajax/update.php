@@ -23,7 +23,7 @@ try {
         exit;
     }
 
-    $check = $pdo->prepare("SELECT id, first_name, last_name FROM candidates WHERE id = :id");
+    $check = $pdo->prepare("SELECT id, first_name, last_name FROM elms_candidates WHERE id = :id");
     $check->execute([':id' => $id]);
     $candidate = $check->fetch();
     if (!$candidate) {
@@ -59,7 +59,7 @@ try {
     }
 
     $stmt = $pdo->prepare("
-        UPDATE candidates SET
+        UPDATE elms_candidates SET
             job_id = :job_id, first_name = :first_name, last_name = :last_name,
             email = :email, phone = :phone, nid = :nid, blood_group = :blood_group,
             dob = :dob, gender = :gender, present_address = :present_address,

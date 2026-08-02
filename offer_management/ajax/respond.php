@@ -33,11 +33,11 @@ try {
     $pdo->beginTransaction();
 
     // Update offer response
-    $oStmt = $pdo->prepare("UPDATE offers SET response_status = :resp, responded_at = NOW(), response_notes = :notes WHERE id = :id");
+    $oStmt = $pdo->prepare("UPDATE elms_offers SET response_status = :resp, responded_at = NOW(), response_notes = :notes WHERE id = :id");
     $oStmt->execute([':resp' => $response, ':notes' => $notes, ':id' => $offerId]);
 
     // Update candidate status accordingly
-    $offer = $pdo->prepare("SELECT candidate_id FROM offers WHERE id = :id");
+    $offer = $pdo->prepare("SELECT candidate_id FROM elms_offers WHERE id = :id");
     $offer->execute([':id' => $offerId]);
     $oData = $offer->fetch();
 
@@ -46,18 +46,18 @@ try {
 
         if ($response === 'Accepted') {
             // Move candidate to Offered status (5) if not already
-            $cStmt = $pdo->prepare("SELECT status_id FROM candidates WHERE id = :id");
+            $cStmt = $pdo->prepare("SELECT status_id FROM elms_candidates WHERE id = :id");
             $cStmt->execute([':id' => $candidateId]);
             $cs = $cStmt->fetchColumn();
 
             if ((int)$cs < 5) {
-                $uStmt = $pdo->prepare("UPDATE candidates SET status_id = 5 WHERE id = :id");
+                $uStmt = $pdo->prepare("UPDATE elms_candidates SET status_id = 5 WHERE id = :id");
                 $uStmt->execute([':id' => $candidateId]);
                 addCandidateLog($pdo, $candidateId, 'offer_accepted', null, null, 'Offer accepted: ' . $notes);
             }
         } elseif ($response === 'Rejected') {
             // Move candidate to Rejected status (7)
-            $uStmt = $pdo->prepare("UPDATE candidates SET status_id = 7 WHERE id = :id");
+            $uStmt = $pdo->prepare("UPDATE elms_candidates SET status_id = 7 WHERE id = :id");
             $uStmt->execute([':id' => $candidateId]);
             addCandidateLog($pdo, $candidateId, 'offer_rejected_candidate', null, null, 'Offer rejected by candidate: ' . $notes);
         }

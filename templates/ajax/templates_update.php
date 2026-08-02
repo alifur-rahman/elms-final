@@ -32,7 +32,7 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("UPDATE letter_templates SET name = :name, type = :type, content = :content, status = :status WHERE id = :id");
+    $stmt = $pdo->prepare("UPDATE elms_letter_templates SET name = :name, type = :type, content = :content, status = :status WHERE id = :id");
     $stmt->execute([':id' => $id, ':name' => $name, ':type' => $type, ':content' => $content, ':status' => $status]);
 
     echo json_encode(['success' => true, 'message' => 'Template updated.']);

@@ -18,11 +18,11 @@ try {
                d.name AS dept_name,
                des.name AS designation_name,
                o.salary, o.joining_date, o.probation_months
-        FROM confirmation_letters cl
-        LEFT JOIN personnel_basic_info pbi ON pbi.PBI_ID = cl.employee_id
-        LEFT JOIN departments d ON d.id = pbi.dept_id
-        LEFT JOIN designations des ON des.id = pbi.DESG_ID
-        LEFT JOIN offers o ON o.id = COALESCE(cl.offer_id, pbi.offer_id)
+        FROM elms_confirmation_letters cl
+        LEFT JOIN elms_personnel_basic_info pbi ON pbi.PBI_ID = cl.employee_id
+        LEFT JOIN elms_departments d ON d.id = pbi.dept_id
+        LEFT JOIN elms_designations des ON des.id = pbi.DESG_ID
+        LEFT JOIN elms_offers o ON o.id = COALESCE(cl.offer_id, pbi.offer_id)
         WHERE cl.id = :id
     ");
     $stmt->execute([':id' => $letterId]);

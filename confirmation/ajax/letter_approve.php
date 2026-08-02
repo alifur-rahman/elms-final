@@ -24,7 +24,7 @@ try {
     }
 
     $newStatus = $action === 'approve' ? 'Approved' : 'Rejected';
-    $uStmt = $pdo->prepare("UPDATE confirmation_letters SET status = :status, approved_at = NOW(), approved_by = 'Admin User' WHERE id = :id");
+    $uStmt = $pdo->prepare("UPDATE elms_confirmation_letters SET status = :status, approved_at = NOW(), approved_by = 'Admin User' WHERE id = :id");
     $uStmt->execute([':status' => $newStatus, ':id' => $letterId]);
 
     echo json_encode(['success' => true, 'message' => 'Confirmation letter ' . strtolower($newStatus) . '.']);

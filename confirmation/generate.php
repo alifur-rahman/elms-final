@@ -20,17 +20,17 @@ if ($employeeId > 0) {
                d.name AS dept_name,
                des.name AS designation_name,
                o.id AS offer_id, o.salary, o.joining_date, o.probation_months
-        FROM personnel_basic_info pbi
-        LEFT JOIN departments d ON d.id = pbi.dept_id
-        LEFT JOIN designations des ON des.id = pbi.DESG_ID
-        LEFT JOIN offers o ON o.id = pbi.offer_id
+        FROM elms_personnel_basic_info pbi
+        LEFT JOIN elms_departments d ON d.id = pbi.dept_id
+        LEFT JOIN elms_designations des ON des.id = pbi.DESG_ID
+        LEFT JOIN elms_offers o ON o.id = pbi.offer_id
         WHERE pbi.PBI_ID = :id
     ");
     $stmt->execute([':id' => $employeeId]);
     $emp = $stmt->fetch();
 
     if ($emp) {
-        $lStmt = $pdo->prepare("SELECT letter_content, employment_type FROM confirmation_letters WHERE employee_id = :eid ORDER BY id DESC LIMIT 1");
+        $lStmt = $pdo->prepare("SELECT letter_content, employment_type FROM elms_confirmation_letters WHERE employee_id = :eid ORDER BY id DESC LIMIT 1");
         $lStmt->execute([':eid' => $employeeId]);
         $existing = $lStmt->fetch();
         if ($existing) {

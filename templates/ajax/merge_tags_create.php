@@ -29,7 +29,7 @@ try {
         exit;
     }
 
-    $check = $pdo->prepare("SELECT id FROM merge_tags WHERE tag = :tag AND type = :type");
+    $check = $pdo->prepare("SELECT id FROM elms_merge_tags WHERE tag = :tag AND type = :type");
     $check->execute([':tag' => $tag, ':type' => $type]);
     if ($check->fetch()) {
         http_response_code(409);
@@ -37,7 +37,7 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("INSERT INTO merge_tags (type, tag, label, description, sort_order) VALUES (:type, :tag, :label, :desc, :order)");
+    $stmt = $pdo->prepare("INSERT INTO elms_merge_tags (type, tag, label, description, sort_order) VALUES (:type, :tag, :label, :desc, :order)");
     $stmt->execute([':type' => $type, ':tag' => $tag, ':label' => $label, ':desc' => $desc, ':order' => $order]);
 
     echo json_encode(['success' => true, 'message' => 'Merge tag created successfully!', 'id' => (int)$pdo->lastInsertId()]);

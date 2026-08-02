@@ -20,7 +20,7 @@ try {
     // ========================================================================
     // candidate_statuses (no FK)
     // ========================================================================
-    $pdo->exec("CREATE TABLE candidate_statuses (
+    $pdo->exec("CREATE TABLE elms_candidate_statuses (
         id INT AUTO_INCREMENT PRIMARY KEY,
         code VARCHAR(30) NOT NULL UNIQUE,
         name VARCHAR(50) NOT NULL,
@@ -28,7 +28,7 @@ try {
         description TEXT DEFAULT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    $pdo->exec("INSERT INTO candidate_statuses (code, name, sort_order, description) VALUES
+    $pdo->exec("INSERT INTO elms_candidate_statuses (code, name, sort_order, description) VALUES
         ('Applied', 'Applied', 1, 'Initial application submitted'),
         ('Shortlisted', 'Shortlisted', 2, 'Shortlisted after screening'),
         ('Interview', 'Interview', 3, 'Interview in progress'),
@@ -42,15 +42,15 @@ try {
     // ========================================================================
     // designations (FK → departments)
     // ========================================================================
-    $pdo->exec("CREATE TABLE designations (
+    $pdo->exec("CREATE TABLE elms_designations (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         code VARCHAR(20) DEFAULT NULL,
         dept_id INT NOT NULL,
-        FOREIGN KEY (dept_id) REFERENCES departments(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (dept_id) REFERENCES elms_departments(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    $pdo->exec("INSERT INTO designations (name, code, dept_id) VALUES
+    $pdo->exec("INSERT INTO elms_designations (name, code, dept_id) VALUES
         ('Software Engineer', 'SE', 1), ('Senior Developer', 'SD', 1),
         ('Team Lead', 'TL', 1), ('Marketing Specialist', 'MS', 2),
         ('Financial Analyst', 'FA', 3), ('HR Executive', 'HRE', 4),
@@ -61,7 +61,7 @@ try {
     // ========================================================================
     // candidates (FK → candidate_statuses)
     // ========================================================================
-    $pdo->exec("CREATE TABLE candidates (
+    $pdo->exec("CREATE TABLE elms_candidates (
         id INT AUTO_INCREMENT PRIMARY KEY,
         job_id INT NOT NULL,
         code VARCHAR(30) NOT NULL,
@@ -81,14 +81,14 @@ try {
         applied_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (job_id) REFERENCES requisitions(id) ON DELETE CASCADE ON UPDATE CASCADE,
-        FOREIGN KEY (status_id) REFERENCES candidate_statuses(id) ON UPDATE CASCADE
+        FOREIGN KEY (job_id) REFERENCES elms_requisitions(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (status_id) REFERENCES elms_candidate_statuses(id) ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
     // candidate_logs (FK → candidates)
     // ========================================================================
-    $pdo->exec("CREATE TABLE candidate_logs (
+    $pdo->exec("CREATE TABLE elms_candidate_logs (
         id INT AUTO_INCREMENT PRIMARY KEY,
         candidate_id INT NOT NULL,
         action VARCHAR(50) NOT NULL,
@@ -97,13 +97,13 @@ try {
         notes TEXT DEFAULT NULL,
         created_by VARCHAR(100) DEFAULT 'Admin User',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (candidate_id) REFERENCES elms_candidates(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
     // screenings (FK → candidates)
     // ========================================================================
-    $pdo->exec("CREATE TABLE screenings (
+    $pdo->exec("CREATE TABLE elms_screenings (
         id INT AUTO_INCREMENT PRIMARY KEY,
         candidate_id INT NOT NULL,
         screened_by VARCHAR(100) DEFAULT 'Admin User',
@@ -117,13 +117,13 @@ try {
         result VARCHAR(30) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (candidate_id) REFERENCES elms_candidates(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
     // interview_log (FK → candidates)
     // ========================================================================
-    $pdo->exec("CREATE TABLE interview_log (
+    $pdo->exec("CREATE TABLE elms_interview_log (
         id INT AUTO_INCREMENT PRIMARY KEY,
         candidate_id INT NOT NULL,
         round INT NOT NULL,
@@ -143,13 +143,13 @@ try {
         is_final_round TINYINT(1) DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE
+        FOREIGN KEY (candidate_id) REFERENCES elms_candidates(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
     // offers (FK → candidates, designations, departments)
     // ========================================================================
-    $pdo->exec("CREATE TABLE offers (
+    $pdo->exec("CREATE TABLE elms_offers (
         id INT AUTO_INCREMENT PRIMARY KEY,
         candidate_id INT NOT NULL,
         salary DECIMAL(12,2) NOT NULL,
@@ -166,15 +166,15 @@ try {
         accepted_at DATETIME DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE ON UPDATE CASCADE,
-        FOREIGN KEY (designation_id) REFERENCES designations(id) ON DELETE SET NULL ON UPDATE CASCADE,
-        FOREIGN KEY (dept_id) REFERENCES departments(id) ON DELETE SET NULL ON UPDATE CASCADE
+        FOREIGN KEY (candidate_id) REFERENCES elms_candidates(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (designation_id) REFERENCES elms_designations(id) ON DELETE SET NULL ON UPDATE CASCADE,
+        FOREIGN KEY (dept_id) REFERENCES elms_departments(id) ON DELETE SET NULL ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
     // offer_approvals (FK → offers)
     // ========================================================================
-    $pdo->exec("CREATE TABLE offer_approvals (
+    $pdo->exec("CREATE TABLE elms_offer_approvals (
         id INT AUTO_INCREMENT PRIMARY KEY,
         offer_id INT NOT NULL,
         level INT NOT NULL DEFAULT 1,
@@ -183,13 +183,13 @@ try {
         comment TEXT DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (offer_id) REFERENCES elms_offers(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
     // salary_proposals (FK → candidates)
     // ========================================================================
-    $pdo->exec("CREATE TABLE salary_proposals (
+    $pdo->exec("CREATE TABLE elms_salary_proposals (
         id INT AUTO_INCREMENT PRIMARY KEY,
         candidate_id INT NOT NULL,
         proposed_salary DECIMAL(12,2) NOT NULL,
@@ -201,13 +201,13 @@ try {
         finalized_at DATETIME DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (candidate_id) REFERENCES elms_candidates(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
     // offer_letters (FK → offers)
     // ========================================================================
-    $pdo->exec("CREATE TABLE offer_letters (
+    $pdo->exec("CREATE TABLE elms_offer_letters (
         id INT AUTO_INCREMENT PRIMARY KEY,
         offer_id INT NOT NULL,
         letter_content LONGTEXT DEFAULT NULL,
@@ -218,13 +218,13 @@ try {
         status VARCHAR(20) NOT NULL DEFAULT 'Draft',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (offer_id) REFERENCES elms_offers(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     // ========================================================================
     // offer_email_log (FK → offers)
     // ========================================================================
-    $pdo->exec("CREATE TABLE offer_email_log (
+    $pdo->exec("CREATE TABLE elms_offer_email_log (
         id INT AUTO_INCREMENT PRIMARY KEY,
         offer_id INT NOT NULL,
         recipient VARCHAR(100) NOT NULL,
@@ -233,7 +233,7 @@ try {
         sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         status VARCHAR(20) NOT NULL DEFAULT 'Sent',
         error_message TEXT DEFAULT NULL,
-        FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (offer_id) REFERENCES elms_offers(id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     echo json_encode(['success' => true, 'message' => 'All tables recreated from scratch with Offer Management schema.']);

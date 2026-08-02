@@ -11,13 +11,13 @@ try {
                des.name AS designation_name,
                o.joining_date, o.probation_months,
                DATEDIFF(DATE_ADD(o.joining_date, INTERVAL o.probation_months MONTH), CURDATE()) AS days_left
-        FROM personnel_basic_info pbi
-        INNER JOIN offers o ON o.id = pbi.offer_id AND o.response_status = 'Accepted'
-        LEFT JOIN departments d ON d.id = pbi.dept_id
-        LEFT JOIN designations des ON des.id = o.designation_id
+        FROM elms_personnel_basic_info pbi
+        INNER JOIN elms_offers o ON o.id = pbi.offer_id AND o.response_status = 'Accepted'
+        LEFT JOIN elms_departments d ON d.id = pbi.dept_id
+        LEFT JOIN elms_designations des ON des.id = o.designation_id
         WHERE pbi.candidate_id IS NOT NULL
           AND pbi.EMPLOYMENT_TYPE = 'Probationer'
-          AND NOT EXISTS (SELECT 1 FROM probation_appraisals pa WHERE pa.employee_id = pbi.PBI_ID)
+          AND NOT EXISTS (SELECT 1 FROM elms_probation_appraisals pa WHERE pa.employee_id = pbi.PBI_ID)
         ORDER BY pbi.PBI_NAME ASC
     ");
     $rows = $stmt->fetchAll();

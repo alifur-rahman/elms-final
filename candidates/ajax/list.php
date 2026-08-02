@@ -7,10 +7,10 @@ try {
 
     $stmt = $pdo->query("
         SELECT c.*, cs.name AS status_name, r.title AS job_title, d.name AS dept_name
-        FROM candidates c
-        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN departments d ON d.id = r.dept_id
+        FROM elms_candidates c
+        LEFT JOIN elms_candidate_statuses cs ON cs.id = c.status_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
+        LEFT JOIN elms_departments d ON d.id = r.dept_id
         ORDER BY c.created_at DESC
     ");
 

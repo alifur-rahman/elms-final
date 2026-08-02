@@ -25,7 +25,7 @@ try {
         exit;
     }
 
-    $uStmt = $pdo->prepare("UPDATE confirmation_letters SET status = 'Sent', sent_at = NOW(), sent_to_email = :rec WHERE id = :id");
+    $uStmt = $pdo->prepare("UPDATE elms_confirmation_letters SET status = 'Sent', sent_at = NOW(), sent_to_email = :rec WHERE id = :id");
     $uStmt->execute([':rec' => $recipient, ':id' => $letterId]);
 
     echo json_encode(['success' => true, 'message' => 'Confirmation letter sent to ' . htmlspecialchars($recipient) . '.']);

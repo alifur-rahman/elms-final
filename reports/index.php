@@ -9,33 +9,33 @@ require_once __DIR__ . '/../includes/config.php';
 $pdo = getDB();
 
 // === STATS ===
-$totalEmployees = (int)$pdo->query("SELECT COUNT(*) FROM personnel_basic_info")->fetchColumn();
-$totalProbations = (int)$pdo->query("SELECT COUNT(*) FROM probation_appraisals")->fetchColumn();
-$completedProbations = (int)$pdo->query("SELECT COUNT(*) FROM probation_appraisals WHERE status = 'Completed'")->fetchColumn();
-$confirmedCount = (int)$pdo->query("SELECT COUNT(*) FROM confirmation_letters WHERE status = 'Approved'")->fetchColumn();
+$totalEmployees = (int)$pdo->query("SELECT COUNT(*) FROM elms_personnel_basic_info")->fetchColumn();
+$totalProbations = (int)$pdo->query("SELECT COUNT(*) FROM elms_probation_appraisals")->fetchColumn();
+$completedProbations = (int)$pdo->query("SELECT COUNT(*) FROM elms_probation_appraisals WHERE status = 'Completed'")->fetchColumn();
+$confirmedCount = (int)$pdo->query("SELECT COUNT(*) FROM elms_confirmation_letters WHERE status = 'Approved'")->fetchColumn();
 $confirmationRate = $totalProbations ? round($confirmedCount / $totalProbations * 100) : 0;
 
 $dueQuarter = (int)$pdo->query("
-    SELECT COUNT(*) FROM probation_appraisals
+    SELECT COUNT(*) FROM elms_probation_appraisals
     WHERE status = 'Pending'
     AND end_date BETWEEN CURDATE() AND DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 3 MONTH)
 ")->fetchColumn();
 $overdue = (int)$pdo->query("
-    SELECT COUNT(*) FROM probation_appraisals
+    SELECT COUNT(*) FROM elms_probation_appraisals
     WHERE status = 'Pending' AND end_date < CURDATE()
 ")->fetchColumn();
 $atRisk = (int)$pdo->query("
-    SELECT COUNT(*) FROM probation_appraisals
+    SELECT COUNT(*) FROM elms_probation_appraisals
     WHERE status = 'Pending'
     AND end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
 ")->fetchColumn();
 
 // === PROBATION SUMMARY ===
-$probRows = $pdo->query("SELECT status, COUNT(*) cnt FROM probation_appraisals GROUP BY status")->fetchAll();
+$probRows = $pdo->query("SELECT status, COUNT(*) cnt FROM elms_probation_appraisals GROUP BY status")->fetchAll();
 $probSummary = [];
 foreach ($probRows as $r) $probSummary[$r['status']] = (int)$r['cnt'];
 
-$avgScore = $pdo->query("SELECT ROUND(AVG(overall_score),1) FROM probation_appraisals WHERE overall_score IS NOT NULL")->fetchColumn();
+$avgScore = $pdo->query("SELECT ROUND(AVG(overall_score),1) FROM elms_probation_appraisals WHERE overall_score IS NOT NULL")->fetchColumn();
 $avgScore = $avgScore ? (float)$avgScore : 0;
 
 // === SCORE DISTRIBUTION ===
@@ -46,14 +46,14 @@ $scoreRanges = $pdo->query("
         COALESCE(SUM(CASE WHEN overall_score >= 3.0 AND overall_score < 4.0 THEN 1 ELSE 0 END),0) as range_2,
         COALESCE(SUM(CASE WHEN overall_score >= 4.0 AND overall_score < 4.5 THEN 1 ELSE 0 END),0) as range_3,
         COALESCE(SUM(CASE WHEN overall_score >= 4.5 THEN 1 ELSE 0 END),0) as range_4
-    FROM probation_appraisals WHERE overall_score IS NOT NULL
+    FROM elms_probation_appraisals WHERE overall_score IS NOT NULL
 ")->fetch(PDO::FETCH_ASSOC);
 if (!$scoreRanges) $scoreRanges = ['range_0'=>0,'range_1'=>0,'range_2'=>0,'range_3'=>0,'range_4'=>0];
 
 // === MONTHLY ACTIVITY ===
 $monthlyActivity = $pdo->query("
     SELECT DATE_FORMAT(created_at, '%Y-%m') as ym, COUNT(*) as total
-    FROM candidate_logs
+    FROM elms_candidate_logs
     WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
     GROUP BY ym ORDER BY ym
 ")->fetchAll();
@@ -64,8 +64,8 @@ $maxAct = $monthlyMap ? max($monthlyMap) : 1;
 // === DEPARTMENT HEADCOUNT ===
 $deptHeadcount = $pdo->query("
     SELECT COALESCE(d.name, 'Unassigned') as dept, COUNT(*) cnt
-    FROM personnel_basic_info pi
-    LEFT JOIN departments d ON pi.DEPT_ID = d.id
+    FROM elms_personnel_basic_info pi
+    LEFT JOIN elms_departments d ON pi.DEPT_ID = d.id
     GROUP BY d.name ORDER BY cnt DESC
 ")->fetchAll();
 $deptCounts = array_column($deptHeadcount, 'cnt');
@@ -74,7 +74,7 @@ $maxDept = $deptCounts ? max($deptCounts) : 1;
 // === RECRUITMENT PIPELINE ===
 $pipelineReport = $pdo->query("
     SELECT cs.name, COUNT(*) cnt
-    FROM candidates c JOIN candidate_statuses cs ON c.status_id = cs.id
+    FROM elms_candidates c JOIN elms_candidate_statuses cs ON c.status_id = cs.id
     GROUP BY cs.id, cs.name ORDER BY cs.sort_order
 ")->fetchAll();
 $totalPipeline = array_sum(array_column($pipelineReport, 'cnt'));
@@ -86,14 +86,14 @@ $offerStats = $pdo->query("
         COALESCE(SUM(CASE WHEN response_status = 'Accepted' THEN 1 ELSE 0 END),0) as accepted,
         COALESCE(SUM(CASE WHEN response_status = 'Pending' THEN 1 ELSE 0 END),0) as pending,
         COALESCE(SUM(CASE WHEN response_status = 'Rejected' THEN 1 ELSE 0 END),0) as rejected
-    FROM offers
+    FROM elms_offers
 ")->fetch(PDO::FETCH_ASSOC);
 $acceptRate = $offerStats['total'] ? round($offerStats['accepted'] / $offerStats['total'] * 100) : 0;
 
 // === GENDER DISTRIBUTION ===
 $genderDist = $pdo->query("
     SELECT COALESCE(PBI_SEX, 'Not Specified') as gender, COUNT(*) cnt
-    FROM personnel_basic_info GROUP BY PBI_SEX
+    FROM elms_personnel_basic_info GROUP BY PBI_SEX
 ")->fetchAll();
 
 $months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];

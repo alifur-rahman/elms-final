@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../includes/config.php';
 try {
     $pdo = getDB();
     $type = trim($_GET['type'] ?? '');
-    $sql = "SELECT * FROM merge_tags";
+    $sql = "SELECT * FROM elms_merge_tags";
     $params = [];
     if ($type !== '') {
         $sql .= " WHERE type = :type";

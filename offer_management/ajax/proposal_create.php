@@ -37,11 +37,11 @@ try {
     }
 
     // Get current latest version
-    $vStmt = $pdo->prepare("SELECT COALESCE(MAX(version), 0) + 1 AS next_ver FROM salary_proposals WHERE candidate_id = :cid");
+    $vStmt = $pdo->prepare("SELECT COALESCE(MAX(version), 0) + 1 AS next_ver FROM elms_salary_proposals WHERE candidate_id = :cid");
     $vStmt->execute([':cid' => $candidateId]);
     $nextVer = (int)$vStmt->fetchColumn();
 
-    $stmt = $pdo->prepare("INSERT INTO salary_proposals (candidate_id, proposed_salary, negotiation_notes, salary_breakdown, status, version, created_by) VALUES (:cid, :sal, :notes, :breakdown, 'Proposed', :ver, 'Admin User')");
+    $stmt = $pdo->prepare("INSERT INTO elms_salary_proposals (candidate_id, proposed_salary, negotiation_notes, salary_breakdown, status, version, created_by) VALUES (:cid, :sal, :notes, :breakdown, 'Proposed', :ver, 'Admin User')");
     $stmt->execute([
         ':cid'       => $candidateId,
         ':sal'       => $proposedSalary,

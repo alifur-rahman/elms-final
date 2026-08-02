@@ -17,7 +17,7 @@ try {
         UNIQUE KEY uq_tag_type (tag, type)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    $cnt = $pdo->query("SELECT COUNT(*) FROM merge_tags")->fetchColumn();
+    $cnt = $pdo->query("SELECT COUNT(*) FROM elms_merge_tags")->fetchColumn();
     if ((int)$cnt === 0) {
         $defaultTags = [
             ['Offer', 'CANDIDATE_NAME', 'Candidate Name', 'Full name of the candidate', 1],
@@ -57,7 +57,7 @@ try {
             ['General', 'HR_NAME', 'HR Name', 'HR representative name', 5],
             ['General', 'DATE', 'Current Date', 'Today\'s date', 6],
         ];
-        $stmt = $pdo->prepare("INSERT INTO merge_tags (type, tag, label, description, sort_order) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO elms_merge_tags (type, tag, label, description, sort_order) VALUES (?, ?, ?, ?, ?)");
         foreach ($defaultTags as $t) {
             $stmt->execute($t);
         }

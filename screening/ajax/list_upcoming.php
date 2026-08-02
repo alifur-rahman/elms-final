@@ -9,10 +9,10 @@ try {
         SELECT c.id AS candidate_id, c.first_name, c.last_name, c.email, c.phone,
                c.job_id, c.status_id, cs.name AS status_name, c.applied_at,
                r.title AS job_title, d.name AS dept_name
-        FROM candidates c
-        LEFT JOIN candidate_statuses cs ON cs.id = c.status_id
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN departments d ON d.id = r.dept_id
+        FROM elms_candidates c
+        LEFT JOIN elms_candidate_statuses cs ON cs.id = c.status_id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
+        LEFT JOIN elms_departments d ON d.id = r.dept_id
         WHERE c.status_id = 1
         ORDER BY c.created_at DESC
     ");

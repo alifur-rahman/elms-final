@@ -52,7 +52,7 @@ if ($monthFilter && $yearFilter) {
 }
 $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
-$totalStmt = $pdo->prepare("SELECT COUNT(*) FROM candidate_logs cl LEFT JOIN candidates c ON cl.candidate_id = c.id $whereClause");
+$totalStmt = $pdo->prepare("SELECT COUNT(*) FROM elms_candidate_logs cl LEFT JOIN elms_candidates c ON cl.candidate_id = c.id $whereClause");
 $totalStmt->execute($params);
 $total = (int)$totalStmt->fetchColumn();
 $totalPages = max(1, ceil($total / $perPage));
@@ -60,8 +60,8 @@ $offset = ($page - 1) * $perPage;
 
 $logs = $pdo->prepare("
     SELECT cl.*, c.first_name, c.last_name
-    FROM candidate_logs cl
-    LEFT JOIN candidates c ON cl.candidate_id = c.id
+    FROM elms_candidate_logs cl
+    LEFT JOIN elms_candidates c ON cl.candidate_id = c.id
     $whereClause
     ORDER BY cl.id DESC
     LIMIT $perPage OFFSET $offset
@@ -69,8 +69,8 @@ $logs = $pdo->prepare("
 $logs->execute($params);
 $logs = $logs->fetchAll();
 
-$allActions = $pdo->query("SELECT DISTINCT action FROM candidate_logs ORDER BY action")->fetchAll(PDO::FETCH_COLUMN);
-$years = $pdo->query("SELECT DISTINCT YEAR(created_at) AS y FROM candidate_logs ORDER BY y DESC")->fetchAll(PDO::FETCH_COLUMN);
+$allActions = $pdo->query("SELECT DISTINCT action FROM elms_candidate_logs ORDER BY action")->fetchAll(PDO::FETCH_COLUMN);
+$years = $pdo->query("SELECT DISTINCT YEAR(created_at) AS y FROM elms_candidate_logs ORDER BY y DESC")->fetchAll(PDO::FETCH_COLUMN);
 
 $actCfg = [
     'candidate_applied'       => ['c'=>'#1a73e8','i'=>'&#x1F4E5;','t'=>'Applied'],

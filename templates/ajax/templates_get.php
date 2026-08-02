@@ -12,7 +12,7 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM letter_templates WHERE id = :id LIMIT 1");
+    $stmt = $pdo->prepare("SELECT * FROM elms_letter_templates WHERE id = :id LIMIT 1");
     $stmt->execute([':id' => $id]);
     $r = $stmt->fetch();
 

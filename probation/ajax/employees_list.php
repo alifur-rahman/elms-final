@@ -10,11 +10,11 @@ try {
                d.name AS dept_name,
                des.name AS designation_name,
                o.joining_date, o.probation_months,
-               (SELECT COUNT(*) FROM probation_appraisals pa2 WHERE pa2.employee_id = pbi.PBI_ID) AS existing_count
-        FROM personnel_basic_info pbi
-        INNER JOIN offers o ON o.id = pbi.offer_id AND o.response_status = 'Accepted'
-        LEFT JOIN departments d ON d.id = pbi.dept_id
-        LEFT JOIN designations des ON des.id = o.designation_id
+               (SELECT COUNT(*) FROM elms_probation_appraisals pa2 WHERE pa2.employee_id = pbi.PBI_ID) AS existing_count
+        FROM elms_personnel_basic_info pbi
+        INNER JOIN elms_offers o ON o.id = pbi.offer_id AND o.response_status = 'Accepted'
+        LEFT JOIN elms_departments d ON d.id = pbi.dept_id
+        LEFT JOIN elms_designations des ON des.id = o.designation_id
         WHERE pbi.candidate_id IS NOT NULL
           AND pbi.EMPLOYMENT_TYPE = 'Probationer'
         ORDER BY pbi.PBI_NAME ASC

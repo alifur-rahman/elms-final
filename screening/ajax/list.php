@@ -16,10 +16,10 @@ try {
             s.experience_match, s.skill_match, s.education_match,
             s.result AS screening_result, s.remarks AS screening_remarks,
             s.screened_by, s.date AS screening_date
-        FROM candidates c
-        LEFT JOIN screenings s ON s.candidate_id = c.id
-        LEFT JOIN requisitions r ON r.id = c.job_id
-        LEFT JOIN departments d ON d.id = r.dept_id
+        FROM elms_candidates c
+        LEFT JOIN elms_screenings s ON s.candidate_id = c.id
+        LEFT JOIN elms_requisitions r ON r.id = c.job_id
+        LEFT JOIN elms_departments d ON d.id = r.dept_id
         WHERE c.status = 'Applied'
         ORDER BY c.created_at DESC
     ");

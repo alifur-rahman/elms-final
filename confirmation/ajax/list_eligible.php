@@ -12,12 +12,12 @@ try {
                des.name AS designation_name,
                o.id AS offer_id, o.salary, o.joining_date, o.probation_months,
                cl.id AS confirmation_id, cl.status AS confirmation_status
-        FROM probation_appraisals pa
-        LEFT JOIN personnel_basic_info pbi ON pbi.PBI_ID = pa.employee_id
-        LEFT JOIN departments d ON d.id = pbi.dept_id
-        LEFT JOIN designations des ON des.id = pbi.DESG_ID
-        LEFT JOIN offers o ON o.id = pbi.offer_id
-        LEFT JOIN confirmation_letters cl ON cl.employee_id = pa.employee_id
+        FROM elms_probation_appraisals pa
+        LEFT JOIN elms_personnel_basic_info pbi ON pbi.PBI_ID = pa.employee_id
+        LEFT JOIN elms_departments d ON d.id = pbi.dept_id
+        LEFT JOIN elms_designations des ON des.id = pbi.DESG_ID
+        LEFT JOIN elms_offers o ON o.id = pbi.offer_id
+        LEFT JOIN elms_confirmation_letters cl ON cl.employee_id = pa.employee_id
         WHERE pa.status = 'Completed'
         ORDER BY pa.end_date DESC
     ");

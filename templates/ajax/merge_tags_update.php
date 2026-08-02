@@ -24,7 +24,7 @@ try {
         exit;
     }
 
-    $check = $pdo->prepare("SELECT id, type FROM merge_tags WHERE id = :id");
+    $check = $pdo->prepare("SELECT id, type FROM elms_merge_tags WHERE id = :id");
     $check->execute([':id' => $id]);
     $existing = $check->fetch();
     if (!$existing) {
@@ -55,7 +55,7 @@ try {
         exit;
     }
 
-    $sql = "UPDATE merge_tags SET " . implode(', ', $updates) . " WHERE id = :id";
+    $sql = "UPDATE elms_merge_tags SET " . implode(', ', $updates) . " WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 

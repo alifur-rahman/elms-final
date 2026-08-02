@@ -48,7 +48,7 @@ try {
     }
 
     $stmt = $pdo->prepare("
-        INSERT INTO requisitions 
+        INSERT INTO elms_requisitions 
             (title, dept_id, location, type, vacancies, deadline, education, experience, 
              salary_min, salary_max, skills, description, responsibilities, benefits, priority, status)
         VALUES 

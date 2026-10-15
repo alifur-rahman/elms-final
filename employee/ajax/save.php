@@ -1,48 +1,102 @@
 <?php
+
+ob_start();
+
+require_once "../../../controllers/routing/default_values.php";
+require_once SERVER_CORE . "routing/layout.top.php";
+require_once "../helpers/helper_functions.php";
+
+ob_end_clean();
+
 header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
-    exit;
-}
-
-require_once __DIR__ . '/../../includes/config.php';
+$table_master = "elms_personnel_basic_info";
+$unique       = "PBI_ID";
 
 try {
-    $pdo = getDB();
+
+    $crud = new crud($table_master);
+
+    // -------------------------------------------------
+    // Method guard
+    // -------------------------------------------------
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+        exit;
+    }
+
+    // -------------------------------------------------
+    // Input
+    // -------------------------------------------------
+
     $body = json_decode(file_get_contents('php://input'), true);
     if (!$body) $body = $_POST;
 
     $offerId = (int)($body['offer_id'] ?? 0);
+
     if ($offerId <= 0) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'offer_id required']);
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT PBI_ID FROM elms_personnel_basic_info WHERE offer_id = :oid");
-    $stmt->execute([':oid' => $offerId]);
-    if ($stmt->fetch()) {
-        echo json_encode(['success' => false, 'message' => 'Employee already exists for this offer']);
+    // -------------------------------------------------
+    // Reject if employee already exists
+    // -------------------------------------------------
+
+    $existing = find_all_field(
+        $table_master,
+        'PBI_ID, offer_id',
+        "offer_id = {$offerId}"
+    );
+
+    if ($existing && !empty($existing->PBI_ID)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Employee already exists for this offer'
+        ]);
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT o.*, c.first_name, c.last_name, c.email FROM elms_offers o LEFT JOIN elms_candidates c ON c.id = o.candidate_id WHERE o.id = :id");
-    $stmt->execute([':id' => $offerId]);
-    $offer = $stmt->fetch();
-    if (!$offer) {
-        echo json_encode(['success' => false, 'message' => 'Offer not found']);
+    // -------------------------------------------------
+    // Load offer
+    // -------------------------------------------------
+
+    $offer = find_all_field(
+        'elms_offers',
+        'id, candidate_id',
+        "id = {$offerId}"
+    );
+
+    if (!$offer || empty($offer->id)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Offer not found'
+        ]);
         exit;
     }
 
-    $maxCode = $pdo->query("SELECT MAX(PBI_CODE) AS mx FROM elms_personnel_basic_info")->fetch();
+    // -------------------------------------------------
+    // Generate next employee code
+    // -------------------------------------------------
+
+    $maxQry = db_query("SELECT MAX(PBI_CODE) AS mx FROM elms_personnel_basic_info");
+    $maxRow = $maxQry ? mysqli_fetch_object($maxQry) : null;
+
     $nextNum = 1;
-    if ($maxCode && $maxCode['mx']) {
-        preg_match('/(\d+)$/', $maxCode['mx'], $m);
-        $nextNum = ($m[1] ?? 0) + 1;
+
+    if ($maxRow && !empty($maxRow->mx)) {
+        preg_match('/(\d+)$/', $maxRow->mx, $m);
+        $nextNum = ((int)($m[1] ?? 0)) + 1;
     }
-    $empCode = 'EMP-' . str_pad($nextNum, 5, '0', STR_PAD_LEFT);
+
+    $empCode = 'EMP-' . str_pad((string)$nextNum, 5, '0', STR_PAD_LEFT);
+
+    // -------------------------------------------------
+    // Field whitelist
+    // -------------------------------------------------
 
     $fields = [
         'PBI_CODE', 'MACHINE_ID', 'PBI_DUE_DOJ', 'PBI_NAME', 'PBI_FATHER_NAME', 'PBI_MOTHER_NAME',
@@ -63,40 +117,70 @@ try {
         'pre_road_no', 'pre_district', 'hobbies',
     ];
 
-    $insertCols = ['PBI_CODE', 'candidate_id', 'offer_id', 'entry_by'];
-    $insertVals = [':PBI_CODE', ':candidate_id', ':offer_id', ':entry_by'];
-    $params = [
-        ':PBI_CODE'     => $empCode,
-        ':candidate_id' => $offer['candidate_id'],
-        ':offer_id'     => $offerId,
-        ':entry_by'     => 1,
-    ];
+    // -------------------------------------------------
+    // Reset $_POST and populate
+    // -------------------------------------------------
+
+    $_POST = [];
 
     foreach ($fields as $f) {
         if (isset($body[$f]) && $body[$f] !== '') {
-            $insertCols[] = $f;
-            $insertVals[] = ':' . $f;
-            $params[':' . $f] = $body[$f];
+            $_POST[$f] = $body[$f];
         }
     }
 
-    $sql = "INSERT INTO elms_personnel_basic_info (" . implode(',', $insertCols) . ") VALUES (" . implode(',', $insertVals) . ")";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
+    // Force system-managed columns (overwrite whatever client sent)
+    $_POST['PBI_CODE']     = $empCode;
+    $_POST['candidate_id'] = (int)$offer->candidate_id;
+    $_POST['offer_id']     = $offerId;
+    $_POST['entry_by']     = $_SESSION['user']['id'];
+    $_POST['add_by']       = $_SESSION['user']['id'];
+    $_POST['add_at']       = date('Y-m-d H:i:s');
 
-    $newId = $pdo->lastInsertId();
+    // -------------------------------------------------
+    // Insert
+    // -------------------------------------------------
+
+    $newId = $crud->insert();
+
+    // -------------------------------------------------
+    // Store Candidate Log
+    // -------------------------------------------------
+
+    $candidateId = (int)$offer->candidate_id;
+
+    if ($candidateId > 0) {
+        addCandidateLog(
+            $candidateId,
+            'employee_created',
+            null,
+            null,
+            'Employee created from offer #' . $offerId . ' with code ' . $empCode
+        );
+    }
+
+    // -------------------------------------------------
+    // Success Response
+    // -------------------------------------------------
 
     echo json_encode([
         'success' => true,
         'message' => 'Employee created successfully! Code: ' . $empCode,
-        'data' => [
-            'employee_id' => $newId,
+        'data'    => [
+            'employee_id'   => $newId,
             'employee_code' => $empCode,
-            'offer_id' => $offerId,
+            'offer_id'      => $offerId,
         ]
     ]);
 
 } catch (Exception $e) {
+
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error: ' . $e->getMessage()
+    ]);
 }
+
+exit;

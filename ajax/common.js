@@ -1,56 +1,118 @@
 // ============================================================
 // ERP HRIS - Centralized AJAX Handler
-// Prepares the project for future AJAX/API development.
+// Compatible with legacy PHP/CRUD ($_POST)
 // ============================================================
 
-// Set to empty; callers pass the full relative path from the page.
 var API_BASE = '';
 
 function apiRequest(endpoint, method, data, onSuccess, onError) {
+
     var xhr = new XMLHttpRequest();
     var url = API_BASE + endpoint;
-    var jsonData = null;
 
+    method = method.toUpperCase();
+
+    // ----------------------------
+    // GET Query String
+    // ----------------------------
     if (method === 'GET' && data) {
+
         var params = [];
+
         for (var key in data) {
             if (data.hasOwnProperty(key)) {
-                params.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+                params.push(
+                    encodeURIComponent(key) + '=' +
+                    encodeURIComponent(data[key])
+                );
             }
         }
-        if (params.length) url += '?' + params.join('&');
-    } else if (data) {
-        jsonData = JSON.stringify(data);
+
+        if (params.length) {
+            url += '?' + params.join('&');
+        }
     }
 
     xhr.open(method, url, true);
     xhr.setRequestHeader('Accept', 'application/json');
-    if (jsonData) {
-        xhr.setRequestHeader('Content-Type', 'application/json');
+
+    var sendData = null;
+
+    // ----------------------------
+    // POST / PUT / DELETE
+    // Send as FormData so PHP receives $_POST
+    // ----------------------------
+    if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
+
+        sendData = new FormData();
+
+        if (data) {
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+
+                    if (Array.isArray(data[key])) {
+
+                        data[key].forEach(function (value) {
+                            sendData.append(key + '[]', value);
+                        });
+
+                    } else {
+
+                        sendData.append(key, data[key]);
+
+                    }
+                }
+            }
+        }
     }
 
     xhr.onload = function () {
+
         var response;
+
         try {
             response = JSON.parse(xhr.responseText);
         } catch (e) {
-            response = xhr.responseText;
+            response = {
+                success: false,
+                message: xhr.responseText
+            };
         }
+
         if (xhr.status >= 200 && xhr.status < 300) {
-            if (onSuccess) onSuccess(response, xhr.status);
+
+            if (typeof onSuccess === 'function') {
+                onSuccess(response, xhr.status);
+            }
+
         } else {
-            if (onError) onError(response, xhr.status);
+
+            if (typeof onError === 'function') {
+                onError(response, xhr.status);
+            }
+
         }
     };
 
     xhr.onerror = function () {
-        if (onError) onError({ error: 'Network error' }, 0);
+
+        if (typeof onError === 'function') {
+            onError({
+                success: false,
+                message: 'Network error'
+            }, 0);
+        }
+
     };
 
-    xhr.send(jsonData);
+    xhr.send(sendData);
 }
 
-// Shorthand methods
+
+// ============================================================
+// Helper Methods
+// ============================================================
+
 function apiGet(endpoint, data, onSuccess, onError) {
     apiRequest(endpoint, 'GET', data, onSuccess, onError);
 }

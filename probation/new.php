@@ -4,7 +4,7 @@ $pageTitle  = 'New Probation Appraisal';
 $activePage = 'probation';
 $breadcrumb = 'Home / Probation / New Appraisal';
 $pageCss = 'css/page_css/new.css';
-$pageJs = 'js/page_js/new.js';;
+$pageJs = 'js/page_js/new.js';
 ob_start();
 ?>
 

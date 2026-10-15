@@ -7,20 +7,18 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/../../includes/config.php';
 
-try {
-    $pdo = getDB();
+$conn = get_mysqli();
 
-    $stmt = $pdo->query("
-        SELECT r.*, d.name AS dept_name
-        FROM elms_requisitions r
-        LEFT JOIN elms_departments d ON d.id = r.dept_id
-        ORDER BY r.created_at DESC
-    ");
+$res = $conn->query("
+    SELECT r.*, d.name AS dept_name
+    FROM elms_requisitions r
+    LEFT JOIN elms_departments d ON d.id = r.dept_id
+    ORDER BY r.created_at DESC
+");
 
-    $rows = $stmt->fetchAll();
-
-    $jobs = [];
-    foreach ($rows as $r) {
+$jobs = [];
+if ($res) {
+    while ($r = $res->fetch_assoc()) {
         $jobs[] = [
             'id'            => (int) $r['id'],
             'title'         => $r['title'],
@@ -44,10 +42,6 @@ try {
             'created_at'    => $r['created_at'],
         ];
     }
-
-    echo json_encode(['success' => true, 'data' => $jobs]);
-
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
+
+echo json_encode(['success' => true, 'data' => $jobs]);
